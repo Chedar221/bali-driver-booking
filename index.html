@@ -1,0 +1,188 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BALI DRIVER BOOKING</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:#f5f7f4;color:#19372d}
+header{background:#103c30;color:white;padding:22px 7%;display:flex;justify-content:space-between;align-items:center}
+.logo{font-size:21px;font-weight:bold;letter-spacing:1px}
+.hero{padding:65px 8%;background:linear-gradient(120deg,#103c30,#28634c);color:white}
+.hero h1{font-size:38px;max-width:650px;line-height:1.2}
+.hero p{color:#d8e9df;font-size:17px}
+main{max-width:760px;margin:35px auto;padding:0 16px}
+.card{background:white;border-radius:18px;padding:25px;box-shadow:0 5px 25px #00000010}
+h2{margin-top:0}
+label{display:block;font-weight:bold;margin:15px 0 7px}
+input,select,textarea{width:100%;padding:13px;border:1px solid #d8e1dc;border-radius:9px;font-size:15px;background:white}
+button{width:100%;padding:16px;background:#c49b51;color:white;border:0;border-radius:9px;font-size:16px;font-weight:bold;margin-top:22px;cursor:pointer}
+button:disabled{opacity:.6}
+.services{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:20px 0}
+.service{padding:16px;background:#f0f5f1;border-radius:12px;font-weight:bold}
+.note{font-size:13px;color:#65776d}
+#message{margin-top:16px;padding:12px;border-radius:8px;display:none}
+footer{text-align:center;padding:30px;color:#718078;font-size:13px}
+</style>
+</head>
+<body>
+
+<header>
+<div class="logo">BALI DRIVER BOOKING</div>
+<div>Private Driver Bali</div>
+</header>
+
+<section class="hero">
+<h1>Discover Bali With Your Private Driver</h1>
+<p>Travel comfortably. Explore Bali. Enjoy every journey.</p>
+</section>
+
+<main>
+<div class="card">
+<h2>Our Services</h2>
+<div class="services">
+<div class="service">✈️ Airport Transfer</div>
+<div class="service">🌴 Private Tour</div>
+<div class="service">🚘 Point to Point</div>
+<div class="service">⭐ Private Car Charter</div>
+</div>
+
+<h2>Book Your Driver</h2>
+<form id="bookingForm">
+<label>Full Name / Nama Lengkap</label>
+<input id="name" required maxlength="100">
+
+<label>WhatsApp Number</label>
+<input id="phone" required maxlength="25">
+
+<label>Email (optional)</label>
+<input id="email" type="email" maxlength="150">
+
+<label>Service / Layanan</label>
+<select id="service" required>
+<option value="">Loading services...</option>
+</select>
+
+<label>Pickup Location</label>
+<input id="pickup" required maxlength="250">
+
+<label>Destination</label>
+<input id="destination" required maxlength="250">
+
+<label>Pickup Date</label>
+<input id="date" type="date" required>
+
+<label>Pickup Time</label>
+<input id="time" type="time" required>
+
+<label>Number of Passengers</label>
+<input id="passengers" type="number" min="1" max="20" value="1" required>
+
+<label>Additional Notes</label>
+<textarea id="notes" rows="3" maxlength="1000"></textarea>
+
+<button id="submitBtn" type="submit">BOOK YOUR DRIVER</button>
+<p class="note">Your booking request will be reviewed by our team. Final price will be confirmed by the admin.</p>
+</form>
+<div id="message" role="status"></div>
+</div>
+</main>
+
+<footer>
+BALI DRIVER BOOKING · Your Journey, Our Priority.
+</footer>
+
+<script>
+const SUPABASE_URL = "https://zfksninbrjylfipebpvo.supabase.co";
+const SUPABASE_ANON_KEY = "ISI_PUBLISHABLE_KEY_DI_SINI";
+
+const db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+const serviceSelect = document.getElementById("service");
+const message = document.getElementById("message");
+const form = document.getElementById("bookingForm");
+const submitBtn = document.getElementById("submitBtn");
+
+document.getElementById("date").min =
+  new Date().toLocaleDateString("en-CA");
+
+async function loadServices() {
+  const {data,error} = await db
+    .from("services")
+    .select("id,name")
+    .eq("is_active",true)
+    .order("id");
+
+  if(error) {
+    serviceSelect.innerHTML =
+      '<option value="">Services unavailable</option>';
+    return;
+  }
+
+  serviceSelect.innerHTML =
+    '<option value="">Select a service</option>';
+
+  data.forEach(item => {
+    const option = document.createElement("option");
+    option.value = item.id;
+    option.textContent = item.name;
+    serviceSelect.appendChild(option);
+  });
+}
+
+function showMessage(text,success) {
+  message.style.display = "block";
+  message.style.background = success ? "#e4f5e9" : "#fde8e8";
+  message.style.color = success ? "#176334" : "#a12626";
+  message.textContent = text;
+}
+
+form.addEventListener("submit",async function(event) {
+  event.preventDefault();
+  submitBtn.disabled = true;
+  submitBtn.textContent = "SENDING...";
+
+  const bookingCode = "BD" +
+    Date.now().toString().slice(-9) +
+    Math.floor(Math.random()*90+10);
+
+  const booking = {
+    booking_code: bookingCode,
+    customer_name: document.getElementById("name").value.trim(),
+    customer_phone: document.getElementById("phone").value.trim(),
+    customer_email: document.getElementById("email").value.trim() || null,
+    service_id: Number(serviceSelect.value),
+    pickup_location: document.getElementById("pickup").value.trim(),
+    destination: document.getElementById("destination").value.trim(),
+    pickup_date: document.getElementById("date").value,
+    pickup_time: document.getElementById("time").value,
+    passenger_count: Number(document.getElementById("passengers").value),
+    notes: document.getElementById("notes").value.trim() || null,
+    status: "pending",
+    total_price: 0
+  };
+
+  const {error} = await db.from("bookings").insert(booking);
+
+  if(error) {
+    showMessage("Booking belum berhasil. Silakan coba kembali.",false);
+  } else {
+    showMessage(
+      "Booking request berhasil dikirim! Kode pemesanan: " + bookingCode,
+      true
+    );
+    form.reset();
+    document.getElementById("passengers").value = 1;
+  }
+
+  submitBtn.disabled = false;
+  submitBtn.textContent = "BOOK YOUR DRIVER";
+});
+
+loadServices();
+</script>
+</body>
+</html>
