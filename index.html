@@ -229,6 +229,88 @@ async function ownerLogin() {
   }
 
   message.textContent = 'Login Owner berhasil!';
+  document.getElementById('owner-login').style.display = 'none';
+
+document.getElementById('owner-dashboard').style.display = 'block';
+
+await loadOwnerDashboard();
+}
+</script>
+  <!-- OWNER DASHBOARD -->
+<div id="owner-dashboard" style="display:none;max-width:1000px;margin:30px auto;padding:20px;background:#f4f7f2;border-radius:15px;">
+
+  <h2 style="color:#176b45;">BALI DRIVER BOOKING</h2>
+  <h3>OWNER DASHBOARD</h3>
+  <p>Selamat datang, Owner!</p>
+
+  <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;">
+
+    <div style="background:white;padding:18px;border-radius:12px;">
+      <p>Total Booking</p>
+      <h2 id="total-bookings">0</h2>
+    </div>
+
+    <div style="background:white;padding:18px;border-radius:12px;">
+      <p>Total Driver</p>
+      <h2 id="total-drivers">0</h2>
+    </div>
+
+    <div style="background:white;padding:18px;border-radius:12px;">
+      <p>Driver Tersedia</p>
+      <h2 id="active-drivers">0</h2>
+    </div>
+
+    <div style="background:white;padding:18px;border-radius:12px;">
+      <p>Booking Pending</p>
+      <h2 id="pending-bookings">0</h2>
+    </div>
+
+  </div>
+
+  <button onclick="loadOwnerDashboard()"
+    style="margin-top:20px;padding:12px 20px;background:#176b45;color:white;border:0;border-radius:8px;">
+    REFRESH DATA
+  </button>
+
+  <button onclick="ownerLogout()"
+    style="margin-top:20px;padding:12px 20px;background:#555;color:white;border:0;border-radius:8px;">
+    LOGOUT
+  </button>
+
+  <p id="dashboard-message"></p>
+</div>
+
+<script>
+async function loadOwnerDashboard() {
+  const message = document.getElementById('dashboard-message');
+  message.textContent = 'Memuat data...';
+
+  const [bookings, drivers, active, pending] = await Promise.all([
+    db.from('bookings').select('id', {count:'exact', head:true}),
+    db.from('profiles').select('id', {count:'exact', head:true}).eq('role','driver'),
+    db.from('driver_profiles').select('id', {count:'exact', head:true}).eq('is_available',true).eq('verification_status','approved'),
+    db.from('bookings').select('id', {count:'exact', head:true}).eq('status','pending')
+  ]);
+
+  const error = bookings.error || drivers.error || active.error || pending.error;
+
+  if (error) {
+    message.textContent = 'Gagal memuat data: ' + error.message;
+    return;
+  }
+
+  document.getElementById('total-bookings').textContent = bookings.count ?? 0;
+  document.getElementById('total-drivers').textContent = drivers.count ?? 0;
+  document.getElementById('active-drivers').textContent = active.count ?? 0;
+  document.getElementById('pending-bookings').textContent = pending.count ?? 0;
+
+  message.textContent = 'Data berhasil dimuat.';
+}
+
+async function ownerLogout() {
+  await db.auth.signOut();
+  document.getElementById('owner-dashboard').style.display = 'none';
+  document.getElementById('owner-login').style.display = 'block';
 }
 </script>
 </body>
