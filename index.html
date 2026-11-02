@@ -266,14 +266,16 @@ async function driverLogin() {
 
   message.textContent = 'Login Driver berhasil!';
 
-  document.getElementById('driver-login').style.display = 'none';
-  document.getElementById('driver-dashboard').style.display = 'block';
+    document.getElementById('driver-dashboard').style.display = 'block';
+
+  await loadDriverDashboard();
+}
+
 let selectedBookingId = null;
 let selectedPassengerCount = 0;
 
 window.openDriverAssignment = async function(bookingId, passengerCount) {
-alert('FUNGSI OPEN DRIVER ASSIGNMENT DIPANGGIL');
-  
+
   selectedBookingId = bookingId;
   selectedPassengerCount = passengerCount;
 
@@ -418,10 +420,6 @@ function closeDriverAssignment() {
   await loadOwnerDashboard();
 }
   
-await loadDriverDashboard();
-
-  // Dashboard Driver akan kita tampilkan pada langkah berikutnya.
-}
   async function loadDriverDashboard() {
   const message = document.getElementById('driver-dashboard-message');
   message.textContent = 'Memuat data driver...';
@@ -902,15 +900,15 @@ if (booking.status === 'confirmed') {
     'padding:12px;background:#b58b28;color:white;border:0;border-radius:8px;margin-top:10px;';
 
   assignButton.onclick = async function () {
-  try {
-    await window.openDriverAssignment(
-  booking.id,
-  booking.passenger_count
-);
-  } catch (error) {
-    alert('KESALAHAN: ' + error.message);
-  }
-};
+    try {
+      await window.openDriverAssignment(
+        booking.id,
+        booking.passenger_count
+      );
+    } catch (error) {
+      alert('KESALAHAN: ' + error.message);
+    }
+  };
 
   card.appendChild(assignButton);
 }
