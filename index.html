@@ -267,8 +267,155 @@ async function driverLogin() {
   message.textContent = 'Login Driver berhasil!';
 
   document.getElementById('driver-login').style.display = 'none';
-document.getElementById('driver-dashboard').style.display = 'block';
+  document.getElementById('driver-dashboard').style.display = 'block';
+let selectedBookingId = null;
+let selectedPassengerCount = 0;
 
+async function openDriverAssignment(bookingId, passengerCount) {
+  selectedBookingId = bookingId;
+  selectedPassengerCount = passengerCount;
+
+  const modal = document.getElementById('assign-driver-modal');
+  const driverSelect = document.getElementById('assign-driver-select');
+  const vehicleSelect = document.getElementById('assign-vehicle-select');
+  const message = document.getElementById('assign-driver-message');
+
+  modal.style.display = 'block';
+  message.textContent = 'Memuat Driver ONLINE...';
+
+  driverSelect.innerHTML = '<option value="">Pilih Driver</option>';
+  vehicleSelect.innerHTML = '<option value="">Pilih Kendaraan</option>';
+
+  const { data: drivers, error } = await db
+    .from('driver_profiles')
+    .select('id')
+    .eq('is_available', true)
+    .eq('verification_status', 'approved');
+
+  if (error) {
+    message.textContent = 'Gagal memuat Driver: ' + error.message;
+    return;
+  }
+
+  if (!drivers || drivers.length === 0) {
+    message.textContent = 'Belum ada Driver ONLINE.';
+    return;
+  }
+
+  const driverIds = drivers.map(driver => driver.id);
+
+  const { data: profiles, error: profileError } = await db
+    .from('profiles')
+    .select('id, full_name')
+    .in('id', driverIds);
+
+  if (profileError) {
+    message.textContent = 'Gagal memuat nama Driver: ' + profileError.message;
+    return;
+  }
+
+  profiles.forEach(profile => {
+    const option = document.createElement('option');
+    option.value = profile.id;
+    option.textContent = profile.full_name;
+    driverSelect.appendChild(option);
+  });
+
+  message.textContent = 'Silakan pilih Driver.';
+}
+
+async function loadDriverVehicles() {
+  const driverId = document.getElementById('assign-driver-select').value;
+  const vehicleSelect = document.getElementById('assign-vehicle-select');
+  const message = document.getElementById('assign-driver-message');
+
+  vehicleSelect.innerHTML = '<option value="">Pilih Kendaraan</option>';
+
+  if (!driverId) return;
+
+  message.textContent = 'Memuat kendaraan...';
+
+  const { data: vehicles, error } = await db
+    .from('vehicles')
+    .select('id, vehicle_name, plate_number, seats')
+    .eq('driver_id', driverId)
+    .eq('is_active', true)
+    .gte('seats', selectedPassengerCount);
+
+  if (error) {
+    message.textContent = 'Gagal memuat kendaraan: ' + error.message;
+    return;
+  }
+
+  if (!vehicles || vehicles.length === 0) {
+    message.textContent = 'Tidak ada kendaraan aktif dengan kursi mencukupi.';
+    return;
+  }
+
+  vehicles.forEach(vehicle => {
+    const option = document.createElement('option');
+    option.value = vehicle.id;
+    option.textContent =
+      vehicle.vehicle_name + ' - ' +
+      vehicle.plate_number + ' (' + vehicle.seats + ' kursi)';
+
+    vehicleSelect.appendChild(option);
+  });
+
+  message.textContent = 'Silakan pilih kendaraan.';
+}
+
+function closeDriverAssignment() {
+  document.getElementById('assign-driver-modal').style.display = 'none';
+}
+
+  async function confirmDriverAssignment() {
+  const driverId =
+    document.getElementById('assign-driver-select').value;
+
+  const vehicleId =
+    document.getElementById('assign-vehicle-select').value;
+
+  const message =
+    document.getElementById('assign-driver-message');
+
+  const button =
+    document.getElementById('confirm-assign-button');
+
+  if (!selectedBookingId || !driverId || !vehicleId) {
+    message.textContent = 'Pilih Driver dan kendaraan terlebih dahulu.';
+    return;
+  }
+
+  button.disabled = true;
+  button.textContent = 'MEMPROSES...';
+  message.textContent = 'Sedang menugaskan booking...';
+
+  const { data, error } = await db.rpc('owner_assign_booking', {
+    p_booking_id: selectedBookingId,
+    p_driver_id: driverId,
+    p_vehicle_id: Number(vehicleId)
+  });
+
+  if (error || data !== true) {
+    message.textContent = 'Gagal: ' +
+      (error ? error.message : 'Penugasan tidak berhasil.');
+
+    button.disabled = false;
+    button.textContent = 'KONFIRMASI PENUGASAN';
+    return;
+  }
+
+  alert('Booking berhasil ditugaskan kepada Driver!');
+
+  closeDriverAssignment();
+
+  button.disabled = false;
+  button.textContent = 'KONFIRMASI PENUGASAN';
+
+  await loadOwnerDashboard();
+}
+  
 await loadDriverDashboard();
 
   // Dashboard Driver akan kita tampilkan pada langkah berikutnya.
@@ -482,6 +629,40 @@ async function driverLogout() {
 
   <p id="driver-dashboard-message"></p>
 
+</div>
+<!-- ASSIGN DRIVER MODAL -->
+<div id="assign-driver-modal"
+  style="display:none;max-width:450px;margin:20px auto;padding:20px;background:white;border:2px solid #176b45;border-radius:12px;">
+
+  <h3 style="color:#176b45;">ASSIGN DRIVER</h3>
+
+  <p>Pilih Driver ONLINE:</p>
+
+<select id="assign-driver-select"
+    onchange="loadDriverVehicles()"
+    style="width:100%;padding:12px;margin-bottom:15px;">
+    <option value="">Pilih Driver</option>
+  </select>
+
+  <p>Pilih Kendaraan:</p>
+
+  <select id="assign-vehicle-select"
+    style="width:100%;padding:12px;margin-bottom:15px;">
+    <option value="">Pilih Kendaraan</option>
+  </select>
+
+  <button id="confirm-assign-button"
+    onclick="confirmDriverAssignment()"
+    style="width:100%;padding:14px;background:#176b45;color:white;border:0;border-radius:8px;">
+    KONFIRMASI PENUGASAN
+  </button>
+
+  <button onclick="closeDriverAssignment()"
+    style="width:100%;padding:12px;margin-top:10px;background:#555;color:white;border:0;border-radius:8px;">
+    BATAL
+  </button>
+
+  <p id="assign-driver-message"></p>
 </div>
   
   <!-- OWNER DASHBOARD -->
@@ -710,6 +891,21 @@ if (booking.status === 'pending') {
 
   card.appendChild(confirmButton);
 }
+if (booking.status === 'confirmed') {
+  const assignButton = document.createElement('button');
+
+  assignButton.textContent = 'ASSIGN DRIVER';
+
+  assignButton.style.cssText =
+    'padding:12px;background:#b58b28;color:white;border:0;border-radius:8px;margin-top:10px;';
+
+  assignButton.onclick = function () {
+    openDriverAssignment(booking.id, booking.passenger_count);
+  };
+
+  card.appendChild(assignButton);
+}
+    
     list.appendChild(card);
   });
 }
