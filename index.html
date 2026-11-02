@@ -903,10 +903,10 @@ if (booking.status === 'confirmed') {
 
   assignButton.onclick = async function () {
   try {
-    await openDriverAssignment(
-      booking.id,
-      booking.passenger_count
-    );
+    await window.openDriverAssignment(
+  booking.id,
+  booking.passenger_count
+);
   } catch (error) {
     alert('KESALAHAN: ' + error.message);
   }
