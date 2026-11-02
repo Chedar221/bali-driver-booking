@@ -280,9 +280,12 @@ window.openDriverAssignment = async function(bookingId, passengerCount) {
   selectedPassengerCount = passengerCount;
 
   const modal = document.getElementById('assign-driver-modal');
-  const driverSelect = document.getElementById('assign-driver-select');
-  const vehicleSelect = document.getElementById('assign-vehicle-select');
-  const message = document.getElementById('assign-driver-message');
+
+alert('Modal ditemukan: ' + (modal !== null));
+
+const driverSelect = document.getElementById('assign-driver-select');
+const vehicleSelect = document.getElementById('assign-vehicle-select');
+const message = document.getElementById('assign-driver-message');
 
   modal.style.display = 'block';
 
