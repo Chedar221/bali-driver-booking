@@ -377,10 +377,64 @@ await loadOwnerBookings();
   message.textContent = 'Data berhasil dimuat.';
 }
 
-async function ownerLogout() {
-  await db.auth.signOut();
-  document.getElementById('owner-dashboard').style.display = 'none';
-  document.getElementById('owner-login').style.display = 'block';
+async function loadOwnerBookings() {
+  const list = document.getElementById('booking-list');
+
+  list.textContent = 'Memuat booking...';
+
+  const { data, error } = await db
+    .from('bookings')
+    .select(`
+      booking_code,
+      customer_name,
+      customer_phone,
+      pickup_location,
+      destination,
+      pickup_date,
+      pickup_time,
+      passenger_count,
+      status
+    `)
+    .order('id', { ascending: false });
+
+  if (error) {
+    list.textContent = 'Gagal memuat booking: ' + error.message;
+    return;
+  }
+
+  if (!data || data.length === 0) {
+    list.textContent = 'Belum ada booking.';
+    return;
+  }
+
+  list.innerHTML = '';
+
+  data.forEach(booking => {
+    const card = document.createElement('div');
+
+    card.style.cssText =
+      'padding:15px;margin:12px 0;border:1px solid #ddd;border-radius:10px;';
+
+    const details = [
+      'Kode Booking: ' + booking.booking_code,
+      'Nama: ' + booking.customer_name,
+      'Telepon: ' + booking.customer_phone,
+      'Penjemputan: ' + booking.pickup_location,
+      'Tujuan: ' + booking.destination,
+      'Tanggal: ' + booking.pickup_date,
+      'Jam: ' + booking.pickup_time,
+      'Jumlah Penumpang: ' + booking.passenger_count,
+      'Status: ' + booking.status
+    ];
+
+    details.forEach(detail => {
+      const line = document.createElement('p');
+      line.textContent = detail;
+      card.appendChild(line);
+    });
+
+    list.appendChild(card);
+  });
 }
 </script>
 </body>
