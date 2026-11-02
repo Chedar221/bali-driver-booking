@@ -901,7 +901,7 @@ if (booking.status === 'confirmed') {
 
   assignButton.onclick = async function () {
     alert('TOMBOL ASSIGN DRIVER TERTEKAN');
-
+alert(typeof window.openDriverAssignment);
     try {
       await window.openDriverAssignment(
         booking.id,
