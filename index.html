@@ -235,7 +235,255 @@ document.getElementById('owner-dashboard').style.display = 'block';
 
 await loadOwnerDashboard();
 }
+async function driverLogin() {
+  const email = document.getElementById('driver-email').value;
+  const password = document.getElementById('driver-password').value;
+  const message = document.getElementById('driver-login-message');
+
+  message.textContent = 'Memeriksa akun driver...';
+
+  const { data, error } = await db.auth.signInWithPassword({
+    email,
+    password
+  });
+
+  if (error) {
+    message.textContent = 'Login gagal: ' + error.message;
+    return;
+  }
+
+  const { data: profile, error: profileError } = await db
+    .from('profiles')
+    .select('full_name, role')
+    .eq('id', data.user.id)
+    .single();
+
+  if (profileError || profile.role !== 'driver') {
+    await db.auth.signOut();
+    message.textContent = 'Akun ini bukan Driver.';
+    return;
+  }
+
+  message.textContent = 'Login Driver berhasil!';
+
+  document.getElementById('driver-login').style.display = 'none';
+document.getElementById('driver-dashboard').style.display = 'block';
+
+await loadDriverDashboard();
+
+  // Dashboard Driver akan kita tampilkan pada langkah berikutnya.
+}
+  async function loadDriverDashboard() {
+  const message = document.getElementById('driver-dashboard-message');
+  message.textContent = 'Memuat data driver...';
+
+  const { data: userData } = await db.auth.getUser();
+
+  if (!userData.user) {
+    message.textContent = 'Silakan login kembali.';
+    return;
+  }
+
+  const driverId = userData.user.id;
+
+  const { data: profile, error } = await db
+    .from('profiles')
+    .select('full_name')
+    .eq('id', driverId)
+    .single();
+
+  if (error) {
+    message.textContent = 'Gagal memuat profil: ' + error.message;
+    return;
+  }
+
+  const { data: driver, error: driverError } = await db
+    .from('driver_profiles')
+    .select('is_available, verification_status')
+    .eq('id', driverId)
+    .single();
+
+  if (driverError) {
+    message.textContent = 'Gagal memuat status driver: ' + driverError.message;
+    return;
+  }
+
+  document.getElementById('driver-name').textContent = profile.full_name;
+  document.getElementById('driver-verification').textContent =
+    driver.verification_status.toUpperCase();
+
+  document.getElementById('driver-availability').textContent =
+    driver.is_available ? 'ONLINE' : 'OFFLINE';
+
+  const button = document.getElementById('driver-online-button');
+
+  button.textContent = driver.is_available
+    ? 'NONAKTIFKAN ONLINE'
+    : 'AKTIFKAN ONLINE';
+
+  button.disabled = driver.verification_status !== 'approved';
+
+  if (driver.verification_status !== 'approved') {
+    message.textContent = 'Akun Driver belum disetujui Owner.';
+  } else {
+    message.textContent = 'Dashboard berhasil dimuat.';
+  }
+
+  await loadDriverBookings();
+}
+
+async function toggleDriverAvailability() {
+  const button = document.getElementById('driver-online-button');
+  button.disabled = true;
+
+  const currentStatus =
+    document.getElementById('driver-availability').textContent === 'ONLINE';
+
+  const { data, error } = await db.rpc('set_driver_availability', {
+    p_available: !currentStatus
+  });
+
+  if (error || data !== true) {
+    alert('Gagal mengubah status. Pastikan akun sudah disetujui Owner.');
+  }
+
+  await loadDriverDashboard();
+  button.disabled = false;
+}
+
+async function loadDriverBookings() {
+  const list = document.getElementById('driver-booking-list');
+
+  const { data, error } = await db
+    .from('bookings')
+    .select(`
+      id,
+      booking_code,
+      customer_name,
+      customer_phone,
+      pickup_location,
+      destination,
+      pickup_date,
+      pickup_time,
+      passenger_count,
+      status
+    `)
+    .order('id', { ascending: false });
+
+  if (error) {
+    list.textContent = 'Gagal memuat booking: ' + error.message;
+    return;
+  }
+
+  if (!data || data.length === 0) {
+    list.textContent = 'Belum ada booking yang ditugaskan kepada Anda.';
+    return;
+  }
+
+  list.innerHTML = '';
+
+  data.forEach(booking => {
+    const card = document.createElement('div');
+    card.style.cssText =
+      'padding:15px;margin:12px 0;border:1px solid #ddd;border-radius:10px;background:white;';
+
+    const details = [
+      'Kode Booking: ' + booking.booking_code,
+      'Pelanggan: ' + booking.customer_name,
+      'Telepon: ' + booking.customer_phone,
+      'Penjemputan: ' + booking.pickup_location,
+      'Tujuan: ' + booking.destination,
+      'Tanggal: ' + booking.pickup_date,
+      'Jam: ' + booking.pickup_time,
+      'Penumpang: ' + booking.passenger_count,
+      'Status: ' + booking.status
+    ];
+
+    details.forEach(detail => {
+      const line = document.createElement('p');
+      line.textContent = detail;
+      card.appendChild(line);
+    });
+
+    list.appendChild(card);
+  });
+}
+
+async function driverLogout() {
+  await db.auth.signOut();
+
+  document.getElementById('driver-dashboard').style.display = 'none';
+  document.getElementById('driver-login').style.display = 'block';
+
+  document.getElementById('driver-password').value = '';
+  document.getElementById('driver-login-message').textContent = '';
+}
 </script>
+
+  <!-- DRIVER LOGIN -->
+<div id="driver-login" style="max-width:400px;margin:30px auto;padding:20px;background:#f4f7f2;border-radius:12px;">
+
+  <h2 style="color:#176b45;">DRIVER LOGIN</h2>
+
+  <input id="driver-email"
+    type="email"
+    placeholder="Email Driver"
+    style="width:100%;padding:12px;margin:8px 0;">
+
+  <input id="driver-password"
+    type="password"
+    placeholder="Password Driver"
+    style="width:100%;padding:12px;margin:8px 0;">
+
+  <button onclick="driverLogin()"
+    style="width:100%;padding:14px;background:#176b45;color:white;border:0;border-radius:8px;">
+    LOGIN DRIVER
+  </button>
+
+  <p id="driver-login-message"></p>
+  
+</div>
+
+  
+
+<!-- DRIVER DASHBOARD -->
+<div id="driver-dashboard" style="display:none;max-width:900px;margin:30px auto;padding:20px;background:#f4f7f2;border-radius:15px;">
+
+  <h2 style="color:#176b45;">BALI DRIVER BOOKING</h2>
+  <h3>DRIVER DASHBOARD</h3>
+
+  <p>Selamat datang, <strong id="driver-name">Driver</strong></p>
+
+  <div style="background:white;padding:18px;border-radius:12px;margin:15px 0;">
+    <h3>Status Verifikasi</h3>
+    <p id="driver-verification">Memeriksa...</p>
+  </div>
+
+  <div style="background:white;padding:18px;border-radius:12px;margin:15px 0;">
+    <h3>Status Driver</h3>
+    <p id="driver-availability">OFFLINE</p>
+
+    <button id="driver-online-button"
+      onclick="toggleDriverAvailability()"
+      style="padding:14px;background:#176b45;color:white;border:0;border-radius:8px;">
+      AKTIFKAN ONLINE
+    </button>
+  </div>
+
+  <div style="background:white;padding:18px;border-radius:12px;margin:15px 0;">
+    <h3>Booking Saya</h3>
+    <div id="driver-booking-list">Belum ada data.</div>
+  </div>
+
+  <button onclick="driverLogout()"
+    style="padding:12px 20px;background:#555;color:white;border:0;border-radius:8px;">
+    LOGOUT DRIVER
+  </button>
+
+  <p id="driver-dashboard-message"></p>
+
+</div>
+  
   <!-- OWNER DASHBOARD -->
 <div id="owner-dashboard" style="display:none;max-width:1000px;margin:30px auto;padding:20px;background:#f4f7f2;border-radius:15px;">
 
@@ -289,6 +537,7 @@ await loadOwnerDashboard();
   <p id="dashboard-message"></p>
 </div>
 
+  
 <script>
   
 async function loadOwnerBookings() {
