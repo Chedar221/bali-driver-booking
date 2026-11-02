@@ -285,7 +285,10 @@ window.openDriverAssignment = async function(bookingId, passengerCount) {
   const message = document.getElementById('assign-driver-message');
 
   modal.style.display = 'block';
-  message.textContent = 'Memuat Driver ONLINE...';
+
+alert('MODAL DIPERINTAHKAN TERBUKA');
+
+message.textContent = 'Memuat Driver ONLINE...';
 
   driverSelect.innerHTML = '<option value="">Pilih Driver</option>';
   vehicleSelect.innerHTML = '<option value="">Pilih Kendaraan</option>';
