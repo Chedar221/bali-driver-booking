@@ -184,5 +184,52 @@ form.addEventListener("submit",async function(event) {
 
 loadServices();
 </script>
+  <!-- OWNER LOGIN -->
+<div id="owner-login" style="max-width:400px;margin:30px auto;padding:20px;background:#f4f7f2;border-radius:12px;">
+  <h2>Owner Login</h2>
+  <input id="owner-email" type="email" placeholder="Email Owner"
+    style="width:100%;padding:12px;margin:8px 0;">
+  <input id="owner-password" type="password" placeholder="Password"
+    style="width:100%;padding:12px;margin:8px 0;">
+  <button onclick="ownerLogin()"
+    style="width:100%;padding:14px;background:#176b45;color:white;border:0;border-radius:8px;">
+    LOGIN OWNER
+  </button>
+  <p id="owner-message"></p>
+</div>
+
+<script>
+async function ownerLogin() {
+  const email = document.getElementById('owner-email').value;
+  const password = document.getElementById('owner-password').value;
+  const message = document.getElementById('owner-message');
+
+  message.textContent = 'Memeriksa akun...';
+
+  const { data, error } = await db.auth.signInWithPassword({
+    email,
+    password
+  });
+
+  if (error) {
+    message.textContent = 'Login gagal: ' + error.message;
+    return;
+  }
+
+  const { data: profile, error: profileError } = await db
+    .from('profiles')
+    .select('full_name, role')
+    .eq('id', data.user.id)
+    .single();
+
+  if (profileError || profile.role !== 'owner') {
+    await db.auth.signOut();
+    message.textContent = 'Akun ini bukan Owner.';
+    return;
+  }
+
+  message.textContent = 'Login Owner berhasil!';
+}
+</script>
 </body>
 </html>
