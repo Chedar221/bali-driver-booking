@@ -327,16 +327,16 @@ async function loadOwnerBookings() {
       'padding:15px;margin:12px 0;border:1px solid #ddd;border-radius:10px;';
 
     const details = [
-      'Kode Booking: ' + booking.booking_code,
-      'Nama: ' + booking.customer_name,
-      'Telepon: ' + booking.phone,
-      'Penjemputan: ' + booking.pickup,
-      'Tujuan: ' + booking.destination,
-      'Tanggal: ' + booking.date,
-      'Jam: ' + booking.time,
-      'Jumlah Penumpang: ' + booking.passenger_count,
-      'Status: ' + booking.status
-    ];
+  'Kode Booking: ' + booking.booking_code,
+  'Nama: ' + booking.customer_name,
+  'Telepon: ' + booking.phone,
+  'Penjemputan: ' + booking.pickup,
+  'Tujuan: ' + booking.destination,
+  'Tanggal: ' + booking.date,
+  'Jam: ' + booking.time,
+  'Jumlah Penumpang: ' + booking.passenger_count,
+  'Status: ' + booking.status
+];
 
     details.forEach(detail => {
       const line = document.createElement('p');
