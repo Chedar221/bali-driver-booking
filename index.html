@@ -271,7 +271,7 @@ async function driverLogin() {
 let selectedBookingId = null;
 let selectedPassengerCount = 0;
 
-async function openDriverAssignment(bookingId, passengerCount) {
+window.openDriverAssignment = async function(bookingId, passengerCount) {
 alert('FUNGSI OPEN DRIVER ASSIGNMENT DIPANGGIL');
   
   selectedBookingId = bookingId;
@@ -324,7 +324,7 @@ alert('FUNGSI OPEN DRIVER ASSIGNMENT DIPANGGIL');
   });
 
   message.textContent = 'Silakan pilih Driver.';
-}
+};
 
 async function loadDriverVehicles() {
   const driverId = document.getElementById('assign-driver-select').value;
