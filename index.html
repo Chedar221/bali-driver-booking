@@ -288,8 +288,9 @@ await loadOwnerDashboard();
 
   <p id="dashboard-message"></p>
 </div>
+
+<script>
   
-  </script>
 async function loadOwnerBookings() {
   const list = document.getElementById('booking-list');
 
@@ -347,9 +348,9 @@ async function loadOwnerBookings() {
     });
 
     list.appendChild(card);
-  });
+    });
 }
-<script>
+</script>
 async function loadOwnerDashboard() {
   const message = document.getElementById('dashboard-message');
   message.textContent = 'Memuat data...';
