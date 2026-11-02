@@ -553,12 +553,44 @@ async function loadDriverBookings() {
     ];
 
     details.forEach(detail => {
-      const line = document.createElement('p');
-      line.textContent = detail;
-      card.appendChild(line);
+  const line = document.createElement('p');
+  line.textContent = detail;
+  card.appendChild(line);
+});
+
+if (booking.status === 'assigned') {
+  const acceptButton = document.createElement('button');
+
+  acceptButton.textContent = 'TERIMA BOOKING';
+  acceptButton.style.cssText =
+    'padding:12px;background:#176b45;color:white;border:0;border-radius:8px;';
+
+  acceptButton.onclick = async function () {
+    acceptButton.disabled = true;
+    acceptButton.textContent = 'MEMPROSES...';
+
+    const { data, error } = await db.rpc('update_driver_booking_status', {
+      p_booking_id: booking.id,
+      p_new_status: 'confirmed'
     });
 
-    list.appendChild(card);
+    if (error || data !== true) {
+      alert('Gagal menerima booking: ' +
+        (error ? error.message : 'Proses tidak berhasil'));
+
+      acceptButton.disabled = false;
+      acceptButton.textContent = 'TERIMA BOOKING';
+      return;
+    }
+
+    alert('Booking berhasil diterima!');
+    await loadDriverDashboard();
+  };
+
+  card.appendChild(acceptButton);
+}
+
+list.appendChild(card);
   });
 }
 
@@ -777,12 +809,44 @@ async function loadOwnerBookings() {
 ];
 
     details.forEach(detail => {
-      const line = document.createElement('p');
-      line.textContent = detail;
-      card.appendChild(line);
+  const line = document.createElement('p');
+  line.textContent = detail;
+  card.appendChild(line);
+});
+
+if (booking.status === 'assigned') {
+  const acceptButton = document.createElement('button');
+
+  acceptButton.textContent = 'TERIMA BOOKING';
+  acceptButton.style.cssText =
+    'padding:12px;background:#176b45;color:white;border:0;border-radius:8px;';
+
+  acceptButton.onclick = async function () {
+    acceptButton.disabled = true;
+    acceptButton.textContent = 'MEMPROSES...';
+
+    const { data, error } = await db.rpc('update_driver_booking_status', {
+      p_booking_id: booking.id,
+      p_new_status: 'confirmed'
     });
 
-    list.appendChild(card);
+    if (error || data !== true) {
+      alert('Gagal menerima booking: ' +
+        (error ? error.message : 'Proses tidak berhasil'));
+
+      acceptButton.disabled = false;
+      acceptButton.textContent = 'TERIMA BOOKING';
+      return;
+    }
+
+    alert('Booking berhasil diterima!');
+    await loadDriverDashboard();
+  };
+
+  card.appendChild(acceptButton);
+}
+
+list.appendChild(card);
     });
 }
 
