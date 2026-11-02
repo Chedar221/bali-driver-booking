@@ -900,8 +900,10 @@ if (booking.status === 'confirmed') {
     'padding:12px;background:#b58b28;color:white;border:0;border-radius:8px;margin-top:10px;';
 
   assignButton.onclick = function () {
-    openDriverAssignment(booking.id, booking.passenger_count);
-  };
+  alert('TOMBOL ASSIGN DRIVER BERFUNGSI');
+
+  openDriverAssignment(booking.id, booking.passenger_count);
+};
 
   card.appendChild(assignButton);
 }
