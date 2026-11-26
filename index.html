@@ -1051,5 +1051,83 @@ if (booking.status === 'confirmed') {
   });
 }
 </script>
+
+<!-- DRIVER INVITATION ACTIVATION -->
+<div id="driver-activation" style="display:none;position:fixed;inset:0;z-index:100000;background:#10251dcc;align-items:center;justify-content:center;padding:18px;">
+  <div style="width:100%;max-width:440px;background:white;border-radius:16px;padding:26px;box-shadow:0 12px 40px #0005;">
+    <h2 style="color:#176b45;margin-top:0;">AKTIVASI AKUN DRIVER</h2>
+    <p id="activation-email" style="color:#52645a;font-size:14px;">Undangan Driver</p>
+    <p>Buat password baru untuk mengaktifkan akun Driver Anda.</p>
+    <form id="driver-activation-form">
+      <label for="activation-password">Password Baru</label>
+      <input id="activation-password" type="password" minlength="8" autocomplete="new-password" required placeholder="Minimal 8 karakter">
+      <label for="activation-password-confirm">Ulangi Password</label>
+      <input id="activation-password-confirm" type="password" minlength="8" autocomplete="new-password" required placeholder="Ulangi password">
+      <button id="activation-submit" type="submit" style="background:#176b45;">SIMPAN PASSWORD</button>
+    </form>
+    <p id="activation-message" role="status" style="font-size:14px;"></p>
+  </div>
+</div>
+<script>
+(function initDriverInvitationActivation() {
+  const panel = document.getElementById('driver-activation');
+  const form = document.getElementById('driver-activation-form');
+  const message = document.getElementById('activation-message');
+  const button = document.getElementById('activation-submit');
+  const hash = new URLSearchParams(window.location.hash.replace(/^#/, ''));
+  const params = new URLSearchParams(window.location.search);
+  const isInviteLink = hash.get('type') === 'invite' || params.get('activate') === 'driver';
+
+  if (!isInviteLink) return;
+  panel.style.display = 'flex';
+  message.textContent = 'Memverifikasi undangan...';
+
+  db.auth.getSession().then(({ data, error }) => {
+    if (error || !data.session) {
+      message.style.color = '#a12626';
+      message.textContent = 'Sesi undangan tidak ditemukan atau tautan sudah kedaluwarsa. Minta Owner mengirim undangan baru.';
+      form.style.display = 'none';
+      return;
+    }
+    document.getElementById('activation-email').textContent =
+      'Akun: ' + (data.session.user.email || 'Driver');
+    message.textContent = 'Undangan valid. Silakan buat password.';
+  });
+
+  form.addEventListener('submit', async function(event) {
+    event.preventDefault();
+    const password = document.getElementById('activation-password').value;
+    const confirm = document.getElementById('activation-password-confirm').value;
+    if (password.length < 8) {
+      message.style.color = '#a12626';
+      message.textContent = 'Password minimal 8 karakter.';
+      return;
+    }
+    if (password !== confirm) {
+      message.style.color = '#a12626';
+      message.textContent = 'Password dan ulangi password tidak sama.';
+      return;
+    }
+    button.disabled = true;
+    button.textContent = 'MENYIMPAN...';
+    message.style.color = '#555';
+    message.textContent = 'Sedang mengaktifkan akun...';
+    const { error } = await db.auth.updateUser({ password });
+    if (error) {
+      message.style.color = '#a12626';
+      message.textContent = 'Gagal menyimpan password: ' + error.message;
+      button.disabled = false;
+      button.textContent = 'SIMPAN PASSWORD';
+      return;
+    }
+    await db.auth.signOut();
+    form.style.display = 'none';
+    message.style.color = '#176334';
+    message.textContent = 'Akun berhasil diaktifkan. Silakan login melalui bagian DRIVER LOGIN menggunakan email dan password baru.';
+    history.replaceState({}, document.title, window.location.pathname);
+  });
+})();
+</script>
+
 </body>
 </html>
