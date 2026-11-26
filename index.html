@@ -28,10 +28,9 @@ button:disabled{opacity:.6}
 footer{text-align:center;padding:30px;color:#718078;font-size:13px}
 
 .popup-nav{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-.popup-menu-link{display:inline-flex;align-items:center;justify-content:center;padding:12px 16px;background:#c49b51;color:#102f26;border-radius:999px;font-size:13px;font-weight:bold;text-decoration:none;white-space:nowrap;min-height:42px}
+.popup-menu-link{display:inline-flex;align-items:center;justify-content:center;padding:12px 16px;background:#c49b51;color:#102f26;border-radius:999px;font-size:13px;font-weight:bold;text-decoration:none;white-space:nowrap;min-height:42px;width:auto;margin:0;border:0;cursor:pointer}
 .popup-menu-link.booking-link{background:#f4ead5}
 .popup-menu-link:focus-visible{outline:3px solid #fff;outline-offset:3px}
-.popup-overlay:target{display:flex}
 .popup-overlay{display:none;position:fixed;inset:0;z-index:90000;background:rgba(5,20,15,.78);backdrop-filter:blur(5px);align-items:center;justify-content:center;padding:18px;overflow-y:auto}
 .popup-panel{position:relative;width:100%;max-width:680px;max-height:90vh;overflow-y:auto;background:#fff;border:1px solid #d8c18e;border-radius:20px;padding:26px;box-shadow:0 24px 70px #0008}
 .popup-panel.login-panel{max-width:430px}
@@ -46,7 +45,7 @@ body.popup-open{overflow:hidden}
 
 <header>
 <div class="logo">AGUS DRIVER BOOKING</div>
-<nav class="popup-nav" aria-label="Menu utama"><a class="popup-menu-link booking-link" href="#booking-popup">BOOKING</a><a class="popup-menu-link" href="#owner-popup">LOGIN OWNER</a><a class="popup-menu-link driver-popup-link" href="#driver-popup">LOGIN DRIVER</a></nav>
+<nav class="popup-nav" aria-label="Menu utama"><button class="popup-menu-link booking-link" type="button" onclick="document.getElementById('booking-popup').style.display='flex'">BOOKING</button><button class="popup-menu-link" type="button" onclick="document.getElementById('owner-popup').style.display='flex'">LOGIN OWNER</button><button class="popup-menu-link driver-popup-link" type="button" onclick="document.getElementById('driver-popup').style.display='flex'">LOGIN DRIVER</button></nav>
 </header>
 
 <section class="hero">
