@@ -1064,13 +1064,36 @@ async function driverLogout() {
   <p id="assign-driver-message"></p>
 </div>
   
-  <!-- OWNER DASHBOARD -->
+  
+<style>
+.admin-menu-button{width:100%;display:flex;align-items:center;justify-content:space-between;gap:12px;margin:12px 0 0;padding:16px 18px;border:1px solid #dce8df;border-radius:12px;background:linear-gradient(135deg,#176b45,#0f5135);color:#fff;font-weight:700;font-size:14px;text-align:left;cursor:pointer;box-shadow:0 4px 12px #173b2915;}
+.admin-menu-button:active{transform:scale(.99);}
+.admin-menu-chevron{font-size:20px;line-height:1;}
+.admin-menu-content{padding:12px 0 4px;}
+.admin-menu-content[hidden]{display:none!important;}
+#owner-dashboard .admin-menu-content>div{margin-top:8px!important;}
+@media(max-width:520px){.admin-menu-button{padding:14px;font-size:13px;}#owner-dashboard{padding:14px!important;}}
+</style>
+<script>
+function toggleAdminSection(id,button){
+ const panel=document.getElementById(id);
+ if(!panel)return;
+ const willOpen=panel.hidden;
+ panel.hidden=!willOpen;
+ button.setAttribute('aria-expanded',String(willOpen));
+ const icon=button.querySelector('.admin-menu-chevron');
+ if(icon)icon.textContent=willOpen?'－':'＋';
+}
+</script>
+<!-- OWNER DASHBOARD -->
 <div id="owner-dashboard" style="display:none;max-width:1000px;margin:30px auto;padding:20px;background:#f4f7f2;border-radius:15px;">
 
   <h2 style="color:#176b45;">BALI DRIVER BOOKING</h2>
   <h3>OWNER DASHBOARD</h3>
   <p>Selamat datang, Owner!</p>
 
+<button type="button" class="admin-menu-button" aria-expanded="false" aria-controls="admin-create-driver" onclick="toggleAdminSection('admin-create-driver',this)">+ TAMBAH / KELOLA DRIVER<span class="admin-menu-chevron">＋</span></button>
+<div id="admin-create-driver" class="admin-menu-content" hidden>
   <div style="margin:20px 0;background:white;padding:18px;border-radius:12px;">
     <h3 style="color:#176b45;">MANAJEMEN DRIVER</h3>
     <p style="color:#65776d;font-size:14px;">Buat akun Driver dari sini. Undangan untuk mengatur password akan dikirim ke email Driver.</p>
@@ -1089,13 +1112,17 @@ async function driverLogout() {
     </form>
     <p id="create-driver-message" role="status"></p>
   </div>
+</div>
 
+<button type="button" class="admin-menu-button" aria-expanded="false" aria-controls="admin-overview" onclick="toggleAdminSection('admin-overview',this)">RINGKASAN DASHBOARD<span class="admin-menu-chevron">＋</span></button>
+<div id="admin-overview" class="admin-menu-content" hidden>
   <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;">
 
     <div style="background:white;padding:18px;border-radius:12px;">
       <p>Total Booking</p>
       <h2 id="total-bookings">0</h2>
     </div>
+</div>
 
     <div style="background:white;padding:18px;border-radius:12px;">
       <p>Total Driver</p>
@@ -1121,11 +1148,16 @@ async function driverLogout() {
     </div>
 
   </div>
+<button type="button" class="admin-menu-button" aria-expanded="false" aria-controls="admin-driver-list" onclick="toggleAdminSection('admin-driver-list',this)">DAFTAR DRIVER & PERSETUJUAN<span class="admin-menu-chevron">＋</span></button>
+<div id="admin-driver-list" class="admin-menu-content" hidden>
 <div style="margin-top:25px;background:white;padding:18px;border-radius:12px;">
   <h3 style="color:#176b45;">DAFTAR DRIVER & PERSETUJUAN</h3>
   <div id="driver-management-list">Memuat daftar driver...</div>
 </div>
+</div>
 <!-- MANAJEMEN HARGA & RUTE -->
+<button type="button" class="admin-menu-button" aria-expanded="false" aria-controls="admin-route-prices" onclick="toggleAdminSection('admin-route-prices',this)">MANAJEMEN HARGA & RUTE<span class="admin-menu-chevron">＋</span></button>
+<div id="admin-route-prices" class="admin-menu-content" hidden>
 <div style="margin-top:25px;background:white;padding:18px;border-radius:12px;">
   <h3 style="color:#176b45;">MANAJEMEN HARGA & RUTE</h3>
   <p style="color:#65776d;font-size:14px;">Tambah rute perjalanan dan atur tarif. Contoh: Padangbai → Uluwatu = Rp600.000.</p>
@@ -1143,12 +1175,15 @@ async function driverLogout() {
       <button id="route-save-button" type="submit" style="flex:1;background:#176b45;">+ SIMPAN RUTE & HARGA</button>
       <button id="route-cancel-button" type="button" onclick="cancelRouteEdit()" style="display:none;flex:1;background:#68756e;">BATAL EDIT</button>
     </div>
+</div>
   </form>
   <p id="route-price-message" role="status" style="font-size:14px;"></p>
   <h4 style="margin:22px 0 10px;color:#29483d;">DAFTAR RUTE & HARGA</h4>
   <div id="route-price-list">Memuat daftar rute...</div>
 </div>
 <!-- DAFTAR BOOKING -->
+<button type="button" class="admin-menu-button" aria-expanded="false" aria-controls="admin-bookings" onclick="toggleAdminSection('admin-bookings',this)">DAFTAR BOOKING PELANGGAN<span class="admin-menu-chevron">＋</span></button>
+<div id="admin-bookings" class="admin-menu-content" hidden>
 <div style="margin-top:25px;background:white;padding:18px;border-radius:12px;">
 
   <h3 style="color:#176b45;">DAFTAR BOOKING PELANGGAN</h3>
@@ -1163,6 +1198,7 @@ async function driverLogout() {
     <option value="cancelled">Dibatalkan</option>
   </select>
   <div id="booking-list">Memuat daftar booking...</div>
+</div>
 
 </div>
   <button onclick="loadOwnerDashboard()"
