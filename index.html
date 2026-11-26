@@ -112,6 +112,7 @@ AGUS DRIVER BOOKING · Your Journey, Our Priority.
 
 <script>
 function openPopup(id) {
+  if (location.hash) history.replaceState(null, '', location.pathname + location.search);
   document.querySelectorAll('.popup-overlay').forEach(p => {
     p.classList.remove('is-open');
     p.style.display = 'none';
@@ -123,6 +124,7 @@ function openPopup(id) {
   document.body.classList.add('popup-open');
 }
 function closePopup(id) {
+  if (location.hash === '#' + id) history.replaceState(null, '', location.pathname + location.search);
   const popup = document.getElementById(id);
   if (!popup) return;
   popup.classList.remove('is-open');
@@ -138,6 +140,15 @@ document.addEventListener('keydown', function(event) {
       p.classList.remove('is-open');
       p.style.display = 'none';
     });
+    if (location.hash) history.replaceState(null, '', location.pathname + location.search);
+    document.body.classList.remove('popup-open');
+  }
+});
+window.addEventListener('hashchange', function() {
+  const target = document.getElementById(location.hash.slice(1));
+  if (target && target.classList.contains('popup-overlay')) {
+    document.body.classList.add('popup-open');
+  } else if (!document.querySelector('.popup-overlay.is-open')) {
     document.body.classList.remove('popup-open');
   }
 });
@@ -252,7 +263,7 @@ loadServices();
 <!-- DRIVER LOGIN POPUP -->
 <div id="driver-popup" class="popup-overlay" role="dialog" aria-modal="true" aria-label="Login Driver" onclick="if(event.target===this)closePopup('driver-popup')">
   <div class="popup-panel login-panel">
-    <a class="popup-close" href="#" aria-label="Tutup" style="display:flex;align-items:center;justify-content:center;text-decoration:none;">×</a>
+    <button class="popup-close" type="button" aria-label="Tutup" onclick="closePopup('driver-popup')">×</button>
     <div style="max-width:400px;margin:30px auto;padding:20px;background:#f4f7f2;border-radius:12px;">
       <h2>DRIVER LOGIN</h2>
       <label for="driver-email">Email Driver</label>
