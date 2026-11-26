@@ -297,6 +297,11 @@ function formatIDR(value) {
 function normalizeRouteName(value) {
   return String(value || '').trim().toLocaleLowerCase('id-ID');
 }
+function routeNameMatches(inputValue, savedValue) {
+  const input = normalizeRouteName(inputValue);
+  const saved = normalizeRouteName(savedValue);
+  return input === saved || (saved.length >= 3 && input.includes(saved));
+}
 async function refreshRoutePricePreview() {
   const preview = document.getElementById('route-price-preview');
   if (!preview) return;
@@ -315,8 +320,8 @@ async function refreshRoutePricePreview() {
     return;
   }
   const match = (data || []).find(route =>
-    normalizeRouteName(route.origin) === normalizeRouteName(origin) &&
-    normalizeRouteName(route.destination) === normalizeRouteName(destination)
+    routeNameMatches(origin, route.origin) &&
+    routeNameMatches(destination, route.destination)
   );
   if (match) {
     matchedRoutePrice = Number(match.price);
