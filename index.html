@@ -680,7 +680,7 @@ async function sendDriverPasswordReset() {
   message.textContent = 'Tautan reset password dikirim. Periksa email dan buka tautannya di website ini.';
 }
 
-async async function driverLogout() {
+async function driverLogout() {
   await db.auth.signOut();
 
   document.getElementById('driver-dashboard').style.display = 'none';
