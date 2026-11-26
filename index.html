@@ -376,6 +376,7 @@ form.addEventListener("submit", async function(event) {
     Math.floor(Math.random()*90+10);
 
   try {
+    await refreshRoutePricePreview();
     const booking = {
       booking_code: bookingCode,
       customer_name: document.getElementById("name").value.trim(),
