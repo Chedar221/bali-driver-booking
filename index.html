@@ -46,7 +46,7 @@ body.popup-open{overflow:hidden}
 
 <header>
 <div class="logo">AGUS DRIVER BOOKING</div>
-<nav class="popup-nav" aria-label="Menu utama"><button class="popup-menu-link booking-link" type="button" onclick="document.getElementById('booking-popup').style.display='flex';document.body.classList.add('popup-open')">BOOKING</button><button class="popup-menu-link" type="button" onclick="document.getElementById('owner-popup').style.display='flex';document.body.classList.add('popup-open')">LOGIN OWNER</button><button class="popup-menu-link driver-popup-link" type="button" onclick="document.getElementById('driver-popup').classList.add('is-open');document.body.classList.add('popup-open')">LOGIN DRIVER</button></nav>
+<nav class="popup-nav" aria-label="Menu utama"><button class="popup-menu-link booking-link" type="button" onclick="openPopup('booking-popup')">BOOKING</button><button class="popup-menu-link" type="button" onclick="openPopup('owner-popup')">LOGIN OWNER</button><button class="popup-menu-link driver-popup-link" type="button" onclick="openPopup('driver-popup')">LOGIN DRIVER</button></nav>
 </header>
 
 <section class="hero">
@@ -54,8 +54,8 @@ body.popup-open{overflow:hidden}
 <p>Travel comfortably. Explore Bali. Enjoy every journey.</p>
 </section>
 
-<div id="booking-popup" class="popup-overlay" role="dialog" aria-modal="true" aria-label="Form booking" onclick="if(event.target===this){this.classList.remove('is-open');this.style.display='none';document.body.classList.remove('popup-open')}"><main class="popup-panel">
-<button class="popup-close" type="button" aria-label="Tutup" onclick="document.getElementById('booking-popup').style.display='none';document.body.classList.remove('popup-open')">×</button>
+<div id="booking-popup" class="popup-overlay" role="dialog" aria-modal="true" aria-label="Form booking" onclick="if(event.target===this)closePopup('booking-popup')"><main class="popup-panel">
+<button class="popup-close" type="button" aria-label="Tutup" onclick="closePopup('booking-popup')">×</button>
 <div class="card">
 <h2>Our Services</h2>
 <div class="services">
@@ -112,20 +112,32 @@ AGUS DRIVER BOOKING · Your Journey, Our Priority.
 
 <script>
 function openPopup(id) {
+  document.querySelectorAll('.popup-overlay').forEach(p => {
+    p.classList.remove('is-open');
+    p.style.display = 'none';
+  });
   const popup = document.getElementById(id);
   if (!popup) return;
   popup.style.display = 'flex';
+  popup.classList.add('is-open');
   document.body.classList.add('popup-open');
 }
 function closePopup(id) {
   const popup = document.getElementById(id);
   if (!popup) return;
+  popup.classList.remove('is-open');
   popup.style.display = 'none';
-  if (!Array.from(document.querySelectorAll('.popup-overlay')).some(p => p.style.display === 'flex')) document.body.classList.remove('popup-open');
+  const anyOpen = Array.from(document.querySelectorAll('.popup-overlay')).some(p =>
+    p.classList.contains('is-open') || p.style.display === 'flex'
+  );
+  if (!anyOpen) document.body.classList.remove('popup-open');
 }
 document.addEventListener('keydown', function(event) {
   if (event.key === 'Escape') {
-    document.querySelectorAll('.popup-overlay').forEach(p => { if (p.style.display === 'flex') p.style.display = 'none'; });
+    document.querySelectorAll('.popup-overlay').forEach(p => {
+      p.classList.remove('is-open');
+      p.style.display = 'none';
+    });
     document.body.classList.remove('popup-open');
   }
 });
@@ -220,8 +232,8 @@ form.addEventListener("submit", async function(event) {
 loadServices();
 </script>
   <!-- OWNER LOGIN POPUP -->
-<div id="owner-popup" class="popup-overlay" role="dialog" aria-modal="true" aria-label="Login Owner" onclick="if(event.target===this){this.style.display='none';document.body.classList.remove('popup-open')}"><div class="popup-panel login-panel">
-<button class="popup-close" type="button" aria-label="Tutup" onclick="document.getElementById('owner-popup').style.display='none';document.body.classList.remove('popup-open')">×</button>
+<div id="owner-popup" class="popup-overlay" role="dialog" aria-modal="true" aria-label="Login Owner" onclick="if(event.target===this)closePopup('owner-popup')"><div class="popup-panel login-panel">
+<button class="popup-close" type="button" aria-label="Tutup" onclick="closePopup('owner-popup')">×</button>
 <div id="owner-login" style="max-width:400px;margin:30px auto;padding:20px;background:#f4f7f2;border-radius:12px;">
   <h2>Owner Login</h2>
   <input id="owner-email" type="email" placeholder="Email Owner"
@@ -238,7 +250,7 @@ loadServices();
 </div></div>
 
 <!-- DRIVER LOGIN POPUP -->
-<div id="driver-popup" class="popup-overlay" role="dialog" aria-modal="true" aria-label="Login Driver" onclick="if(event.target===this){this.classList.remove('is-open');this.style.display='none';document.body.classList.remove('popup-open')}">
+<div id="driver-popup" class="popup-overlay" role="dialog" aria-modal="true" aria-label="Login Driver" onclick="if(event.target===this)closePopup('driver-popup')">
   <div class="popup-panel login-panel">
     <button class="popup-close" type="button" aria-label="Tutup" onclick="closePopup('driver-popup')">×</button>
     <div style="max-width:400px;margin:30px auto;padding:20px;background:#f4f7f2;border-radius:12px;">
