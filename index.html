@@ -29,7 +29,7 @@ footer{text-align:center;padding:30px;color:#718078;font-size:13px}
 
 .popup-nav{display:flex;gap:10px;align-items:center}
 .popup-nav button{width:auto;margin:0;padding:11px 16px;background:#c49b51;color:#102f26;border-radius:999px;font-size:13px}
-.popup-nav button:first-child{background:#f4ead5}
+.popup-nav button:first-child{background:#f4ead5}\n.popup-nav .driver-popup-link{display:inline-block;padding:11px 16px;background:#c49b51;color:#102f26;border-radius:999px;font-size:13px;font-weight:bold;text-decoration:none;white-space:nowrap}\n.popup-overlay:target{display:flex}
 .popup-overlay{display:none;position:fixed;inset:0;z-index:90000;background:rgba(5,20,15,.78);backdrop-filter:blur(5px);align-items:center;justify-content:center;padding:18px;overflow-y:auto}
 .popup-panel{position:relative;width:100%;max-width:680px;max-height:90vh;overflow-y:auto;background:#fff;border:1px solid #d8c18e;border-radius:20px;padding:26px;box-shadow:0 24px 70px #0008}
 .popup-panel.login-panel{max-width:430px}
@@ -44,7 +44,7 @@ body.popup-open{overflow:hidden}
 
 <header>
 <div class="logo">AGUS DRIVER BOOKING</div>
-<div class="popup-nav" aria-label="Menu utama"><button type="button" onclick="openPopup('booking-popup')">BOOKING</button><button type="button" onclick="openPopup('owner-popup')">LOGIN OWNER</button><button type="button" onclick="openPopup('driver-popup')">LOGIN DRIVER</button></div>
+<div class="popup-nav" aria-label="Menu utama"><button type="button" onclick="openPopup('booking-popup')">BOOKING</button><button type="button" onclick="openPopup('owner-popup')">LOGIN OWNER</button><a class="driver-popup-link" href="#driver-popup">LOGIN DRIVER</a></div>
 </header>
 
 <section class="hero">
@@ -692,7 +692,7 @@ async function driverLogout() {
 
   <!-- DRIVER LOGIN POPUP -->
 <div id="driver-popup" class="popup-overlay" role="dialog" aria-modal="true" aria-label="Login Driver" onclick="if(event.target===this)closePopup('driver-popup')"><div class="popup-panel login-panel">
-<button class="popup-close" type="button" aria-label="Tutup" onclick="closePopup('driver-popup')">×</button>
+<a class="popup-close" href="#" aria-label="Tutup" style="display:grid;place-items:center;text-decoration:none;">×</a>
 <div id="driver-login" style="max-width:400px;margin:30px auto;padding:20px;background:#f4f7f2;border-radius:12px;">
 
   <h2 style="color:#176b45;">DRIVER LOGIN</h2>
