@@ -352,7 +352,7 @@ async function loadPublicRoutePrices() {
     const group = document.createElement('div');
     group.style.cssText = 'margin:12px 0;padding:12px;background:#f7f6f1;border:1px solid #e9e2d5;border-radius:10px;min-width:0;box-sizing:border-box;';
     const heading = document.createElement('h3');
-    heading.textContent = name;
+    heading.textContent = String(name).toLocaleUpperCase('id-ID');
     heading.style.cssText = 'margin:0 0 8px;color:#174635;font-size:15px;line-height:1.2;';
     group.appendChild(heading);
     items.forEach(route => {
