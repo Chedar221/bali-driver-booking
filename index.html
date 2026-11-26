@@ -45,7 +45,7 @@ body.popup-open{overflow:hidden}
 
 <header>
 <div class="logo">AGUS DRIVER BOOKING</div>
-<nav class="popup-nav" aria-label="Menu utama"><button class="popup-menu-link booking-link" type="button" onclick="document.getElementById('booking-popup').style.display='flex'">BOOKING</button><button class="popup-menu-link" type="button" onclick="document.getElementById('owner-popup').style.display='flex'">LOGIN OWNER</button><button class="popup-menu-link driver-popup-link" type="button" onclick="document.getElementById('driver-popup').style.display='flex'">LOGIN DRIVER</button></nav>
+<nav class="popup-nav" aria-label="Menu utama"><button class="popup-menu-link booking-link" type="button" onclick="document.getElementById('booking-popup').style.display='flex';document.body.classList.add('popup-open')">BOOKING</button><button class="popup-menu-link" type="button" onclick="document.getElementById('owner-popup').style.display='flex';document.body.classList.add('popup-open')">LOGIN OWNER</button><button class="popup-menu-link driver-popup-link" type="button" onclick="document.getElementById('driver-popup').style.display='flex';document.body.classList.add('popup-open')">LOGIN DRIVER</button></nav>
 </header>
 
 <section class="hero">
@@ -53,8 +53,8 @@ body.popup-open{overflow:hidden}
 <p>Travel comfortably. Explore Bali. Enjoy every journey.</p>
 </section>
 
-<div id="booking-popup" class="popup-overlay" role="dialog" aria-modal="true" aria-label="Form booking" onclick="if(event.target===this)closePopup('booking-popup')"><main class="popup-panel">
-<button class="popup-close" type="button" aria-label="Tutup" onclick="closePopup('booking-popup')">×</button>
+<div id="booking-popup" class="popup-overlay" role="dialog" aria-modal="true" aria-label="Form booking" onclick="if(event.target===this){this.style.display='none';document.body.classList.remove('popup-open')}"><main class="popup-panel">
+<button class="popup-close" type="button" aria-label="Tutup" onclick="document.getElementById('booking-popup').style.display='none';document.body.classList.remove('popup-open')">×</button>
 <div class="card">
 <h2>Our Services</h2>
 <div class="services">
@@ -219,8 +219,8 @@ form.addEventListener("submit", async function(event) {
 loadServices();
 </script>
   <!-- OWNER LOGIN POPUP -->
-<div id="owner-popup" class="popup-overlay" role="dialog" aria-modal="true" aria-label="Login Owner" onclick="if(event.target===this)closePopup('owner-popup')"><div class="popup-panel login-panel">
-<button class="popup-close" type="button" aria-label="Tutup" onclick="closePopup('owner-popup')">×</button>
+<div id="owner-popup" class="popup-overlay" role="dialog" aria-modal="true" aria-label="Login Owner" onclick="if(event.target===this){this.style.display='none';document.body.classList.remove('popup-open')}"><div class="popup-panel login-panel">
+<button class="popup-close" type="button" aria-label="Tutup" onclick="document.getElementById('owner-popup').style.display='none';document.body.classList.remove('popup-open')">×</button>
 <div id="owner-login" style="max-width:400px;margin:30px auto;padding:20px;background:#f4f7f2;border-radius:12px;">
   <h2>Owner Login</h2>
   <input id="owner-email" type="email" placeholder="Email Owner"
@@ -692,8 +692,8 @@ async function driverLogout() {
 </script>
 
   <!-- DRIVER LOGIN POPUP -->
-<div id="driver-popup" class="popup-overlay" role="dialog" aria-modal="true" aria-label="Login Driver" onclick="if(event.target===this)closePopup('driver-popup')"><div class="popup-panel login-panel">
-<a class="popup-close" href="#" aria-label="Tutup" style="display:grid;place-items:center;text-decoration:none;">×</a>
+<div id="driver-popup" class="popup-overlay" role="dialog" aria-modal="true" aria-label="Login Driver" onclick="if(event.target===this){this.style.display='none';document.body.classList.remove('popup-open')}"><div class="popup-panel login-panel">
+<button class="popup-close" type="button" aria-label="Tutup" onclick="document.getElementById('driver-popup').style.display='none';document.body.classList.remove('popup-open')">×</button>
 <div id="driver-login" style="max-width:400px;margin:30px auto;padding:20px;background:#f4f7f2;border-radius:12px;">
 
   <h2 style="color:#176b45;">DRIVER LOGIN</h2>
