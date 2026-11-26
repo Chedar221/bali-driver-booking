@@ -1598,7 +1598,7 @@ document.getElementById("location-map-search-input").addEventListener("keydown",
  <button id="floating-chat-button" type="button" onclick="toggleCustomerChat()"><span class="chat-icon">✉</span> CHAT SUPPORT</button>
 </div>
 <script>
-const SUPPORT_WHATSAPP_NUMBER = ""; // Isi nomor WhatsApp Owner format internasional, tanpa tanda + atau spasi.
+const SUPPORT_WHATSAPP_NUMBER = "6281337326221"; // Isi nomor WhatsApp Owner format internasional, tanpa tanda + atau spasi.
 function toggleCustomerChat(force){const panel=document.getElementById("chat-contact-panel");const open=typeof force==="boolean"?force:!panel.classList.contains("open");panel.classList.toggle("open",open);if(open)document.getElementById("customer-chat-message").focus();}
 function sendCustomerChatMessage(){const message=document.getElementById("customer-chat-message").value.trim();const status=document.getElementById("chat-contact-status");if(!message){status.textContent="Tulis pesan terlebih dahulu.";return;}if(!/^\\d{8,15}$/.test(SUPPORT_WHATSAPP_NUMBER)){status.textContent="Chat siap. WhatsApp Owner belum dihubungkan—perlu nomor WhatsApp Owner untuk mengaktifkan pengiriman.";return;}window.open("https://wa.me/"+SUPPORT_WHATSAPP_NUMBER+"?text="+encodeURIComponent(message),"_blank","noopener");}
 document.addEventListener("keydown",e=>{if(e.key==="Escape")toggleCustomerChat(false);});
