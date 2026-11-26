@@ -40,18 +40,72 @@ footer{text-align:center;padding:30px;color:#718078;font-size:13px}
 body.popup-open{overflow:hidden}
 @media(max-width:650px){header{padding:16px 5%;gap:12px;align-items:flex-start;flex-direction:column}.popup-nav{width:100%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}.popup-menu-link{width:100%;padding:11px 4px;font-size:11px;white-space:normal;text-align:center}.hero{padding:48px 7%}.hero h1{font-size:30px}.popup-panel{padding:20px 16px;max-height:92vh}}
 
+/* PREMIUM BALI PRIVATE DRIVER — visual-only refresh */
+:root{--forest:#102f27;--forest2:#19483b;--gold:#c9a45e;--sand:#f4efe4;--ink:#18352d}
+html{scroll-behavior:smooth}
+body{font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;background:#f7f6f1;color:var(--ink)}
+header{position:relative;z-index:5;background:rgba(13,43,35,.98);padding:18px clamp(20px,6vw,88px);min-height:82px;border-bottom:1px solid rgba(201,164,94,.35);box-shadow:0 8px 30px #061d1730}
+.logo{font-size:17px;letter-spacing:2px;color:#fff;display:flex;align-items:center;gap:12px}
+.logo:before{content:"✦";display:grid;place-items:center;width:38px;height:38px;border:1px solid var(--gold);border-radius:50%;color:var(--gold);font-size:18px}
+.popup-nav{gap:9px}
+.popup-menu-link{border:1px solid rgba(201,164,94,.65);background:transparent;color:#f8f4e9;padding:12px 18px;letter-spacing:.6px;transition:background .2s,transform .2s}
+.popup-menu-link:hover{background:var(--gold);color:#142e26;transform:translateY(-1px)}
+.popup-menu-link.booking-link{background:var(--gold);color:#142e26;border-color:var(--gold)}
+.hero{position:relative;isolation:isolate;min-height:440px;display:flex;flex-direction:column;justify-content:center;padding:76px clamp(24px,9vw,140px);overflow:hidden;background:linear-gradient(90deg,rgba(8,35,28,.94) 0%,rgba(8,35,28,.78) 48%,rgba(8,35,28,.22) 100%),url("https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=2000&q=85") center 52%/cover no-repeat;color:#fff}
+.hero:before{content:"BALI • PRIVATE CHAUFFEUR";display:block;color:#e2c98f;font-size:12px;font-weight:800;letter-spacing:3px;margin-bottom:18px}
+.hero h1{font-family:Georgia,"Times New Roman",serif;font-weight:500;font-size:clamp(38px,5.3vw,66px);max-width:720px;line-height:1.08;letter-spacing:-1px;margin:0 0 18px}
+.hero p{max-width:540px;color:#e5e9e3;font-size:17px;line-height:1.75;margin:0}
+.hero .hero-booking-cta{width:auto;align-self:flex-start;margin-top:28px;padding:15px 24px;background:var(--gold);color:#172f27;border-radius:4px;font-size:12px;letter-spacing:1px}
+main{max-width:850px;margin:38px auto}
+.card{border:1px solid #e8e1d2;border-radius:16px;padding:clamp(20px,4vw,34px);box-shadow:0 18px 50px #20382d0c}
+h2{font-family:Georgia,"Times New Roman",serif;color:var(--forest);font-size:27px;font-weight:500}
+.services{gap:14px;margin:20px 0 30px}
+.service{background:var(--sand);border:1px solid #e8dfcd;border-radius:10px;padding:19px 17px;color:#294b3d;min-height:70px}
+label{color:#29483d;font-size:13px;letter-spacing:.2px}
+input,select,textarea{border:1px solid #d9dfd8;border-radius:7px;padding:14px;color:#1c382f;background:#fff;outline:none}
+input:focus,select:focus,textarea:focus{border-color:var(--gold);box-shadow:0 0 0 3px #c9a45e22}
+button{background:var(--forest2);border-radius:7px;letter-spacing:.35px;transition:filter .2s,transform .2s}
+button:hover{filter:brightness(1.08)}
+button:active{transform:translateY(1px)}
+#submitBtn{background:var(--gold);color:#17352b;border-radius:5px}
+.note{color:#78847c;line-height:1.6}
+footer{background:var(--forest);color:#d8dfd8;padding:28px 18px;margin-top:55px;letter-spacing:.5px}
+.popup-overlay{background:rgba(5,20,15,.82)}
+.popup-panel{border:1px solid #d5bd89;border-radius:14px;box-shadow:0 28px 90px #0008}
+.popup-panel.login-panel{background:#fbfaf6}
+.popup-panel h2{font-family:Georgia,"Times New Roman",serif}
+.popup-close{background:var(--forest);border:1px solid var(--gold)}
+#owner-dashboard,#driver-dashboard{font-family:inherit!important;background:#f2f0e9!important;border:1px solid #e2dac8;box-shadow:0 14px 45px #20382d10}
+#owner-dashboard h2,#driver-dashboard h2{color:var(--forest)!important;font-family:Georgia,serif}
+#owner-dashboard>div,#driver-dashboard>div{border:1px solid #e9e2d5}
+#owner-dashboard button,#driver-dashboard button{border-radius:7px}
+#assign-driver-modal{border-color:var(--gold)!important;border-radius:14px!important}
+#driver-activation>div{border:1px solid var(--gold)}
+@media(max-width:650px){
+ header{padding:14px 5%;gap:13px}
+ .logo{font-size:14px;letter-spacing:1.3px}
+ .hero{min-height:400px;padding:54px 7%;background-position:58% center}
+ .hero h1{font-size:39px;max-width:500px}
+ .hero p{font-size:15px}
+ .popup-nav{grid-template-columns:repeat(3,minmax(0,1fr))}
+ .popup-menu-link{font-size:10px;letter-spacing:0;padding:11px 3px}
+ .services{grid-template-columns:1fr 1fr}
+ main{margin:22px auto}
+ footer{margin-top:36px}
+}
+
 </style>
 </head>
 <body>
 
 <header>
-<div class="logo">AGUS DRIVER BOOKING</div>
+<div class="logo">BALI PRIVATE DRIVER</div>
 <nav class="popup-nav" aria-label="Menu utama"><button class="popup-menu-link booking-link" type="button" onclick="openPopup('booking-popup')">BOOKING</button><button class="popup-menu-link" type="button" onclick="openPopup('owner-popup')">LOGIN OWNER</button><a class="popup-menu-link driver-popup-link" href="#driver-popup">LOGIN DRIVER</a></nav>
 </header>
 
 <section class="hero">
 <h1>Discover Bali With Your Private Driver</h1>
-<p>Travel comfortably. Explore Bali. Enjoy every journey.</p>
+<p>Travel comfortably. Explore Bali. Enjoy every journey with a dedicated private driver.</p><button class="hero-booking-cta" type="button" onclick="openPopup(\"booking-popup\")">BOOK YOUR JOURNEY</button>
 </section>
 
 <div id="booking-popup" class="popup-overlay" role="dialog" aria-modal="true" aria-label="Form booking" onclick="if(event.target===this)closePopup('booking-popup')"><main class="popup-panel">
@@ -107,7 +161,7 @@ body.popup-open{overflow:hidden}
 </main></div>
 
 <footer>
-AGUS DRIVER BOOKING · Your Journey, Our Priority.
+BALI PRIVATE DRIVER · Your Journey, Our Priority.
 </footer>
 
 <script>
