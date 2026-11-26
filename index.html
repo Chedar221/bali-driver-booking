@@ -1600,7 +1600,7 @@ document.getElementById("location-map-search-input").addEventListener("keydown",
 <script>
 const SUPPORT_WHATSAPP_NUMBER = "6281337326221"; // Isi nomor WhatsApp Owner format internasional, tanpa tanda + atau spasi.
 function toggleCustomerChat(force){const panel=document.getElementById("chat-contact-panel");const open=typeof force==="boolean"?force:!panel.classList.contains("open");panel.classList.toggle("open",open);if(open)document.getElementById("customer-chat-message").focus();}
-function sendCustomerChatMessage(){const message=document.getElementById("customer-chat-message").value.trim();const status=document.getElementById("chat-contact-status");if(!message){status.textContent="Tulis pesan terlebih dahulu.";return;}if(!/^\\d{8,15}$/.test(SUPPORT_WHATSAPP_NUMBER)){status.textContent="Chat siap. WhatsApp Owner belum dihubungkan—perlu nomor WhatsApp Owner untuk mengaktifkan pengiriman.";return;}window.open("https://wa.me/"+SUPPORT_WHATSAPP_NUMBER+"?text="+encodeURIComponent(message),"_blank","noopener");}
+function sendCustomerChatMessage(){const message=document.getElementById("customer-chat-message").value.trim();const status=document.getElementById("chat-contact-status");if(!message){status.textContent="Tulis pesan terlebih dahulu.";return;}const phone=String(SUPPORT_WHATSAPP_NUMBER||"").replace(/\\D/g,"");if(phone.length<8||phone.length>15){status.textContent="Nomor WhatsApp Owner belum valid. Hubungi Owner.";return;}const url="https://wa.me/"+phone+"?text="+encodeURIComponent(message);status.textContent="Membuka WhatsApp Owner...";window.open(url,"_blank","noopener");}
 document.addEventListener("keydown",e=>{if(e.key==="Escape")toggleCustomerChat(false);});
 </script>
 </body>
