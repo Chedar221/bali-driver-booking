@@ -206,6 +206,7 @@ footer{background:var(--forest);color:#d8dfd8;padding:28px 18px;margin-top:55px;
 
 <label>Destination</label>
 <div class="location-field"><input id="destination" required maxlength="250" placeholder="Pilih lokasi tujuan"><button class="location-map-btn" type="button" onclick="openLocationMap(&quot;destination&quot;)">📍 Pilih di peta</button></div>
+<p id="route-price-preview" class="note" style="margin:8px 0 14px;">Harga rute akan muncul jika asal dan tujuan cocok dengan daftar harga.</p>
 
 <label>Pickup Date</label>
 <input id="date" type="date" required>
@@ -288,6 +289,47 @@ const submitBtn = document.getElementById("submitBtn");
 document.getElementById("date").min =
   new Date().toLocaleDateString("en-CA");
 
+let matchedRoutePrice = 0;
+
+function formatIDR(value) {
+  return new Intl.NumberFormat('id-ID', {style:'currency',currency:'IDR',maximumFractionDigits:0}).format(Number(value || 0));
+}
+function normalizeRouteName(value) {
+  return String(value || '').trim().toLocaleLowerCase('id-ID');
+}
+async function refreshRoutePricePreview() {
+  const preview = document.getElementById('route-price-preview');
+  if (!preview) return;
+  const origin = document.getElementById('pickup').value.trim();
+  const destination = document.getElementById('destination').value.trim();
+  const serviceId = Number(serviceSelect.value);
+  matchedRoutePrice = 0;
+  if (!origin || !destination || !serviceId) {
+    preview.textContent = 'Harga rute akan muncul jika asal dan tujuan cocok dengan daftar harga.';
+    return;
+  }
+  const {data,error} = await db.from('service_routes').select('price,origin,destination')
+    .eq('service_id',serviceId).eq('is_active',true);
+  if (error) {
+    preview.textContent = 'Harga belum dapat diperiksa. Owner akan mengonfirmasi tarif.';
+    return;
+  }
+  const match = (data || []).find(route =>
+    normalizeRouteName(route.origin) === normalizeRouteName(origin) &&
+    normalizeRouteName(route.destination) === normalizeRouteName(destination)
+  );
+  if (match) {
+    matchedRoutePrice = Number(match.price);
+    preview.textContent = 'Estimasi harga: ' + formatIDR(matchedRoutePrice);
+    preview.style.color = '#176334';
+    preview.style.fontWeight = '700';
+  } else {
+    preview.textContent = 'Rute belum memiliki harga tetap. Owner akan mengonfirmasi tarif.';
+    preview.style.color = '#65776d';
+    preview.style.fontWeight = '400';
+  }
+}
+
 async function loadServices() {
   const {data,error} = await db
     .from("services")
@@ -311,6 +353,11 @@ async function loadServices() {
     serviceSelect.appendChild(option);
   });
 }
+
+
+document.getElementById('pickup').addEventListener('change', refreshRoutePricePreview);
+document.getElementById('destination').addEventListener('change', refreshRoutePricePreview);
+serviceSelect.addEventListener('change', refreshRoutePricePreview);
 
 function showMessage(text,success) {
   message.style.display = "block";
@@ -342,7 +389,7 @@ form.addEventListener("submit", async function(event) {
       passenger_count: Number(document.getElementById("passengers").value),
       notes: document.getElementById("notes").value.trim() || null,
       status: "pending",
-      total_price: 0
+      total_price: matchedRoutePrice
     };
 
     const { error } = await db.from("bookings").insert(booking);
@@ -978,6 +1025,29 @@ async function driverLogout() {
   <h3 style="color:#176b45;">DAFTAR DRIVER & PERSETUJUAN</h3>
   <div id="driver-management-list">Memuat daftar driver...</div>
 </div>
+<!-- MANAJEMEN HARGA & RUTE -->
+<div style="margin-top:25px;background:white;padding:18px;border-radius:12px;">
+  <h3 style="color:#176b45;">MANAJEMEN HARGA & RUTE</h3>
+  <p style="color:#65776d;font-size:14px;">Tambah rute perjalanan dan atur tarif. Contoh: Padangbai → Uluwatu = Rp600.000.</p>
+  <form id="route-price-form" onsubmit="saveServiceRoute(event)">
+    <input type="hidden" id="route-edit-id">
+    <label for="route-service">Jenis Layanan</label>
+    <select id="route-service" required></select>
+    <label for="route-origin">Dari</label>
+    <input id="route-origin" required minlength="2" maxlength="120" placeholder="Contoh: Padangbai">
+    <label for="route-destination">Tujuan</label>
+    <input id="route-destination" required minlength="2" maxlength="120" placeholder="Contoh: Uluwatu">
+    <label for="route-price">Harga (Rupiah)</label>
+    <input id="route-price" type="number" required min="0" step="1000" placeholder="600000">
+    <div style="display:flex;gap:9px;flex-wrap:wrap;">
+      <button id="route-save-button" type="submit" style="flex:1;background:#176b45;">+ SIMPAN RUTE & HARGA</button>
+      <button id="route-cancel-button" type="button" onclick="cancelRouteEdit()" style="display:none;flex:1;background:#68756e;">BATAL EDIT</button>
+    </div>
+  </form>
+  <p id="route-price-message" role="status" style="font-size:14px;"></p>
+  <h4 style="margin:22px 0 10px;color:#29483d;">DAFTAR RUTE & HARGA</h4>
+  <div id="route-price-list">Memuat daftar rute...</div>
+</div>
 <!-- DAFTAR BOOKING -->
 <div style="margin-top:25px;background:white;padding:18px;border-radius:12px;">
 
@@ -1062,8 +1132,124 @@ async function loadOwnerDashboard() {
   document.getElementById('total-drivers').textContent = drivers.count ?? 0;
   document.getElementById('active-drivers').textContent = active.count ?? 0;
   document.getElementById('pending-bookings').textContent = pending.count ?? 0;
-await Promise.all([loadOwnerBookings(), loadOwnerDrivers()]);
+await Promise.all([loadOwnerBookings(), loadOwnerDrivers(), loadServiceRoutes()]);
   message.textContent = 'Data berhasil dimuat.';
+}
+
+async function loadServiceRoutes() {
+  const list = document.getElementById('route-price-list');
+  const serviceSelectOwner = document.getElementById('route-service');
+  if (!list || !serviceSelectOwner) return;
+  list.textContent = 'Memuat daftar rute...';
+  const [servicesResult, routesResult] = await Promise.all([
+    db.from('services').select('id,name').order('id'),
+    db.from('service_routes').select('id,service_id,origin,destination,price,is_active').order('origin')
+  ]);
+  if (servicesResult.error || routesResult.error) {
+    list.textContent = 'Gagal memuat rute/harga: ' + (routesResult.error?.message || servicesResult.error?.message);
+    return;
+  }
+  const serviceNames = new Map((servicesResult.data || []).map(x => [String(x.id), x.name]));
+  const current = serviceSelectOwner.value;
+  serviceSelectOwner.innerHTML = '';
+  (servicesResult.data || []).forEach(service => {
+    const option = document.createElement('option');
+    option.value = service.id;
+    option.textContent = service.name;
+    serviceSelectOwner.appendChild(option);
+  });
+  if (current) serviceSelectOwner.value = current;
+  list.innerHTML = '';
+  if (!routesResult.data?.length) {
+    list.textContent = 'Belum ada rute. Tambahkan rute pertama melalui formulir di atas.';
+    return;
+  }
+  routesResult.data.forEach(route => {
+    const card = document.createElement('div');
+    card.style.cssText = 'padding:14px;margin:10px 0;border:1px solid #e2e8e3;border-radius:10px;background:#fbfcfa;';
+    const title = document.createElement('strong');
+    title.textContent = route.origin + ' → ' + route.destination;
+    title.style.cssText = 'display:block;color:#234a39;margin-bottom:5px;';
+    const meta = document.createElement('div');
+    meta.textContent = (serviceNames.get(String(route.service_id)) || 'Layanan') + ' · ' + formatIDR(route.price) + (route.is_active ? '' : ' · Nonaktif');
+    meta.style.cssText = 'font-size:14px;color:#65776d;';
+    const actions = document.createElement('div');
+    actions.style.cssText = 'display:flex;gap:8px;margin-top:10px;';
+    const edit = document.createElement('button');
+    edit.type = 'button'; edit.textContent = 'EDIT';
+    edit.style.cssText = 'margin:0;padding:10px;background:#176b45;flex:1;';
+    edit.onclick = () => editServiceRoute(route);
+    const remove = document.createElement('button');
+    remove.type = 'button'; remove.textContent = 'HAPUS';
+    remove.style.cssText = 'margin:0;padding:10px;background:#a33b35;flex:1;';
+    remove.onclick = () => deleteServiceRoute(route.id);
+    actions.append(edit, remove);
+    card.append(title, meta, actions);
+    list.appendChild(card);
+  });
+}
+function editServiceRoute(route) {
+  document.getElementById('route-edit-id').value = route.id;
+  document.getElementById('route-service').value = route.service_id;
+  document.getElementById('route-origin').value = route.origin;
+  document.getElementById('route-destination').value = route.destination;
+  document.getElementById('route-price').value = route.price;
+  document.getElementById('route-save-button').textContent = 'SIMPAN PERUBAHAN';
+  document.getElementById('route-cancel-button').style.display = 'block';
+  document.getElementById('route-price-message').textContent = 'Mode edit: ubah data lalu simpan.';
+  document.getElementById('route-origin').scrollIntoView({behavior:'smooth',block:'center'});
+}
+function cancelRouteEdit() {
+  document.getElementById('route-price-form').reset();
+  document.getElementById('route-edit-id').value = '';
+  document.getElementById('route-save-button').textContent = '+ SIMPAN RUTE & HARGA';
+  document.getElementById('route-cancel-button').style.display = 'none';
+  document.getElementById('route-price-message').textContent = '';
+}
+async function saveServiceRoute(event) {
+  event.preventDefault();
+  const button = document.getElementById('route-save-button');
+  const message = document.getElementById('route-price-message');
+  const id = document.getElementById('route-edit-id').value;
+  const payload = {
+    service_id: Number(document.getElementById('route-service').value),
+    origin: document.getElementById('route-origin').value.trim(),
+    destination: document.getElementById('route-destination').value.trim(),
+    price: Number(document.getElementById('route-price').value),
+    is_active: true
+  };
+  if (!payload.service_id || !payload.origin || !payload.destination || !Number.isFinite(payload.price) || payload.price < 0) {
+    message.textContent = 'Periksa kembali jenis layanan, rute, dan harga.';
+    return;
+  }
+  button.disabled = true;
+  button.textContent = 'MENYIMPAN...';
+  const result = id
+    ? await db.from('service_routes').update(payload).eq('id', Number(id))
+    : await db.from('service_routes').insert(payload);
+  button.disabled = false;
+  button.textContent = id ? 'SIMPAN PERUBAHAN' : '+ SIMPAN RUTE & HARGA';
+  if (result.error) {
+    message.style.color = '#a12626';
+    message.textContent = 'Gagal menyimpan: ' + (result.error.code === '23505' ? 'Rute untuk layanan ini sudah ada.' : result.error.message);
+    return;
+  }
+  message.style.color = '#176334';
+  message.textContent = id ? 'Perubahan rute berhasil disimpan.' : 'Rute dan harga berhasil ditambahkan.';
+  cancelRouteEdit();
+  await loadServiceRoutes();
+  await refreshRoutePricePreview();
+}
+async function deleteServiceRoute(id) {
+  if (!confirm('Hapus rute dan harga ini? Tindakan ini tidak bisa dibatalkan.')) return;
+  const {error} = await db.from('service_routes').delete().eq('id', Number(id));
+  if (error) {
+    alert('Gagal menghapus rute: ' + error.message);
+    return;
+  }
+  document.getElementById('route-price-message').textContent = 'Rute berhasil dihapus.';
+  await loadServiceRoutes();
+  await refreshRoutePricePreview();
 }
 
 async function loadOwnerBookings() {
