@@ -112,7 +112,7 @@ AGUS DRIVER BOOKING · Your Journey, Our Priority.
 
 <script>
 function openPopup(id) {
-  if (location.hash) history.replaceState(null, '', location.pathname + location.search);
+  if (location.hash) location.hash = '';
   document.querySelectorAll('.popup-overlay').forEach(p => {
     p.classList.remove('is-open');
     p.style.display = 'none';
@@ -124,7 +124,7 @@ function openPopup(id) {
   document.body.classList.add('popup-open');
 }
 function closePopup(id) {
-  if (location.hash === '#' + id) history.replaceState(null, '', location.pathname + location.search);
+  if (location.hash === '#' + id) location.hash = '';
   const popup = document.getElementById(id);
   if (!popup) return;
   popup.classList.remove('is-open');
@@ -140,7 +140,7 @@ document.addEventListener('keydown', function(event) {
       p.classList.remove('is-open');
       p.style.display = 'none';
     });
-    if (location.hash) history.replaceState(null, '', location.pathname + location.search);
+    if (location.hash) location.hash = '';
     document.body.classList.remove('popup-open');
   }
 });
