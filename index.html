@@ -968,7 +968,7 @@ async function loadOwnerBookings() {
   const list = document.getElementById('booking-list');
   list.textContent = 'Memuat booking...';
   const { data, error } = await db.from('bookings')
-    .select('id, booking_code, customer_name, customer_phone, pickup_location, destination, pickup_date, pickup_time, passenger_count, status, total_price')
+    .select('id, booking_code, customer_name, customer_phone, pickup_location, destination, pickup_date, pickup_time, passenger_count, status, total_price, driver_id, vehicle_id')
     .order('id', { ascending: false });
   if (error) {
     list.textContent = 'Gagal memuat booking: ' + error.message;
@@ -1013,7 +1013,7 @@ async function loadOwnerBookings() {
         await loadOwnerDashboard();
       };
       card.appendChild(btn);
-    } else if (booking.status === 'confirmed') {
+    } else if (booking.status === 'confirmed' && !booking.driver_id) {
       const btn = document.createElement('button');
       btn.textContent = 'ASSIGN DRIVER';
       btn.onclick = () => window.openDriverAssignment(booking.id, booking.passenger_count);
