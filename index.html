@@ -722,12 +722,16 @@ async function driverLogout() {
     <h3 style="color:#176b45;">MANAJEMEN DRIVER</h3>
     <p style="color:#65776d;font-size:14px;">Buat akun Driver dari sini. Undangan untuk mengatur password akan dikirim ke email Driver.</p>
     <form id="create-driver-form" onsubmit="createDriverAccount(event)">
-      <label for="new-driver-name">Nama lengkap Driver</label>
-      <input id="new-driver-name" required minlength="2" maxlength="100" placeholder="Nama lengkap">
-      <label for="new-driver-email">Email Driver</label>
+      <label for="new-driver-name">Nama Driver</label>
+      <input id="new-driver-name" required minlength="2" maxlength="100" placeholder="Nama lengkap Driver">
+      <label for="new-driver-phone">Nomor WhatsApp</label>
+      <input id="new-driver-phone" type="tel" required minlength="8" maxlength="25" placeholder="08xxxxxxxxxx">
+      <label for="new-driver-vehicle">Jenis / Tipe Mobil</label>
+      <input id="new-driver-vehicle" required minlength="2" maxlength="80" placeholder="Contoh: Suzuki Ertiga">
+      <label for="new-driver-plate">Plat Nomor Mobil</label>
+      <input id="new-driver-plate" required minlength="3" maxlength="15" placeholder="Contoh: DK 1234 ABC" style="text-transform:uppercase;">
+      <label for="new-driver-email">Email Login Driver</label>
       <input id="new-driver-email" type="email" required maxlength="150" placeholder="email@example.com">
-      <label for="new-driver-phone">Nomor WhatsApp (opsional)</label>
-      <input id="new-driver-phone" type="tel" maxlength="25" placeholder="08xxxxxxxxxx">
       <button id="create-driver-button" type="submit" style="background:#176b45;">+ TAMBAH DRIVER & KIRIM UNDANGAN</button>
     </form>
     <p id="create-driver-message" role="status"></p>
@@ -882,6 +886,8 @@ async function createDriverAccount(event) {
   const full_name = document.getElementById('new-driver-name').value.trim();
   const email = document.getElementById('new-driver-email').value.trim();
   const phone = document.getElementById('new-driver-phone').value.trim();
+  const vehicle_name = document.getElementById('new-driver-vehicle').value.trim();
+  const plate_number = document.getElementById('new-driver-plate').value.trim().toUpperCase();
 
   button.disabled = true;
   button.textContent = 'MEMBUAT AKUN...';
@@ -889,7 +895,7 @@ async function createDriverAccount(event) {
   message.textContent = 'Memproses akun dan mengirim undangan email...';
 
   const { data, error } = await db.functions.invoke('owner-create-driver', {
-    body: { full_name, email, phone }
+    body: { full_name, email, phone, vehicle_name, plate_number }
   });
 
   if (error || !data || !data.success) {
