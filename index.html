@@ -850,96 +850,86 @@ async function toggleDriverAvailability() {
 
 async function loadDriverBookings() {
   const list = document.getElementById('driver-booking-list');
+  const historyList = document.getElementById('driver-booking-history');
   const { data: authData, error: authError } = await db.auth.getUser();
 
   if (authError || !authData.user) {
     list.textContent = 'Sesi Driver tidak ditemukan. Silakan login kembali.';
+    if (historyList) historyList.textContent = 'Sesi Driver tidak ditemukan.';
     return;
   }
 
-  const driverId = authData.user.id;
-
-  const { data, error } = await db
-    .from('bookings')
-    .select(`
-      id,
-      booking_code,
-      customer_name,
-      customer_phone,
-      pickup_location,
-      destination,
-      pickup_date,
-      pickup_time,
-      passenger_count,
-      status
-    `)
-    .eq('driver_id', driverId)
+  const { data, error } = await db.from('bookings')
+    .select('id, booking_code, customer_name, customer_phone, pickup_location, destination, pickup_date, pickup_time, passenger_count, status')
+    .eq('driver_id', authData.user.id)
     .order('id', { ascending: false });
 
   if (error) {
     list.textContent = 'Gagal memuat booking: ' + error.message;
+    if (historyList) historyList.textContent = 'Gagal memuat riwayat.';
     return;
   }
 
-  if (!data || data.length === 0) {
-    list.textContent = 'Belum ada booking yang ditugaskan kepada Anda.';
-    return;
-  }
+  const active = (data || []).filter(b => ['assigned', 'confirmed', 'in_progress'].includes(b.status));
+  const history = (data || []).filter(b => ['completed', 'cancelled'].includes(b.status));
 
-  list.innerHTML = '';
-
-  data.forEach(booking => {
-    const card = document.createElement('div');
-    card.style.cssText =
-      'padding:15px;margin:12px 0;border:1px solid #ddd;border-radius:10px;background:white;';
-
-    const details = [
-      'Kode Booking: ' + booking.booking_code,
-      'Pelanggan: ' + booking.customer_name,
-      'Telepon: ' + booking.customer_phone,
-      'Penjemputan: ' + booking.pickup_location,
-      'Tujuan: ' + booking.destination,
-      'Tanggal: ' + booking.pickup_date,
-      'Jam: ' + booking.pickup_time,
-      'Penumpang: ' + booking.passenger_count,
-      'Status: ' + booking.status
-    ];
-
-    details.forEach(detail => {
-  const line = document.createElement('p');
-  line.textContent = detail;
-  card.appendChild(line);
-});
-
-const nextAction = {
-      assigned: { label: 'TERIMA BOOKING', status: 'confirmed' },
-      confirmed: { label: 'MULAI PERJALANAN', status: 'in_progress' },
-      in_progress: { label: 'SELESAIKAN PERJALANAN', status: 'completed' }
-    }[booking.status];
-    if (nextAction) {
-      const actionButton = document.createElement('button');
-      actionButton.textContent = nextAction.label;
-      actionButton.style.cssText = 'padding:12px;background:#176b45;color:white;border:0;border-radius:8px;';
-      actionButton.onclick = async function() {
-        actionButton.disabled = true;
-        actionButton.textContent = 'MEMPROSES...';
-        const { data: ok, error: rpcError } = await db.rpc('update_driver_booking_status', {
-          p_booking_id: booking.id,
-          p_new_status: nextAction.status
-        });
-        if (rpcError || ok !== true) {
-          alert('Gagal memperbarui booking: ' + (rpcError?.message || 'Status tidak berubah.'));
-          actionButton.disabled = false;
-          actionButton.textContent = nextAction.label;
-          return;
-        }
-        await loadDriverDashboard();
-      };
-      card.appendChild(actionButton);
+  const renderCards = (target, rows, emptyText, allowActions) => {
+    target.innerHTML = '';
+    if (!rows.length) {
+      target.textContent = emptyText;
+      return;
     }
+    rows.forEach(booking => {
+      const card = document.createElement('div');
+      card.style.cssText = 'padding:15px;margin:12px 0;border:1px solid #ddd;border-radius:10px;background:white;';
+      const details = [
+        'Kode Booking: ' + booking.booking_code,
+        'Pelanggan: ' + booking.customer_name,
+        'Telepon: ' + booking.customer_phone,
+        'Penjemputan: ' + booking.pickup_location,
+        'Tujuan: ' + booking.destination,
+        'Tanggal: ' + booking.pickup_date,
+        'Jam: ' + booking.pickup_time,
+        'Penumpang: ' + booking.passenger_count,
+        'Status: ' + bookingStatusLabel(booking.status)
+      ];
+      details.forEach(detail => {
+        const line = document.createElement('p');
+        line.textContent = detail;
+        card.appendChild(line);
+      });
+      const nextAction = allowActions ? ({
+        assigned: { label: 'TERIMA BOOKING', status: 'confirmed' },
+        confirmed: { label: 'MULAI PERJALANAN', status: 'in_progress' },
+        in_progress: { label: 'SELESAIKAN PERJALANAN', status: 'completed' }
+      })[booking.status] : null;
+      if (nextAction) {
+        const actionButton = document.createElement('button');
+        actionButton.textContent = nextAction.label;
+        actionButton.style.cssText = 'padding:12px;background:#176b45;color:white;border:0;border-radius:8px;';
+        actionButton.onclick = async function() {
+          actionButton.disabled = true;
+          actionButton.textContent = 'MEMPROSES...';
+          const { data: ok, error: rpcError } = await db.rpc('update_driver_booking_status', {
+            p_booking_id: booking.id,
+            p_new_status: nextAction.status
+          });
+          if (rpcError || ok !== true) {
+            alert('Gagal memperbarui booking: ' + (rpcError?.message || 'Status tidak berubah.'));
+            actionButton.disabled = false;
+            actionButton.textContent = nextAction.label;
+            return;
+          }
+          await loadDriverDashboard();
+        };
+        card.appendChild(actionButton);
+      }
+      target.appendChild(card);
+    });
+  };
 
-list.appendChild(card);
-  });
+  renderCards(list, active, 'Belum ada tugas perjalanan aktif.', true);
+  if (historyList) renderCards(historyList, history, 'Belum ada riwayat perjalanan.', false);
 }
 
 async function sendOwnerPasswordReset() {
@@ -1024,8 +1014,12 @@ async function driverLogout() {
   </div>
 
   <div style="background:white;padding:18px;border-radius:12px;margin:15px 0;">
-    <h3>Booking Saya</h3>
+    <h3>TUGAS PERJALANAN AKTIF</h3>
     <div id="driver-booking-list">Belum ada data.</div>
+  </div>
+  <div style="background:white;padding:18px;border-radius:12px;margin:15px 0;">
+    <h3>RIWAYAT PERJALANAN</h3>
+    <div id="driver-booking-history">Belum ada riwayat.</div>
   </div>
 
   <button onclick="driverLogout()"
@@ -1117,6 +1111,14 @@ async function driverLogout() {
       <p>Booking Pending</p>
       <h2 id="pending-bookings">0</h2>
     </div>
+    <div style="background:white;padding:18px;border-radius:12px;">
+      <p>Perjalanan Selesai</p>
+      <h2 id="completed-bookings">0</h2>
+    </div>
+    <div style="background:white;padding:18px;border-radius:12px;">
+      <p>Omzet Booking Selesai</p>
+      <h2 id="completed-revenue">Rp 0</h2>
+    </div>
 
   </div>
 <div style="margin-top:25px;background:white;padding:18px;border-radius:12px;">
@@ -1150,10 +1152,17 @@ async function driverLogout() {
 <div style="margin-top:25px;background:white;padding:18px;border-radius:12px;">
 
   <h3 style="color:#176b45;">DAFTAR BOOKING PELANGGAN</h3>
-
-  <div id="booking-list">
-    Memuat daftar booking...
-  </div>
+  <label for="owner-booking-filter">Filter Status Booking</label>
+  <select id="owner-booking-filter" onchange="renderOwnerBookings()" style="width:100%;padding:12px;margin:8px 0 14px;">
+    <option value="all">Semua Booking</option>
+    <option value="pending">Menunggu Konfirmasi</option>
+    <option value="confirmed">Dikonfirmasi</option>
+    <option value="assigned">Sudah Ditugaskan</option>
+    <option value="in_progress">Sedang Berjalan</option>
+    <option value="completed">Selesai</option>
+    <option value="cancelled">Dibatalkan</option>
+  </select>
+  <div id="booking-list">Memuat daftar booking...</div>
 
 </div>
   <button onclick="loadOwnerDashboard()"
@@ -1212,14 +1221,15 @@ async function loadOwnerDashboard() {
   const message = document.getElementById('dashboard-message');
   message.textContent = 'Memuat data...';
 
-  const [bookings, drivers, active, pending] = await Promise.all([
+  const [bookings, drivers, active, pending, completed] = await Promise.all([
     db.from('bookings').select('id', {count:'exact', head:true}),
     db.from('profiles').select('id', {count:'exact', head:true}).eq('role','driver'),
     db.from('driver_profiles').select('id', {count:'exact', head:true}).eq('is_available',true).eq('verification_status','approved'),
-    db.from('bookings').select('id', {count:'exact', head:true}).eq('status','pending')
+    db.from('bookings').select('id', {count:'exact', head:true}).eq('status','pending'),
+    db.from('bookings').select('total_price').eq('status','completed')
   ]);
 
-  const error = bookings.error || drivers.error || active.error || pending.error;
+  const error = bookings.error || drivers.error || active.error || pending.error || completed.error;
 
   if (error) {
     message.textContent = 'Gagal memuat data: ' + error.message;
@@ -1230,6 +1240,10 @@ async function loadOwnerDashboard() {
   document.getElementById('total-drivers').textContent = drivers.count ?? 0;
   document.getElementById('active-drivers').textContent = active.count ?? 0;
   document.getElementById('pending-bookings').textContent = pending.count ?? 0;
+  const completedRows = completed.data || [];
+  document.getElementById('completed-bookings').textContent = completedRows.length;
+  const completedRevenue = completedRows.reduce((sum, row) => sum + Number(row.total_price || 0), 0);
+  document.getElementById('completed-revenue').textContent = 'Rp ' + completedRevenue.toLocaleString('id-ID');
 await Promise.all([loadOwnerBookings(), loadOwnerDrivers(), loadServiceRoutes()]);
   message.textContent = 'Data berhasil dimuat.';
 }
@@ -1350,6 +1364,19 @@ async function deleteServiceRoute(id) {
   await refreshRoutePricePreview();
 }
 
+let ownerBookingsCache = [];
+
+function bookingStatusLabel(status) {
+  return ({
+    pending: 'MENUNGGU KONFIRMASI',
+    confirmed: 'DIKONFIRMASI',
+    assigned: 'SUDAH DITUGASKAN',
+    in_progress: 'SEDANG BERJALAN',
+    completed: 'SELESAI',
+    cancelled: 'DIBATALKAN'
+  })[status] || String(status || '').toUpperCase();
+}
+
 async function loadOwnerBookings() {
   const list = document.getElementById('booking-list');
   list.textContent = 'Memuat booking...';
@@ -1360,14 +1387,23 @@ async function loadOwnerBookings() {
     list.textContent = 'Gagal memuat booking: ' + error.message;
     return;
   }
-  if (!data || data.length === 0) {
-    list.textContent = 'Belum ada booking.';
+  ownerBookingsCache = data || [];
+  renderOwnerBookings();
+}
+
+function renderOwnerBookings() {
+  const list = document.getElementById('booking-list');
+  if (!list) return;
+  const filter = document.getElementById('owner-booking-filter')?.value || 'all';
+  const rows = filter === 'all' ? ownerBookingsCache : ownerBookingsCache.filter(b => b.status === filter);
+  list.innerHTML = '';
+  if (!rows.length) {
+    list.textContent = 'Tidak ada booking untuk status ini.';
     return;
   }
-  list.innerHTML = '';
-  data.forEach(booking => {
+  rows.forEach(booking => {
     const card = document.createElement('div');
-    card.style.cssText = 'padding:15px;margin:12px 0;border:1px solid #ddd;border-radius:10px;';
+    card.style.cssText = 'padding:15px;margin:12px 0;border:1px solid #ddd;border-radius:10px;background:white;';
     const details = [
       'Kode Booking: ' + booking.booking_code,
       'Nama: ' + booking.customer_name,
@@ -1377,7 +1413,7 @@ async function loadOwnerBookings() {
       'Tanggal: ' + booking.pickup_date,
       'Jam: ' + booking.pickup_time,
       'Jumlah Penumpang: ' + booking.passenger_count,
-      'Status: ' + booking.status,
+      'Status: ' + bookingStatusLabel(booking.status),
       'Harga: Rp ' + Number(booking.total_price || 0).toLocaleString('id-ID')
     ];
     details.forEach(detail => {
