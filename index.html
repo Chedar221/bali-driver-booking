@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>AGUS DRIVER BOOKING</title>
+<title>Bali Private Driver | Layanan Transportasi Wisata</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *{box-sizing:border-box}
@@ -190,18 +190,18 @@ footer{background:var(--forest);color:#d8dfd8;padding:28px 18px;margin-top:55px;
 <body>
 
 <header>
-<div class="logo"><div class="brand-copy"><span class="brand-title">BALI PRIVATE DRIVER</span><span class="brand-subtitle">Discover Bali With Your Private Driver</span></div></div>
-<nav class="popup-nav" aria-label="Menu utama"><button class="popup-menu-link booking-link" type="button" onclick="openPopup('booking-popup')">BOOKING</button><button class="popup-menu-link" type="button" onclick="openPopup('owner-popup')">LOGIN OWNER</button><a class="popup-menu-link driver-popup-link" href="#driver-popup">LOGIN DRIVER</a></nav>
+<div class="logo"><div class="brand-copy"><span class="brand-title">BALI PRIVATE DRIVER</span><span class="brand-subtitle">Jelajahi Bali dengan layanan pengemudi pribadi</span></div></div>
+<nav class="popup-nav" aria-label="Menu utama"><button class="popup-menu-link booking-link" type="button" onclick="openPopup('booking-popup')">BUAT PEMESANAN</button><button class="popup-menu-link" type="button" onclick="openPopup('owner-popup')">MASUK OWNER</button><a class="popup-menu-link driver-popup-link" href="#driver-popup">MASUK DRIVER</a></nav>
 </header>
 
 
 
-<section id="tourist-destinations"><div class="tour-catalog-head"><div class="eyebrow">DISCOVER THE ISLAND OF GODS</div><h2 style="margin:7px 0;color:#173d2f;">Destinasi Wisata Populer di Bali</h2><p style="margin:0;color:#6b7a72;font-size:14px;">Pilih tempat favorit Anda, lihat harga transportasi, lalu pesan perjalanan.</p></div><div id="tourist-destination-grid" class="tour-catalog-grid"><div style="grid-column:1/-1;text-align:center;padding:24px;color:#718078;">Memuat destinasi wisata...</div></div></section>
+<section id="tourist-destinations"><div class="tour-catalog-head"><div class="eyebrow">PILIHAN DESTINASI WISATA</div><h2 style="margin:7px 0;color:#173d2f;">Destinasi Wisata Populer di Bali</h2><p style="margin:0;color:#6b7a72;font-size:14px;">Temukan destinasi pilihan dan pesan perjalanan dengan mudah.</p></div><div id="tourist-destination-grid" class="tour-catalog-grid"><div style="grid-column:1/-1;text-align:center;padding:24px;color:#718078;">Memuat pilihan destinasi...</div></div></section>
 <section id="public-price-list" style="max-width:1000px;margin:38px auto;padding:0 18px;">
   <div style="background:#fff;border:1px solid #e8e1d2;border-radius:16px;padding:clamp(20px,4vw,32px);box-shadow:0 18px 50px #20382d0c;">
     <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px;">
-      <div><p style="color:#b18b48;font-weight:800;letter-spacing:2px;font-size:12px;margin:0 0 8px;">TRANSPARENT PRICING</p><h2 style="margin:0;">PRICE LIST</h2></div>
-      <button type="button" onclick="openPopup('booking-popup')" style="width:auto;margin:0;padding:12px 18px;background:#c9a45e;color:#17352b;">BOOK NOW</button>
+      <div><p style="color:#b18b48;font-weight:800;letter-spacing:2px;font-size:12px;margin:0 0 8px;">INFORMASI TARIF</p><h2 style="margin:0;">Daftar Tarif</h2></div>
+      <button type="button" onclick="openPopup('booking-popup')" style="width:auto;margin:0;padding:12px 18px;background:#c9a45e;color:#17352b;">Pesan Sekarang</button>
     </div>
     <p class="note">Harga perjalanan berdasarkan rute yang tersedia. Hubungi kami jika tujuan Anda belum tercantum.</p>
     <div id="public-route-price-list" style="margin-top:18px;">Memuat daftar harga...</div>
@@ -211,51 +211,51 @@ footer{background:var(--forest);color:#d8dfd8;padding:28px 18px;margin-top:55px;
 <div id="booking-popup" class="popup-overlay" role="dialog" aria-modal="true" aria-label="Form booking" onclick="if(event.target===this)closePopup('booking-popup')"><main class="popup-panel">
 <button class="popup-close" type="button" aria-label="Tutup" onclick="closePopup('booking-popup')">×</button>
 <div class="card">
-<h2>Our Services</h2>
+<h2>Pilihan Layanan</h2>
 <div class="services">
-<div class="service">✈️ Airport Transfer</div>
-<div class="service">🌴 Private Tour</div>
-<div class="service">🚘 Point to Point</div>
-<div class="service">⭐ Private Car Charter</div>
+<div class="service">✈️ Antar-Jemput Bandara</div>
+<div class="service">🌴 Wisata Pribadi</div>
+<div class="service">🚘 Antar Lokasi</div>
+<div class="service">⭐ Sewa Kendaraan dengan Pengemudi</div>
 </div>
 
-<h2>Book Your Driver</h2>
+<h2>Formulir Pemesanan</h2>
 <form id="bookingForm">
-<label>Full Name / Nama Lengkap</label>
+<label>Nama Lengkap</label>
 <input id="name" required maxlength="100">
 
-<label>WhatsApp Number</label>
+<label>Nomor WhatsApp</label>
 <input id="phone" required maxlength="25">
 
-<label>Email (optional)</label>
+<label>Alamat Email (Opsional)</label>
 <input id="email" type="email" maxlength="150">
 
-<label>Service / Layanan</label>
+<label>Kategori Layanan</label>
 <select id="service" required>
-<option value="">Loading services...</option>
+<option value="">Memuat pilihan layanan...</option>
 </select>
 
-<label>Pickup Location</label>
-<div class="location-field"><input id="pickup" required maxlength="250" placeholder="Pilih titik penjemputan"><button class="location-map-btn" type="button" onclick="openLocationMap(&quot;pickup&quot;)">📍 Pilih di peta</button></div>
+<label>Lokasi Penjemputan</label>
+<div class="location-field"><input id="pickup" required maxlength="250" placeholder="Pilih titik penjemputan"><button class="location-map-btn" type="button" onclick="openLocationMap(&quot;pickup&quot;)">Pilih pada Peta</button></div>
 
-<label>Destination</label>
-<div class="location-field"><input id="destination" required maxlength="250" placeholder="Pilih lokasi tujuan"><button class="location-map-btn" type="button" onclick="openLocationMap(&quot;destination&quot;)">📍 Pilih di peta</button></div>
+<label>Lokasi Tujuan</label>
+<div class="location-field"><input id="destination" required maxlength="250" placeholder="Pilih lokasi tujuan"><button class="location-map-btn" type="button" onclick="openLocationMap(&quot;destination&quot;)">Pilih pada Peta</button></div>
 <p id="route-price-preview" class="note" style="margin:8px 0 14px;">Harga rute akan muncul jika asal dan tujuan cocok dengan daftar harga.</p>
 
-<label>Pickup Date</label>
+<label>Tanggal Penjemputan</label>
 <input id="date" type="date" required>
 
-<label>Pickup Time</label>
+<label>Waktu Penjemputan</label>
 <input id="time" type="time" required>
 
-<label>Number of Passengers</label>
+<label>Jumlah Penumpang</label>
 <input id="passengers" type="number" min="1" max="20" value="1" required>
 
-<label>Additional Notes</label>
+<label>Catatan Tambahan</label>
 <textarea id="notes" rows="3" maxlength="1000"></textarea>
 
-<button id="submitBtn" type="submit">BOOK YOUR DRIVER</button>
-<p class="note">Your booking request will be reviewed by our team. Final price will be confirmed by the admin.</p>
+<button id="submitBtn" type="submit">Kirim Permintaan Pemesanan</button>
+<p class="note">Permintaan Anda akan ditinjau oleh tim kami. Tarif akhir akan dikonfirmasi sebelum perjalanan.</p>
 </form>
 <div id="message" role="status"></div>
 <div id="booking-receipt" style="display:none;margin-top:14px;padding:18px;border:1px solid #c8e3d2;border-radius:14px;background:#f0faf3;"></div>
@@ -264,7 +264,7 @@ footer{background:var(--forest);color:#d8dfd8;padding:28px 18px;margin-top:55px;
 
 <div id="location-map-modal" role="dialog" aria-modal="true" aria-label="Pilih lokasi di peta" onclick="if(event.target===this)closeLocationMap()"><div class="location-map-panel"><div class="location-map-head"><h3 id="location-map-title">Pilih lokasi</h3><button id="location-map-close" type="button" onclick="closeLocationMap()">×</button></div><div class="location-map-search"><input id="location-map-search-input" type="search" placeholder="Cari nama tempat, hotel, alamat..."><button id="location-map-search-btn" type="button" onclick="searchMapLocation()">CARI</button></div><div id="location-map"></div><p id="location-map-status">Geser peta atau ketuk lokasi yang diinginkan.</p><div class="location-map-actions"><button id="location-map-current" type="button" onclick="useCurrentLocation()">GUNAKAN LOKASI SAYA</button><button id="location-map-confirm" type="button" onclick="confirmMapLocation()">GUNAKAN TITIK INI</button></div></div></div>
 <footer>
-BALI PRIVATE DRIVER · Your Journey, Our Priority.
+BALI PRIVATE DRIVER · Kenyamanan Perjalanan Anda adalah Prioritas Kami.
 </footer>
 
 <script>
@@ -516,29 +516,29 @@ loadTourDestinations();
 <div id="owner-popup" class="popup-overlay" role="dialog" aria-modal="true" aria-label="Login Owner" onclick="if(event.target===this)closePopup('owner-popup')"><div class="popup-panel login-panel">
 <button class="popup-close" type="button" aria-label="Tutup" onclick="closePopup('owner-popup')">×</button>
 <div id="owner-login" style="max-width:400px;margin:30px auto;padding:20px;background:#f4f7f2;border-radius:12px;">
-  <h2>Owner Login</h2>
-  <input id="owner-email" type="email" placeholder="Email Owner"
+  <h2>Masuk Owner</h2>
+  <input id="owner-email" type="email" placeholder="Alamat Email Owner"
     style="width:100%;padding:12px;margin:8px 0;">
   <input id="owner-password" type="password" placeholder="Password"
     style="width:100%;padding:12px;margin:8px 0;">
   <button onclick="ownerLogin()"
     style="width:100%;padding:14px;background:#176b45;color:white;border:0;border-radius:8px;">
-    LOGIN OWNER
+    MASUK OWNER
   </button>
   <p id="owner-message"></p>
-  <button type="button" onclick="sendOwnerPasswordReset()" style="width:100%;padding:10px;background:#e8efe9;color:#176b45;border:1px solid #176b45;border-radius:8px;margin-top:10px;">LUPA PASSWORD OWNER?</button>
+  <button type="button" onclick="sendOwnerPasswordReset()" style="width:100%;padding:10px;background:#e8efe9;color:#176b45;border:1px solid #176b45;border-radius:8px;margin-top:10px;">LUPA KATA SANDI OWNER?</button>
   <p id="owner-reset-message" role="status" style="font-size:14px;"></p>
 </div></div></div>
 
-<!-- DRIVER LOGIN POPUP -->
+<!-- Masuk Driver POPUP -->
 <div id="driver-popup" class="popup-overlay" role="dialog" aria-modal="true" aria-label="Login Driver" onclick="if(event.target===this)closePopup('driver-popup')">
   <div class="popup-panel login-panel">
     <button class="popup-close" type="button" aria-label="Tutup" onclick="closePopup('driver-popup')">×</button>
     <div style="max-width:400px;margin:30px auto;padding:20px;background:#f4f7f2;border-radius:12px;">
-      <h2>DRIVER LOGIN</h2>
-      <label for="driver-email">Email Driver</label>
-      <input id="driver-email" type="email" autocomplete="username" placeholder="Email Driver" required>
-      <label for="driver-password">Password</label>
+      <h2>Masuk Driver</h2>
+      <label for="driver-email">Alamat Email Driver</label>
+      <input id="driver-email" type="email" autocomplete="username" placeholder="Alamat Email Driver" required>
+      <label for="driver-password">Kata Sandi</label>
       <input id="driver-password" type="password" autocomplete="current-password" placeholder="Password" required>
       <button type="button" onclick="driverLogin()" style="width:100%;padding:14px;background:#176b45;color:white;border:0;border-radius:8px;">LOGIN DRIVER</button>
       <p id="driver-login-message" role="status"></p>
@@ -1159,22 +1159,22 @@ function toggleAdminSection(id,button){
   <div id="driver-management-list">Memuat daftar driver...</div>
 </div>
 </div>
-<button type="button" class="admin-menu-button" aria-expanded="false" aria-controls="admin-tourist-destinations" onclick="toggleAdminSection('admin-tourist-destinations',this)">MANAJEMEN DESTINASI WISATA<span class="admin-menu-chevron">＋</span></button><div id="admin-tourist-destinations" class="admin-menu-content" hidden><div style="margin-top:18px;background:white;padding:18px;border-radius:12px;"><h3 style="color:#176b45;">KELOLA KATALOG WISATA</h3><p style="color:#65776d;font-size:13px;">Tambah foto dari galeri HP, atur harga transportasi, edit informasi, atau hapus destinasi.</p><form id="tour-destination-form" onsubmit="saveTourDestination(event)"><input type="hidden" id="tour-edit-id"><label for="tour-name">Nama objek wisata</label><input id="tour-name" required maxlength="120" placeholder="Contoh: Pura Lempuyang"><label for="tour-category">Kategori</label><select id="tour-category" required><option>Wisata Pura</option><option>Wisata Budaya</option><option>Wisata Alam</option><option>Adventure</option><option>Aktivitas Wisata</option><option>Pantai</option></select><label for="tour-description">Keterangan singkat</label><textarea id="tour-description" rows="2" maxlength="300" placeholder="Deskripsi singkat tempat wisata"></textarea><label for="tour-price">Harga transportasi mulai dari (Rupiah)</label><input id="tour-price" type="number" min="0" step="1000" required placeholder="Contoh: 600000"><label for="tour-image">Foto objek wisata</label><input id="tour-image" type="file" accept="image/*" onchange="previewTourImage(event)"><img id="tour-image-preview" class="tour-admin-preview" alt="Pratinjau foto destinasi"><p style="font-size:11px;color:#77847d;">Pilih foto JPG, PNG, atau WebP. Foto otomatis diperkecil. Saat menambah destinasi, foto wajib dipilih.</p><div style="display:flex;gap:8px;flex-wrap:wrap;"><button id="tour-save-button" type="submit" style="flex:1;background:#176b45;">+ SIMPAN DESTINASI</button><button id="tour-cancel-button" type="button" onclick="cancelTourEdit()" style="display:none;flex:1;background:#68756e;">BATAL EDIT</button></div><p id="tour-admin-message" role="status" style="font-size:13px;"></p></form><h4 style="color:#29483d;margin:22px 0 8px;">DAFTAR DESTINASI</h4><div id="tour-admin-list">Memuat daftar destinasi...</div></div></div>
-<!-- MANAJEMEN HARGA & RUTE -->
-<button type="button" class="admin-menu-button" aria-expanded="false" aria-controls="admin-route-prices" onclick="toggleAdminSection('admin-route-prices',this)">MANAJEMEN HARGA & RUTE<span class="admin-menu-chevron">＋</span></button>
+<button type="button" class="admin-menu-button" aria-expanded="false" aria-controls="admin-tourist-destinations" onclick="toggleAdminSection('admin-tourist-destinations',this)">PENGELOLAAN DESTINASI WISATA<span class="admin-menu-chevron">＋</span></button><div id="admin-tourist-destinations" class="admin-menu-content" hidden><div style="margin-top:18px;background:white;padding:18px;border-radius:12px;"><h3 style="color:#176b45;">Kelola Katalog Destinasi Wisata</h3><p style="color:#65776d;font-size:13px;">Tambahkan foto, tetapkan tarif transportasi, perbarui informasi, atau hapus destinasi.</p><form id="tour-destination-form" onsubmit="saveTourDestination(event)"><input type="hidden" id="tour-edit-id"><label for="tour-name">Nama Destinasi Wisata</label><input id="tour-name" required maxlength="120" placeholder="Contoh: Pura Lempuyang"><label for="tour-category">Kategori</label><select id="tour-category" required><option>Wisata Pura</option><option>Wisata Budaya</option><option>Wisata Alam</option><option>Adventure</option><option>Aktivitas Wisata</option><option>Pantai</option></select><label for="tour-description">Deskripsi Destinasi</label><textarea id="tour-description" rows="2" maxlength="300" placeholder="Deskripsi singkat tempat wisata"></textarea><label for="tour-price">Tarif Transportasi Mulai dari (Rupiah)</label><input id="tour-price" type="number" min="0" step="1000" required placeholder="Contoh: 600000"><label for="tour-image">Foto objek wisata</label><input id="tour-image" type="file" accept="image/*" onchange="previewTourImage(event)"><img id="tour-image-preview" class="tour-admin-preview" alt="Pratinjau foto destinasi"><p style="font-size:11px;color:#77847d;">Pilih foto JPG, PNG, atau WebP. Ukuran gambar akan disesuaikan secara otomatis. Foto wajib disertakan saat menambahkan destinasi.</p><div style="display:flex;gap:8px;flex-wrap:wrap;"><button id="tour-save-button" type="submit" style="flex:1;background:#176b45;">+ SIMPAN DESTINASI</button><button id="tour-cancel-button" type="button" onclick="cancelTourEdit()" style="display:none;flex:1;background:#68756e;">BATAL EDIT</button></div><p id="tour-admin-message" role="status" style="font-size:13px;"></p></form><h4 style="color:#29483d;margin:22px 0 8px;">Daftar Destinasi</h4><div id="tour-admin-list">Memuat daftar destinasi...</div></div></div>
+<!-- PENGELOLAAN TARIF DAN RUTE -->
+<button type="button" class="admin-menu-button" aria-expanded="false" aria-controls="admin-route-prices" onclick="toggleAdminSection('admin-route-prices',this)">PENGELOLAAN TARIF DAN RUTE<span class="admin-menu-chevron">＋</span></button>
 <div id="admin-route-prices" class="admin-menu-content" hidden>
 <div style="margin-top:25px;background:white;padding:18px;border-radius:12px;">
-  <h3 style="color:#176b45;">MANAJEMEN HARGA & RUTE</h3>
-  <p style="color:#65776d;font-size:14px;">Tambah rute perjalanan dan atur tarif. Contoh: Padangbai → Uluwatu = Rp600.000.</p>
+  <h3 style="color:#176b45;">PENGELOLAAN TARIF DAN RUTE</h3>
+  <p style="color:#65776d;font-size:14px;">Tambahkan rute perjalanan dan tetapkan tarif. Contoh: Padangbai → Uluwatu = Rp600.000.</p>
   <form id="route-price-form" onsubmit="saveServiceRoute(event)">
     <input type="hidden" id="route-edit-id">
-    <label for="route-service">Jenis Layanan</label>
+    <label for="route-service">Kategori Layanan</label>
     <select id="route-service" required></select>
     <label for="route-origin">Dari</label>
     <input id="route-origin" required minlength="2" maxlength="120" placeholder="Contoh: Padangbai">
     <label for="route-destination">Tujuan</label>
     <input id="route-destination" required minlength="2" maxlength="120" placeholder="Contoh: Uluwatu">
-    <label for="route-price">Harga (Rupiah)</label>
+    <label for="route-price">Tarif (Rupiah)</label>
     <input id="route-price" type="number" required min="0" step="1000" placeholder="600000">
     <div style="display:flex;gap:9px;flex-wrap:wrap;">
       <button id="route-save-button" type="submit" style="flex:1;background:#176b45;">+ SIMPAN RUTE & HARGA</button>
@@ -1183,15 +1183,15 @@ function toggleAdminSection(id,button){
 </div>
   </form>
   <p id="route-price-message" role="status" style="font-size:14px;"></p>
-  <h4 style="margin:22px 0 10px;color:#29483d;">DAFTAR RUTE & HARGA</h4>
+  <h4 style="margin:22px 0 10px;color:#29483d;">Daftar Rute dan Tarif</h4>
   <div id="route-price-list">Memuat daftar rute...</div>
 </div>
 <!-- DAFTAR BOOKING -->
-<button type="button" class="admin-menu-button" aria-expanded="false" aria-controls="admin-bookings" onclick="toggleAdminSection('admin-bookings',this)">DAFTAR BOOKING PELANGGAN<span class="admin-menu-chevron">＋</span></button>
+<button type="button" class="admin-menu-button" aria-expanded="false" aria-controls="admin-bookings" onclick="toggleAdminSection('admin-bookings',this)">DAFTAR PEMESANAN PELANGGAN<span class="admin-menu-chevron">＋</span></button>
 <div id="admin-bookings" class="admin-menu-content" hidden>
 <div style="margin-top:25px;background:white;padding:18px;border-radius:12px;">
 
-  <h3 style="color:#176b45;">DAFTAR BOOKING PELANGGAN</h3>
+  <h3 style="color:#176b45;">DAFTAR PEMESANAN PELANGGAN</h3>
   <label for="owner-booking-filter">Filter Status Booking</label>
   <select id="owner-booking-filter" onchange="renderOwnerBookings()" style="width:100%;padding:12px;margin:8px 0 14px;">
     <option value="all">Semua Booking</option>
@@ -1408,7 +1408,7 @@ async function deleteServiceRoute(id) {
 /* TOURIST DESTINATIONS */
 let tourDestinationsCache=[],tourImageData='';
 function formatTourPrice(v){const n=Number(v||0);return n>0?'Rp '+n.toLocaleString('id-ID'):'Hubungi kami';}
-async function loadTourDestinations(){const grid=document.getElementById('tourist-destination-grid');if(!grid)return;grid.textContent='Memuat destinasi wisata...';const {data,error}=await db.from('tourist_destinations').select('id,name,category,description,price,image_data').eq('is_active',true).order('sort_order').order('name');if(error){grid.textContent='Destinasi belum dapat dimuat. Silakan hubungi kami.';console.error(error);return;}tourDestinationsCache=data||[];renderTourDestinations();}
+async function loadTourDestinations(){const grid=document.getElementById('tourist-destination-grid');if(!grid)return;grid.textContent='Memuat pilihan destinasi...';const {data,error}=await db.from('tourist_destinations').select('id,name,category,description,price,image_data').eq('is_active',true).order('sort_order').order('name');if(error){grid.textContent='Destinasi belum dapat dimuat. Silakan hubungi kami.';console.error(error);return;}tourDestinationsCache=data||[];renderTourDestinations();}
 function renderTourDestinations(){const grid=document.getElementById('tourist-destination-grid');if(!grid)return;grid.innerHTML='';if(!tourDestinationsCache.length){grid.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:25px;background:#fff;border:1px dashed #d5dfd8;border-radius:14px;color:#68776f;">Destinasi wisata akan segera ditambahkan. Silakan hubungi kami untuk rekomendasi perjalanan.</div>';return;}tourDestinationsCache.forEach(item=>{const card=document.createElement('article');card.className='tour-card';if(item.image_data){const img=document.createElement('img');img.src=item.image_data;img.alt=item.name;img.loading='lazy';card.appendChild(img);}else{const p=document.createElement('div');p.className='tour-image-placeholder';p.textContent='🌴';card.appendChild(p);}const body=document.createElement('div');body.className='tour-card-body';const cat=document.createElement('span');cat.className='tour-category';cat.textContent=item.category;const h=document.createElement('h3');h.textContent=item.name;const d=document.createElement('p');d.textContent=item.description||'Jelajahi salah satu destinasi menarik di Bali.';const l=document.createElement('div');l.className='tour-price-label';l.textContent='HARGA TRANSPORTASI MULAI DARI';const price=document.createElement('div');price.className='tour-price';price.textContent=formatTourPrice(item.price);const b=document.createElement('button');b.type='button';b.className='tour-book-btn';b.textContent='PESAN PERJALANAN';b.onclick=()=>bookTourDestination(item.name);body.append(cat,h,d,l,price,b);card.appendChild(body);grid.appendChild(card);});}
 function bookTourDestination(name){openPopup('booking-popup');const dest=document.getElementById('destination');if(dest){dest.value=name;dest.dispatchEvent(new Event('change',{bubbles:true}));}const service=document.getElementById('service');if(service){const o=[...service.options].find(x=>/private tour|tour/i.test(x.textContent));if(o){service.value=o.value;service.dispatchEvent(new Event('change',{bubbles:true}));}}}
 async function previewTourImage(e){const file=e.target.files?.[0];if(!file)return;const msg=document.getElementById('tour-admin-message');if(!file.type.startsWith('image/')){msg.textContent='File harus berupa gambar.';e.target.value='';return;}if(file.size>12*1024*1024){msg.textContent='Ukuran foto maksimal 12 MB sebelum diproses.';e.target.value='';return;}try{const url=await new Promise((r,j)=>{const fr=new FileReader();fr.onload=()=>r(fr.result);fr.onerror=j;fr.readAsDataURL(file);});const img=await new Promise((r,j)=>{const im=new Image();im.onload=()=>r(im);im.onerror=j;im.src=url;});const scale=Math.min(1,1000/Math.max(img.width,img.height));const cv=document.createElement('canvas');cv.width=Math.max(1,Math.round(img.width*scale));cv.height=Math.max(1,Math.round(img.height*scale));cv.getContext('2d').drawImage(img,0,0,cv.width,cv.height);tourImageData=cv.toDataURL('image/jpeg',.72);if(tourImageData.length>950000)tourImageData=cv.toDataURL('image/jpeg',.55);const p=document.getElementById('tour-image-preview');p.src=tourImageData;p.style.display='block';msg.textContent='Foto siap disimpan.';}catch(_){msg.textContent='Gagal membaca foto. Coba pilih gambar lain.';}}
@@ -1597,7 +1597,7 @@ async function ownerLogout() {
     <form id="driver-activation-form">
       <label for="activation-password">Password Baru</label>
       <input id="activation-password" type="password" minlength="8" autocomplete="new-password" required placeholder="Minimal 8 karakter">
-      <label for="activation-password-confirm">Ulangi Password</label>
+      <label for="activation-password-confirm">Ulangi Kata Sandi</label>
       <input id="activation-password-confirm" type="password" minlength="8" autocomplete="new-password" required placeholder="Ulangi password">
       <button id="activation-submit" type="submit" style="background:#176b45;">SIMPAN PASSWORD</button>
     </form>
@@ -1674,7 +1674,7 @@ async function ownerLogout() {
     message.style.color = '#176334';
     message.textContent = isRecoveryLink
       ? 'Password berhasil diubah. Silakan login ' + (resetTarget === 'owner' ? 'Owner' : 'Driver') + ' menggunakan password baru.'
-      : 'Akun berhasil diaktifkan. Silakan login melalui bagian DRIVER LOGIN menggunakan email dan password baru.';
+      : 'Akun berhasil diaktifkan. Silakan login melalui bagian Masuk Driver menggunakan email dan password baru.';
     history.replaceState({}, document.title, window.location.pathname);
   });
 })();
@@ -1696,8 +1696,8 @@ document.getElementById("location-map-search-input").addEventListener("keydown",
 <!-- Floating customer support chat -->
 <div id="floating-chat-widget" aria-live="polite">
  <div id="chat-contact-panel" role="dialog" aria-label="Chat customer support">
-  <div id="chat-contact-head"><div class="chat-avatar">BD</div><div><div style="font-weight:800">BALI PRIVATE DRIVER</div><div style="font-size:12px;color:#d9e7dd;margin-top:3px">Customer Support</div></div><button type="button" aria-label="Close chat" onclick="toggleCustomerChat(false)" style="margin:0 0 0 auto;width:30px;height:30px;padding:0;background:transparent;color:white;font-size:20px">×</button></div>
-  <div id="chat-contact-body"><p>Halo! Ada pertanyaan tentang booking, harga, atau perjalanan di Bali? Tulis pesan di bawah untuk menghubungi kami.</p><textarea id="customer-chat-message" placeholder="Tulis pesan Anda..."></textarea><button type="button" onclick="sendCustomerChatMessage()">KIRIM PESAN</button><div id="chat-contact-status" role="status"></div></div>
+  <div id="chat-contact-head"><div class="chat-avatar">BD</div><div><div style="font-weight:800">BALI PRIVATE DRIVER</div><div style="font-size:12px;color:#d9e7dd;margin-top:3px">Layanan Pelanggan</div></div><button type="button" aria-label="Close chat" onclick="toggleCustomerChat(false)" style="margin:0 0 0 auto;width:30px;height:30px;padding:0;background:transparent;color:white;font-size:20px">×</button></div>
+  <div id="chat-contact-body"><p>Selamat datang. Silakan sampaikan pertanyaan mengenai pemesanan, tarif, atau perjalanan Anda di Bali.</p><textarea id="customer-chat-message" placeholder="Tuliskan pesan Anda di sini..."></textarea><button type="button" onclick="sendCustomerChatMessage()">Kirim Pesan</button><div id="chat-contact-status" role="status"></div></div>
  </div>
  <button id="floating-chat-button" type="button" onclick="toggleCustomerChat()"><span class="chat-icon">✉</span> CHAT SUPPORT</button>
 </div>
@@ -1707,5 +1707,85 @@ function toggleCustomerChat(force){const panel=document.getElementById("chat-con
 function sendCustomerChatMessage(){const message=document.getElementById("customer-chat-message").value.trim();const status=document.getElementById("chat-contact-status");if(!message){status.textContent="Tulis pesan terlebih dahulu.";return;}const phone=String(SUPPORT_WHATSAPP_NUMBER||"").replace(/\\D/g,"");if(phone.length<8||phone.length>15){status.textContent="Nomor WhatsApp Owner belum valid. Hubungi Owner.";return;}const url="https://wa.me/"+phone+"?text="+encodeURIComponent(message);status.textContent="Membuka WhatsApp Owner...";window.open(url,"_blank","noopener");}
 document.addEventListener("keydown",e=>{if(e.key==="Escape")toggleCustomerChat(false);});
 </script>
+
+<style id="refined-elegant-design">
+:root{--forest:#12382e;--forest2:#1d5140;--gold:#b99a61;--sand:#f5f2e9;--ink:#243a32;--muted:#718078}
+html{scroll-behavior:smooth}
+body{font-family:Inter,"Segoe UI",Arial,sans-serif!important;font-size:14px;line-height:1.55;letter-spacing:.05px;background:#f7f7f3!important;color:var(--ink)!important}
+header{padding:13px clamp(16px,5vw,68px)!important;min-height:70px!important}
+.logo{gap:10px!important}
+.logo:before{width:34px!important;height:34px!important;font-size:15px!important}
+.brand-title{font-size:15px!important;letter-spacing:1.45px!important;font-weight:750!important}
+.brand-subtitle{font-size:10px!important;letter-spacing:.15px!important}
+.popup-nav{gap:7px!important}
+.popup-menu-link{padding:9px 14px!important;min-height:37px!important;font-size:11px!important;letter-spacing:.25px!important;border-radius:5px!important}
+#tourist-destinations{max-width:1160px!important;margin:24px auto!important;padding:0 18px!important}
+.tour-catalog-head{margin-bottom:16px!important}
+.tour-catalog-head .eyebrow{font-size:10px!important;letter-spacing:1.7px!important}
+.tour-catalog-head h2{font-size:clamp(22px,3vw,29px)!important;margin:4px 0!important}
+.tour-catalog-head p{font-size:13px!important}
+.tour-catalog-grid{gap:12px!important}
+.tour-card{border-color:#e7e3d8!important;border-radius:10px!important;box-shadow:0 5px 16px rgba(22,48,38,.055)!important}
+.tour-card img,.tour-image-placeholder{height:126px!important}
+.tour-card-body{padding:10px!important}
+.tour-card h3{font-family:Georgia,"Times New Roman",serif!important;font-size:14px!important;font-weight:600!important;margin:7px 0 3px!important}
+.tour-card p{font-size:11px!important;line-height:1.45!important;min-height:32px!important;margin-bottom:7px!important}
+.tour-category{font-size:9px!important;letter-spacing:.15px!important}
+.tour-price-label{font-size:9px!important;letter-spacing:.25px!important}
+.tour-price{font-size:14px!important;margin:2px 0 8px!important}
+.tour-book-btn{font-size:10px!important;letter-spacing:.2px!important;padding:9px 6px!important;border-radius:5px!important}
+#public-price-list{margin:22px auto!important;padding:0 18px!important}
+#public-price-list>div{padding:20px!important;border-radius:11px!important;box-shadow:0 7px 24px rgba(22,48,38,.05)!important}
+#public-price-list h2{font-size:25px!important}
+#public-price-list .note{font-size:12px!important}
+#public-route-price-list{margin-top:12px!important;font-size:13px!important;line-height:1.5!important}
+#public-route-price-list>div{margin:10px 0!important;padding:12px!important;border-radius:8px!important}
+.popup-overlay{padding:12px!important}
+.popup-panel{padding:20px!important;border-radius:12px!important}
+.popup-panel h2{font-size:22px!important;margin-bottom:10px!important}
+.popup-panel label{font-size:12px!important;margin:10px 0 5px!important}
+.popup-panel input,.popup-panel select,.popup-panel textarea{min-height:42px!important;padding:10px 12px!important;font-size:13px!important;border-radius:6px!important}
+#booking-popup .card{padding:20px!important}
+#booking-popup .services{gap:7px!important;margin:0 0 17px!important}
+#booking-popup .service{min-height:48px!important;padding:8px 6px!important;font-size:11px!important;border-radius:7px!important}
+#booking-popup .card>h2:first-child{font-size:11px!important;letter-spacing:1px!important;margin-bottom:9px!important}
+#booking-popup .card h2:not(:first-child){font-size:22px!important;margin:8px 0 12px!important}
+#bookingForm label{margin:9px 0 4px!important}
+#bookingForm .note{font-size:11px!important;margin-top:8px!important}
+#submitBtn{font-size:12px!important;padding:12px!important;margin-top:15px!important}
+button{font-family:inherit!important;font-size:12px}
+input,select,textarea{font-family:inherit!important}
+footer{margin-top:30px!important;padding:20px 14px!important;font-size:11px!important;letter-spacing:.25px!important}
+.admin-menu-button{margin-top:8px!important;padding:12px 14px!important;border-radius:8px!important;font-size:12px!important;letter-spacing:.2px!important;box-shadow:none!important}
+.admin-menu-content{padding:8px 0 2px!important}
+.admin-menu-content>div{margin-top:7px!important;padding:14px!important;border-radius:9px!important}
+#owner-dashboard,#driver-dashboard{padding:14px!important}
+#owner-dashboard h2,#driver-dashboard h2{font-size:21px!important}
+#owner-dashboard button,#driver-dashboard button{font-size:11px!important;padding:10px 12px!important}
+#floating-chat-button{font-size:11px!important;letter-spacing:.2px!important;padding:11px 14px!important}
+#chat-contact-panel{border-radius:12px!important}
+@media(max-width:650px){
+ header{padding:12px 4%!important;gap:9px!important}
+ .brand-title{font-size:13px!important;letter-spacing:1px!important}
+ .brand-subtitle{font-size:9px!important}
+ .popup-nav{gap:5px!important}
+ .popup-menu-link{font-size:9px!important;padding:9px 3px!important;min-height:34px!important}
+ #tourist-destinations{margin:18px auto!important;padding:0 12px!important}
+ .tour-catalog-grid{gap:9px!important}
+ .tour-card img,.tour-image-placeholder{height:104px!important}
+ .tour-card-body{padding:8px!important}
+ .tour-card h3{font-size:12px!important}
+ .tour-card p{font-size:10px!important;min-height:40px!important}
+ .tour-price{font-size:12px!important}
+ .tour-book-btn{font-size:9px!important;padding:8px 3px!important}
+ #public-price-list{margin:18px auto!important;padding:0 12px!important}
+ #public-price-list>div{padding:15px!important}
+ #public-price-list h2{font-size:21px!important}
+ .popup-panel{padding:16px 12px!important}
+ #booking-popup .card{padding:15px!important}
+ #booking-popup .services{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+ footer{margin-top:24px!important}
+}
+</style>
 </body>
 </html>
