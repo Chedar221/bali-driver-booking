@@ -722,39 +722,7 @@ async function driverLogout() {
 }
 </script>
 
-  <!-- DRIVER LOGIN POPUP -->
-<div id="driver-popup" class="popup-overlay" role="dialog" aria-modal="true" aria-label="Login Driver" onclick="if(event.target===this){this.style.display='none';document.body.classList.remove('popup-open')}"><div class="popup-panel login-panel">
-<button class="popup-close" type="button" aria-label="Tutup" onclick="document.getElementById('driver-popup').classList.remove('is-open');document.getElementById('driver-popup').style.display='none';document.body.classList.remove('popup-open')">×</button>
-<div id="driver-login" style="max-width:400px;margin:30px auto;padding:20px;background:#f4f7f2;border-radius:12px;">
-
-  <h2 style="color:#176b45;">DRIVER LOGIN</h2>
-
-  <input id="driver-email"
-    type="email"
-    placeholder="Email Driver"
-    style="width:100%;padding:12px;margin:8px 0;">
-
-  <input id="driver-password"
-    type="password"
-    placeholder="Password Driver"
-    style="width:100%;padding:12px;margin:8px 0;">
-
-  <button onclick="driverLogin()"
-    style="width:100%;padding:14px;background:#176b45;color:white;border:0;border-radius:8px;">
-    LOGIN DRIVER
-  </button>
-
-  <p id="driver-login-message"></p>
-  <button type="button" onclick="sendDriverPasswordReset()" style="width:100%;padding:10px;background:#e8efe9;color:#176b45;border:1px solid #176b45;border-radius:8px;margin-top:10px;">
-    LUPA PASSWORD?
-  </button>
-  <p id="driver-reset-message" role="status" style="font-size:14px;"></p>
-  
-</div></div>
-
-  
-
-<!-- DRIVER DASHBOARD -->
+  <!-- DRIVER DASHBOARD -->
 <div id="driver-dashboard" style="display:none;max-width:900px;margin:30px auto;padding:20px;background:#f4f7f2;border-radius:15px;">
 
   <h2 style="color:#176b45;">BALI DRIVER BOOKING</h2>
