@@ -132,7 +132,27 @@ footer{background:var(--forest);color:#d8dfd8;padding:28px 18px;margin-top:55px;
  #booking-popup #bookingForm label,#booking-popup #bookingForm input,#booking-popup #bookingForm select,#booking-popup #bookingForm textarea{grid-column:1!important}
  #owner-login,#driver-popup .popup-panel>div:not(.popup-close){padding:34px 22px 24px!important}
 }
+.location-field{display:flex;gap:8px;align-items:stretch}
+.location-field input{flex:1;min-width:0}
+.location-map-btn{width:auto;min-width:112px;margin:0;padding:0 13px;background:#eaf2ed!important;color:#24553f!important;border:1px solid #d5e3da!important;border-radius:10px!important;font-size:12px!important;font-weight:700}
+#location-map-modal{display:none;position:fixed;inset:0;z-index:110000;background:#071c15c9;backdrop-filter:blur(5px);padding:14px;align-items:center;justify-content:center}
+#location-map-modal.is-open{display:flex}
+.location-map-panel{width:min(100%,760px);background:#fff;border-radius:18px;padding:16px;box-shadow:0 24px 80px #0008}
+.location-map-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}
+.location-map-head h3{margin:0;color:#173e30;font-size:18px}
+#location-map-close{width:36px;height:36px;margin:0;padding:0;border-radius:50%;background:#edf3ef;color:#285440}
+.location-map-search{display:flex;gap:8px;margin-bottom:10px}
+.location-map-search input{flex:1;min-width:0}
+#location-map-search-btn{width:auto;margin:0;padding:0 16px}
+#location-map{height:min(54vh,430px);min-height:280px;border-radius:12px;overflow:hidden;background:#e9eee9}
+.location-map-actions{display:flex;gap:10px;margin-top:12px}
+.location-map-actions button{margin:0;min-height:45px}
+#location-map-current{background:#edf3ef;color:#285440}
+#location-map-confirm{background:#174b39;color:#fff}
+#location-map-status{font-size:12px;color:#65776d;margin:8px 0 0;min-height:18px}
+@media(max-width:600px){.location-field{flex-direction:column;gap:6px}.location-map-btn{width:100%;min-height:38px}.location-map-panel{padding:12px}#location-map{height:48vh;min-height:250px}.location-map-actions{flex-direction:column}}
 </style>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 </head>
 <body>
 
@@ -174,10 +194,10 @@ footer{background:var(--forest);color:#d8dfd8;padding:28px 18px;margin-top:55px;
 </select>
 
 <label>Pickup Location</label>
-<input id="pickup" required maxlength="250">
+<div class="location-field"><input id="pickup" required maxlength="250" placeholder="Pilih titik penjemputan"><button class="location-map-btn" type="button" onclick="openLocationMap(&quot;pickup&quot;)">📍 Pilih di peta</button></div>
 
 <label>Destination</label>
-<input id="destination" required maxlength="250">
+<div class="location-field"><input id="destination" required maxlength="250" placeholder="Pilih lokasi tujuan"><button class="location-map-btn" type="button" onclick="openLocationMap(&quot;destination&quot;)">📍 Pilih di peta</button></div>
 
 <label>Pickup Date</label>
 <input id="date" type="date" required>
@@ -198,6 +218,7 @@ footer{background:var(--forest);color:#d8dfd8;padding:28px 18px;margin-top:55px;
 </div>
 </main></div>
 
+<div id="location-map-modal" role="dialog" aria-modal="true" aria-label="Pilih lokasi di peta" onclick="if(event.target===this)closeLocationMap()"><div class="location-map-panel"><div class="location-map-head"><h3 id="location-map-title">Pilih lokasi</h3><button id="location-map-close" type="button" onclick="closeLocationMap()">×</button></div><div class="location-map-search"><input id="location-map-search-input" type="search" placeholder="Cari nama tempat, hotel, alamat..."><button id="location-map-search-btn" type="button" onclick="searchMapLocation()">CARI</button></div><div id="location-map"></div><p id="location-map-status">Geser peta atau ketuk lokasi yang diinginkan.</p><div class="location-map-actions"><button id="location-map-current" type="button" onclick="useCurrentLocation()">GUNAKAN LOKASI SAYA</button><button id="location-map-confirm" type="button" onclick="confirmMapLocation()">GUNAKAN TITIK INI</button></div></div></div>
 <footer>
 BALI PRIVATE DRIVER · Your Journey, Our Priority.
 </footer>
@@ -1277,5 +1298,17 @@ async function ownerLogout() {
 })();
 </script>
 
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+let locationMap=null,locationMapMarker=null,selectedMapPoint=null,activeLocationField=null,selectedMapAddress="";
+function openLocationMap(field){activeLocationField=field;document.getElementById("location-map-title").textContent=field==="pickup"?"Pilih Lokasi Penjemputan":"Pilih Lokasi Tujuan";document.getElementById("location-map-modal").classList.add("is-open");document.body.classList.add("popup-open");if(!window.L){document.getElementById("location-map-status").textContent="Peta gagal dimuat. Periksa koneksi internet.";return;}if(!locationMap){locationMap=L.map("location-map").setView([-8.4095,115.1889],9);L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{attribution:"&copy; OpenStreetMap contributors",maxZoom:19}).addTo(locationMap);locationMap.on("click",e=>setMapPoint(e.latlng.lat,e.latlng.lng,true));}setTimeout(()=>locationMap.invalidateSize(),180);const old=document.getElementById(field).value.trim();if(old){document.getElementById("location-map-search-input").value=old;searchMapLocation();}else{selectedMapPoint=null;selectedMapAddress="";locationMap.setView([-8.4095,115.1889],9);document.getElementById("location-map-status").textContent="Ketuk peta untuk memilih titik lokasi.";}}
+function closeLocationMap(){document.getElementById("location-map-modal").classList.remove("is-open");if(!document.querySelector(".popup-overlay.is-open"))document.body.classList.remove("popup-open");}
+async function setMapPoint(lat,lng,reverse){selectedMapPoint={lat,lng};if(locationMapMarker)locationMap.removeLayer(locationMapMarker);locationMapMarker=L.marker([lat,lng]).addTo(locationMap);locationMap.setView([lat,lng],Math.max(locationMap.getZoom(),15));selectedMapAddress=lat.toFixed(6)+", "+lng.toFixed(6);const status=document.getElementById("location-map-status");status.textContent="Mengambil nama lokasi...";if(reverse){try{const res=await fetch("https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat="+lat+"&lon="+lng);if(res.ok){const data=await res.json();if(data.display_name)selectedMapAddress=data.display_name;}}catch(e){}}status.textContent="Titik dipilih: "+selectedMapAddress;}
+async function searchMapLocation(){const q=document.getElementById("location-map-search-input").value.trim();if(!q)return;const status=document.getElementById("location-map-status");status.textContent="Mencari lokasi...";try{const res=await fetch("https://nominatim.openstreetmap.org/search?format=jsonv2&limit=5&q="+encodeURIComponent(q));if(!res.ok)throw Error();const data=await res.json();if(!data.length){status.textContent="Lokasi tidak ditemukan. Coba kata kunci lain.";return;}await setMapPoint(Number(data[0].lat),Number(data[0].lon),false);selectedMapAddress=data[0].display_name;status.textContent="Hasil: "+selectedMapAddress;}catch(e){status.textContent="Pencarian gagal. Coba pilih langsung di peta.";}}
+function useCurrentLocation(){const status=document.getElementById("location-map-status");if(!navigator.geolocation){status.textContent="Browser tidak mendukung lokasi perangkat.";return;}status.textContent="Meminta izin lokasi perangkat...";navigator.geolocation.getCurrentPosition(p=>setMapPoint(p.coords.latitude,p.coords.longitude,true),e=>{status.textContent=e.code===1?"Izin lokasi ditolak. Pilih titik langsung di peta.":"Lokasi perangkat tidak tersedia.";},{enableHighAccuracy:true,timeout:12000});}
+function confirmMapLocation(){if(!selectedMapPoint){document.getElementById("location-map-status").textContent="Pilih titik di peta atau cari lokasi terlebih dahulu.";return;}const input=document.getElementById(activeLocationField);input.value=selectedMapAddress||selectedMapPoint.lat.toFixed(6)+", "+selectedMapPoint.lng.toFixed(6);input.dispatchEvent(new Event("change",{bubbles:true}));closeLocationMap();}
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&document.getElementById("location-map-modal").classList.contains("is-open"))closeLocationMap();});
+document.getElementById("location-map-search-input").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();searchMapLocation();}});
+</script>
 </body>
 </html>
