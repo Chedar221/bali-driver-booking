@@ -96,8 +96,8 @@ AGUS DRIVER BOOKING · Your Journey, Our Priority.
 </footer>
 
 <script>
-const SUPABASE_URL = "https://zfksninbrjylfipebpvo.supabase.co";
-const SUPABASE_ANON_KEY = "sb_publishable_zdMH2CFssrYuKUYvioQY0w_uHzoSITi";
+const SUPABASE_URL = "https://gdtkesaijsljwpfthocj.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_GbqMaTQ3g2CgO7ft4ea2cg_ltHcRxwD";
 
 const db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -506,6 +506,14 @@ async function toggleDriverAvailability() {
 
 async function loadDriverBookings() {
   const list = document.getElementById('driver-booking-list');
+  const { data: authData, error: authError } = await db.auth.getUser();
+
+  if (authError || !authData.user) {
+    list.textContent = 'Sesi Driver tidak ditemukan. Silakan login kembali.';
+    return;
+  }
+
+  const driverId = authData.user.id;
 
   const { data, error } = await db
     .from('bookings')
@@ -919,7 +927,7 @@ async function loadOwnerBookings() {
       'Kode Booking: ' + booking.booking_code,
       'Nama: ' + booking.customer_name,
       'Telepon: ' + booking.customer_phone,
-      'Penjemputan: ' + booking.pickup_location_location,
+      'Penjemputan: ' + booking.pickup_location,
       'Tujuan: ' + booking.destination,
       'Tanggal: ' + booking.pickup_date,
       'Jam: ' + booking.pickup_time,
