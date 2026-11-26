@@ -46,7 +46,7 @@ body.popup-open{overflow:hidden}
 
 <header>
 <div class="logo">AGUS DRIVER BOOKING</div>
-<nav class="popup-nav" aria-label="Menu utama"><button class="popup-menu-link booking-link" type="button" onclick="openPopup('booking-popup')">BOOKING</button><button class="popup-menu-link" type="button" onclick="openPopup('owner-popup')">LOGIN OWNER</button><button class="popup-menu-link driver-popup-link" type="button" onclick="openPopup('driver-popup')">LOGIN DRIVER</button></nav>
+<nav class="popup-nav" aria-label="Menu utama"><button class="popup-menu-link booking-link" type="button" onclick="openPopup('booking-popup')">BOOKING</button><button class="popup-menu-link" type="button" onclick="openPopup('owner-popup')">LOGIN OWNER</button><button class="popup-menu-link driver-popup-link" type="button" onclick="(function(){document.querySelectorAll('.popup-overlay').forEach(function(p){p.classList.remove('is-open');p.style.display='none';});var p=document.getElementById('driver-popup');if(p){p.style.display='flex';p.classList.add('is-open');document.body.classList.add('popup-open');}})()">LOGIN DRIVER</button></nav>
 </header>
 
 <section class="hero">
