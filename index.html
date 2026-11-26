@@ -1126,7 +1126,9 @@ async function ownerLogout() {
   panel.style.display = 'flex';
   if (isRecoveryLink) {
     document.querySelector('#driver-activation h2').textContent = resetTarget === 'owner' ? 'RESET PASSWORD OWNER' : 'RESET PASSWORD DRIVER';
-    panel.querySelector('p:nth-of-type(2)').textContent = 'Buat password baru untuk akun Driver Anda.';
+    panel.querySelector('p:nth-of-type(2)').textContent = resetTarget === 'owner'
+      ? 'Buat password baru untuk akun Owner Anda.'
+      : 'Buat password baru untuk akun Driver Anda.';
     message.textContent = 'Memverifikasi tautan reset password...';
   } else {
     message.textContent = 'Memverifikasi undangan...';
@@ -1176,7 +1178,7 @@ async function ownerLogout() {
     form.style.display = 'none';
     message.style.color = '#176334';
     message.textContent = isRecoveryLink
-      ? 'Password berhasil diubah. Silakan login Driver menggunakan password baru.'
+      ? 'Password berhasil diubah. Silakan login ' + (resetTarget === 'owner' ? 'Owner' : 'Driver') + ' menggunakan password baru.'
       : 'Akun berhasil diaktifkan. Silakan login melalui bagian DRIVER LOGIN menggunakan email dan password baru.';
     history.replaceState({}, document.title, window.location.pathname);
   });
