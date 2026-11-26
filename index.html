@@ -94,6 +94,44 @@ footer{background:var(--forest);color:#d8dfd8;padding:28px 18px;margin-top:55px;
  footer{margin-top:36px}
 }
 
+
+/* MODERN BOOKING + AUTH POPUPS */
+.popup-overlay{padding:18px!important;align-items:center!important;justify-content:center!important;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+#booking-popup .popup-panel{width:min(100%,760px)!important;max-width:760px!important;max-height:92vh!important;overflow-y:auto!important;padding:0!important;background:#f8faf9!important;border:1px solid #d9e5df!important;border-radius:22px!important;box-shadow:0 28px 90px #071e1680!important}
+#booking-popup .card{padding:clamp(20px,4vw,34px)!important;border:0!important;border-radius:22px!important;background:#f8faf9!important;box-shadow:none!important}
+#booking-popup .card>h2:first-child{font-family:Inter,system-ui,sans-serif!important;font-size:13px!important;font-weight:700!important;letter-spacing:1.5px!important;text-transform:uppercase!important;color:#668174!important;margin:0 0 13px!important}
+#booking-popup .services{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:9px!important;margin:0 0 25px!important}
+#booking-popup .service{display:flex;align-items:center;justify-content:center;text-align:center;min-height:58px!important;padding:10px 8px!important;background:#edf3ef!important;border:1px solid #e0eae4!important;border-radius:11px!important;color:#355b4a!important;font-size:12px!important;font-weight:600!important}
+#booking-popup #bookingForm{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;column-gap:14px!important;row-gap:7px!important}
+#booking-popup #bookingForm label{display:block!important;margin:8px 0 0!important;font-size:12px!important;font-weight:650!important;color:#486255!important}
+#booking-popup #bookingForm input,#booking-popup #bookingForm select,#booking-popup #bookingForm textarea{width:100%!important;min-width:0!important;margin:0!important;padding:12px 13px!important;min-height:45px!important;border:1px solid #dce6e0!important;border-radius:10px!important;background:#fff!important;color:#18392d!important;font:14px Inter,system-ui,sans-serif!important;box-shadow:none!important}
+#booking-popup #bookingForm input:focus,#booking-popup #bookingForm select:focus,#booking-popup #bookingForm textarea:focus{border-color:#2e795d!important;box-shadow:0 0 0 3px #2e795d18!important}
+#booking-popup #bookingForm label[for="notes"],#booking-popup #bookingForm textarea,#booking-popup #submitBtn,#booking-popup #bookingForm .note{grid-column:1/-1!important}
+#booking-popup #bookingForm textarea{min-height:76px!important;resize:vertical}
+#booking-popup #submitBtn{width:100%!important;min-height:49px!important;margin-top:12px!important;background:#174b39!important;color:white!important;border:0!important;border-radius:10px!important;font-weight:750!important;letter-spacing:.8px!important}
+#booking-popup .note{font-size:12px!important;margin:5px 0 0!important;color:#788b80!important}
+#booking-popup #message{margin-top:12px}
+#owner-popup .popup-panel,#driver-popup .popup-panel{width:min(100%,420px)!important;max-width:420px!important;padding:0!important;overflow:hidden!important;border:1px solid #dce8e1!important;border-radius:22px!important;background:#f9fbfa!important;box-shadow:0 28px 90px #071e1680!important}
+#owner-login,#driver-popup .popup-panel>div:not(.popup-close){max-width:none!important;margin:0!important;padding:38px 30px 30px!important;background:#f9fbfa!important;border-radius:22px!important}
+#owner-login h2,#driver-popup .popup-panel h2{margin:0 0 8px!important;font:700 25px/1.2 Inter,system-ui,sans-serif!important;letter-spacing:-.5px!important;color:#173e30!important}
+#owner-login:before{content:"BALI PRIVATE DRIVER  /  OWNER ACCESS";display:block;margin-bottom:16px;color:#8b9c92;font-size:10px;font-weight:750;letter-spacing:1.7px}
+#driver-popup .popup-panel>div:not(.popup-close):before{content:"BALI PRIVATE DRIVER  /  DRIVER ACCESS";display:block;margin-bottom:16px;color:#8b9c92;font-size:10px;font-weight:750;letter-spacing:1.7px}
+#owner-login input,#driver-popup input{display:block!important;width:100%!important;min-height:48px!important;margin:9px 0!important;padding:13px 14px!important;border:1px solid #dce6e0!important;border-radius:10px!important;background:white!important;color:#18392d!important;font:14px Inter,system-ui,sans-serif!important;box-shadow:none!important}
+#owner-login input:focus,#driver-popup input:focus{outline:none!important;border-color:#2e795d!important;box-shadow:0 0 0 3px #2e795d18!important}
+#owner-login button[onclick="ownerLogin()"],#driver-popup button[onclick="driverLogin()"]{width:100%!important;min-height:49px!important;margin-top:12px!important;padding:13px!important;background:#174b39!important;color:white!important;border:0!important;border-radius:10px!important;font-weight:750!important;letter-spacing:.7px!important}
+#owner-login button[onclick="sendOwnerPasswordReset()"],#driver-popup button[onclick="sendDriverPasswordReset()"]{width:100%!important;min-height:42px!important;margin-top:9px!important;padding:10px!important;background:#edf3ef!important;color:#285840!important;border:1px solid #dce8e1!important;border-radius:10px!important;font-size:12px!important;font-weight:700!important}
+#owner-message,#driver-login-message,#owner-reset-message,#driver-reset-message{font-size:12px!important;line-height:1.5!important;color:#496557!important}
+.popup-close{position:sticky!important;top:12px!important;float:right!important;z-index:5!important;margin:12px 12px -46px 0!important;width:34px!important;height:34px!important;border-radius:50%!important;background:#eaf1ed!important;color:#285440!important;border:1px solid #d9e5de!important;font-size:22px!important;line-height:1!important}
+@media(max-width:600px){
+ .popup-overlay{padding:10px!important}
+ #booking-popup .popup-panel{max-height:94vh!important;border-radius:17px!important}
+ #booking-popup .card{padding:23px 17px!important}
+ #booking-popup .services{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:7px!important;margin-bottom:20px!important}
+ #booking-popup .service{min-height:48px!important;font-size:11px!important}
+ #booking-popup #bookingForm{grid-template-columns:1fr!important;row-gap:5px!important}
+ #booking-popup #bookingForm label,#booking-popup #bookingForm input,#booking-popup #bookingForm select,#booking-popup #bookingForm textarea{grid-column:1!important}
+ #owner-login,#driver-popup .popup-panel>div:not(.popup-close){padding:34px 22px 24px!important}
+}
 </style>
 </head>
 <body>
@@ -105,7 +143,7 @@ footer{background:var(--forest);color:#d8dfd8;padding:28px 18px;margin-top:55px;
 
 <section class="hero">
 <h1>Discover Bali With Your Private Driver</h1>
-<p>Travel comfortably. Explore Bali. Enjoy every journey with a dedicated private driver.</p><button class="hero-booking-cta" type="button" onclick="openPopup(\"booking-popup\")">BOOK YOUR JOURNEY</button>
+<p>Travel comfortably. Explore Bali. Enjoy every journey with a dedicated private driver.</p><button class="hero-booking-cta" type="button" onclick="openPopup('booking-popup')">BOOK YOUR JOURNEY</button>
 </section>
 
 <div id="booking-popup" class="popup-overlay" role="dialog" aria-modal="true" aria-label="Form booking" onclick="if(event.target===this)closePopup('booking-popup')"><main class="popup-panel">
