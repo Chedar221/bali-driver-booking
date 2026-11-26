@@ -603,6 +603,29 @@ list.appendChild(card);
   });
 }
 
+async function sendDriverPasswordReset() {
+  const email = document.getElementById('driver-email').value.trim();
+  const message = document.getElementById('driver-reset-message');
+  if (!email) {
+    message.style.color = '#a12626';
+    message.textContent = 'Masukkan email Driver terlebih dahulu.';
+    document.getElementById('driver-email').focus();
+    return;
+  }
+  message.style.color = '#555';
+  message.textContent = 'Mengirim tautan reset password...';
+  const { error } = await db.auth.resetPasswordForEmail(email, {
+    redirectTo: 'https://bali-driver-booking.vercel.app/?reset=driver'
+  });
+  if (error) {
+    message.style.color = '#a12626';
+    message.textContent = 'Gagal mengirim email: ' + error.message;
+    return;
+  }
+  message.style.color = '#176334';
+  message.textContent = 'Tautan reset password dikirim. Periksa email dan buka tautannya di website ini.';
+}
+
 async function driverLogout() {
   await db.auth.signOut();
 
@@ -635,6 +658,10 @@ async function driverLogout() {
   </button>
 
   <p id="driver-login-message"></p>
+  <button type="button" onclick="sendDriverPasswordReset()" style="width:100%;padding:10px;background:#e8efe9;color:#176b45;border:1px solid #176b45;border-radius:8px;margin-top:10px;">
+    LUPA PASSWORD?
+  </button>
+  <p id="driver-reset-message" role="status" style="font-size:14px;"></p>
   
 </div>
 
@@ -1076,11 +1103,19 @@ if (booking.status === 'confirmed') {
   const button = document.getElementById('activation-submit');
   const hash = new URLSearchParams(window.location.hash.replace(/^#/, ''));
   const params = new URLSearchParams(window.location.search);
-  const isInviteLink = hash.get('type') === 'invite' || params.get('activate') === 'driver';
+  const linkType = hash.get('type');
+  const isInviteLink = linkType === 'invite' || params.get('activate') === 'driver';
+  const isRecoveryLink = linkType === 'recovery' || params.get('reset') === 'driver';
 
-  if (!isInviteLink) return;
+  if (!isInviteLink && !isRecoveryLink) return;
   panel.style.display = 'flex';
-  message.textContent = 'Memverifikasi undangan...';
+  if (isRecoveryLink) {
+    document.querySelector('#driver-activation h2').textContent = 'RESET PASSWORD DRIVER';
+    panel.querySelector('p:nth-of-type(2)').textContent = 'Buat password baru untuk akun Driver Anda.';
+    message.textContent = 'Memverifikasi tautan reset password...';
+  } else {
+    message.textContent = 'Memverifikasi undangan...';
+  }
 
   db.auth.getSession().then(({ data, error }) => {
     if (error || !data.session) {
@@ -1091,7 +1126,9 @@ if (booking.status === 'confirmed') {
     }
     document.getElementById('activation-email').textContent =
       'Akun: ' + (data.session.user.email || 'Driver');
-    message.textContent = 'Undangan valid. Silakan buat password.';
+    message.textContent = isRecoveryLink
+      ? 'Tautan reset valid. Silakan buat password baru.'
+      : 'Undangan valid. Silakan buat password.';
   });
 
   form.addEventListener('submit', async function(event) {
@@ -1123,7 +1160,9 @@ if (booking.status === 'confirmed') {
     await db.auth.signOut();
     form.style.display = 'none';
     message.style.color = '#176334';
-    message.textContent = 'Akun berhasil diaktifkan. Silakan login melalui bagian DRIVER LOGIN menggunakan email dan password baru.';
+    message.textContent = isRecoveryLink
+      ? 'Password berhasil diubah. Silakan login Driver menggunakan password baru.'
+      : 'Akun berhasil diaktifkan. Silakan login melalui bagian DRIVER LOGIN menggunakan email dan password baru.';
     history.replaceState({}, document.title, window.location.pathname);
   });
 })();
