@@ -718,6 +718,21 @@ async function driverLogout() {
   <h3>OWNER DASHBOARD</h3>
   <p>Selamat datang, Owner!</p>
 
+  <div style="margin:20px 0;background:white;padding:18px;border-radius:12px;">
+    <h3 style="color:#176b45;">MANAJEMEN DRIVER</h3>
+    <p style="color:#65776d;font-size:14px;">Buat akun Driver dari sini. Undangan untuk mengatur password akan dikirim ke email Driver.</p>
+    <form id="create-driver-form" onsubmit="createDriverAccount(event)">
+      <label for="new-driver-name">Nama lengkap Driver</label>
+      <input id="new-driver-name" required minlength="2" maxlength="100" placeholder="Nama lengkap">
+      <label for="new-driver-email">Email Driver</label>
+      <input id="new-driver-email" type="email" required maxlength="150" placeholder="email@example.com">
+      <label for="new-driver-phone">Nomor WhatsApp (opsional)</label>
+      <input id="new-driver-phone" type="tel" maxlength="25" placeholder="08xxxxxxxxxx">
+      <button id="create-driver-button" type="submit" style="background:#176b45;">+ TAMBAH DRIVER & KIRIM UNDANGAN</button>
+    </form>
+    <p id="create-driver-message" role="status"></p>
+  </div>
+
   <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;">
 
     <div style="background:white;padding:18px;border-radius:12px;">
@@ -857,6 +872,40 @@ if (booking.status === 'assigned') {
 
 list.appendChild(card);
     });
+}
+
+async function createDriverAccount(event) {
+  event.preventDefault();
+  const form = document.getElementById('create-driver-form');
+  const button = document.getElementById('create-driver-button');
+  const message = document.getElementById('create-driver-message');
+  const full_name = document.getElementById('new-driver-name').value.trim();
+  const email = document.getElementById('new-driver-email').value.trim();
+  const phone = document.getElementById('new-driver-phone').value.trim();
+
+  button.disabled = true;
+  button.textContent = 'MEMBUAT AKUN...';
+  message.style.color = '#555';
+  message.textContent = 'Memproses akun dan mengirim undangan email...';
+
+  const { data, error } = await db.functions.invoke('owner-create-driver', {
+    body: { full_name, email, phone }
+  });
+
+  if (error || !data || !data.success) {
+    message.style.color = '#a12626';
+    message.textContent = 'Gagal membuat akun: ' + (data?.error || error?.message || 'Kesalahan tidak diketahui.');
+    button.disabled = false;
+    button.textContent = '+ TAMBAH DRIVER & KIRIM UNDANGAN';
+    return;
+  }
+
+  message.style.color = '#176334';
+  message.textContent = 'Berhasil! Undangan aktivasi dikirim ke ' + data.driver.email + '. Driver perlu membuka email dan mengatur password sebelum login.';
+  form.reset();
+  button.disabled = false;
+  button.textContent = '+ TAMBAH DRIVER & KIRIM UNDANGAN';
+  await loadOwnerDashboard();
 }
 
 async function loadOwnerDashboard() {
