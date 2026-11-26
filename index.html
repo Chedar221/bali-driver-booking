@@ -174,6 +174,17 @@ footer{background:var(--forest);color:#d8dfd8;padding:28px 18px;margin-top:55px;
 <p>Travel comfortably. Explore Bali. Enjoy every journey with a dedicated private driver.</p><button class="hero-booking-cta" type="button" onclick="openPopup('booking-popup')">BOOK YOUR JOURNEY</button>
 </section>
 
+<section id="public-price-list" style="max-width:1000px;margin:38px auto;padding:0 18px;">
+  <div style="background:#fff;border:1px solid #e8e1d2;border-radius:16px;padding:clamp(20px,4vw,32px);box-shadow:0 18px 50px #20382d0c;">
+    <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px;">
+      <div><p style="color:#b18b48;font-weight:800;letter-spacing:2px;font-size:12px;margin:0 0 8px;">TRANSPARENT PRICING</p><h2 style="margin:0;">PRICE LIST</h2></div>
+      <button type="button" onclick="openPopup('booking-popup')" style="width:auto;margin:0;padding:12px 18px;background:#c9a45e;color:#17352b;">BOOK NOW</button>
+    </div>
+    <p class="note">Harga perjalanan berdasarkan rute yang tersedia. Hubungi kami jika tujuan Anda belum tercantum.</p>
+    <div id="public-route-price-list" style="margin-top:18px;">Memuat daftar harga...</div>
+  </div>
+</section>
+
 <div id="booking-popup" class="popup-overlay" role="dialog" aria-modal="true" aria-label="Form booking" onclick="if(event.target===this)closePopup('booking-popup')"><main class="popup-panel">
 <button class="popup-close" type="button" aria-label="Tutup" onclick="closePopup('booking-popup')">×</button>
 <div class="card">
@@ -289,6 +300,52 @@ const submitBtn = document.getElementById("submitBtn");
 document.getElementById("date").min =
   new Date().toLocaleDateString("en-CA");
 
+async function loadPublicRoutePrices() {
+  const container = document.getElementById('public-route-price-list');
+  if (!container) return;
+  const [servicesResult, routesResult] = await Promise.all([
+    db.from('services').select('id,name').eq('is_active',true).order('id'),
+    db.from('service_routes').select('service_id,origin,destination,price').eq('is_active',true).order('origin')
+  ]);
+  if (servicesResult.error || routesResult.error) {
+    container.textContent = 'Daftar harga sedang tidak tersedia. Silakan hubungi Owner.';
+    return;
+  }
+  const serviceMap = new Map((servicesResult.data || []).map(s => [String(s.id),s.name]));
+  const routes = routesResult.data || [];
+  if (!routes.length) {
+    container.innerHTML = '<div style="padding:18px;background:#f5f4ef;border-radius:10px;color:#65776d;">Harga rute akan segera tersedia. Silakan hubungi kami untuk mendapatkan penawaran.</div>';
+    return;
+  }
+  container.innerHTML = '';
+  const grouped = new Map();
+  routes.forEach(route => {
+    const name = serviceMap.get(String(route.service_id)) || 'Layanan';
+    if (!grouped.has(name)) grouped.set(name,[]);
+    grouped.get(name).push(route);
+  });
+  grouped.forEach((items,name) => {
+    const group = document.createElement('div');
+    group.style.cssText = 'margin:18px 0;padding:16px;background:#f7f6f1;border:1px solid #e9e2d5;border-radius:12px;';
+    const heading = document.createElement('h3');
+    heading.textContent = name;
+    heading.style.cssText = 'margin:0 0 12px;color:#174635;font-size:17px;';
+    group.appendChild(heading);
+    items.forEach(route => {
+      const row = document.createElement('div');
+      row.style.cssText = 'display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px solid #e2e0d7;flex-wrap:wrap;';
+      const path = document.createElement('div');
+      path.textContent = route.origin + ' → ' + route.destination;
+      path.style.cssText = 'font-weight:600;color:#29483d;';
+      const price = document.createElement('div');
+      price.textContent = formatIDR(route.price);
+      price.style.cssText = 'font-weight:800;color:#b18b48;white-space:nowrap;';
+      row.append(path,price);
+      group.appendChild(row);
+    });
+    container.appendChild(group);
+  });
+}
 let matchedRoutePrice = 0;
 
 function formatIDR(value) {
@@ -415,6 +472,7 @@ form.addEventListener("submit", async function(event) {
 });
 
 loadServices();
+loadPublicRoutePrices();
 </script>
   <!-- OWNER LOGIN POPUP -->
 <div id="owner-popup" class="popup-overlay" role="dialog" aria-modal="true" aria-label="Login Owner" onclick="if(event.target===this)closePopup('owner-popup')"><div class="popup-panel login-panel">
