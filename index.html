@@ -196,6 +196,8 @@ loadServices();
     LOGIN OWNER
   </button>
   <p id="owner-message"></p>
+  <button type="button" onclick="sendOwnerPasswordReset()" style="width:100%;padding:10px;background:#e8efe9;color:#176b45;border:1px solid #176b45;border-radius:8px;margin-top:10px;">LUPA PASSWORD OWNER?</button>
+  <p id="owner-reset-message" role="status" style="font-size:14px;"></p>
 </div>
 
 <script>
@@ -594,6 +596,29 @@ const nextAction = {
 
 list.appendChild(card);
   });
+}
+
+async function sendOwnerPasswordReset() {
+  const email = document.getElementById('owner-email').value.trim();
+  const message = document.getElementById('owner-reset-message');
+  if (!email) {
+    message.style.color = '#a12626';
+    message.textContent = 'Masukkan email Owner terlebih dahulu.';
+    document.getElementById('owner-email').focus();
+    return;
+  }
+  message.style.color = '#555';
+  message.textContent = 'Mengirim tautan reset password Owner...';
+  const { error } = await db.auth.resetPasswordForEmail(email, {
+    redirectTo: 'https://bali-driver-booking.vercel.app/?reset=owner'
+  });
+  if (error) {
+    message.style.color = '#a12626';
+    message.textContent = 'Gagal mengirim email: ' + error.message;
+    return;
+  }
+  message.style.color = '#176334';
+  message.textContent = 'Tautan reset dikirim. Periksa Inbox dan Spam.';
 }
 
 async function sendDriverPasswordReset() {
@@ -1138,12 +1163,13 @@ async function ownerLogout() {
   const params = new URLSearchParams(window.location.search);
   const linkType = hash.get('type');
   const isInviteLink = linkType === 'invite' || params.get('activate') === 'driver';
-  const isRecoveryLink = linkType === 'recovery' || params.get('reset') === 'driver';
+  const resetTarget = params.get('reset');
+  const isRecoveryLink = linkType === 'recovery' || resetTarget === 'driver' || resetTarget === 'owner';
 
   if (!isInviteLink && !isRecoveryLink) return;
   panel.style.display = 'flex';
   if (isRecoveryLink) {
-    document.querySelector('#driver-activation h2').textContent = 'RESET PASSWORD DRIVER';
+    document.querySelector('#driver-activation h2').textContent = resetTarget === 'owner' ? 'RESET PASSWORD OWNER' : 'RESET PASSWORD DRIVER';
     panel.querySelector('p:nth-of-type(2)').textContent = 'Buat password baru untuk akun Driver Anda.';
     message.textContent = 'Memverifikasi tautan reset password...';
   } else {
