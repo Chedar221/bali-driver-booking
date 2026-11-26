@@ -26,13 +26,25 @@ button:disabled{opacity:.6}
 .note{font-size:13px;color:#65776d}
 #message{margin-top:16px;padding:12px;border-radius:8px;display:none}
 footer{text-align:center;padding:30px;color:#718078;font-size:13px}
+
+.popup-nav{display:flex;gap:10px;align-items:center}
+.popup-nav button{width:auto;margin:0;padding:11px 16px;background:#c49b51;color:#102f26;border-radius:999px;font-size:13px}
+.popup-nav button:first-child{background:#f4ead5}
+.popup-overlay{display:none;position:fixed;inset:0;z-index:90000;background:rgba(5,20,15,.78);backdrop-filter:blur(5px);align-items:center;justify-content:center;padding:18px;overflow-y:auto}
+.popup-panel{position:relative;width:100%;max-width:680px;max-height:90vh;overflow-y:auto;background:#fff;border:1px solid #d8c18e;border-radius:20px;padding:26px;box-shadow:0 24px 70px #0008}
+.popup-panel.login-panel{max-width:430px}
+.popup-close{position:sticky;top:0;float:right;width:38px;height:38px;margin:-10px -8px 8px 12px;padding:0;border-radius:50%;background:#183f32;color:white;font-size:22px;line-height:1}
+.popup-panel h2{color:#174635}
+body.popup-open{overflow:hidden}
+@media(max-width:650px){header{padding:16px 5%;gap:12px;align-items:flex-start;flex-direction:column}.popup-nav{width:100%;display:grid;grid-template-columns:1fr 1fr;gap:8px}.popup-nav button{width:100%;padding:12px 8px;font-size:12px}.hero{padding:48px 7%}.hero h1{font-size:30px}.popup-panel{padding:20px 16px;max-height:92vh}}
+
 </style>
 </head>
 <body>
 
 <header>
 <div class="logo">AGUS DRIVER BOOKING</div>
-<div>Private Driver Bali</div>
+<div class="popup-nav" aria-label="Menu utama"><button type="button" onclick="openPopup('booking-popup')">BOOKING</button><button type="button" onclick="openPopup('owner-popup')">LOGIN OWNER</button><button type="button" onclick="openPopup('driver-popup')">LOGIN DRIVER</button></div>
 </header>
 
 <section class="hero">
@@ -40,7 +52,8 @@ footer{text-align:center;padding:30px;color:#718078;font-size:13px}
 <p>Travel comfortably. Explore Bali. Enjoy every journey.</p>
 </section>
 
-<main>
+<div id="booking-popup" class="popup-overlay" role="dialog" aria-modal="true" aria-label="Form booking" onclick="if(event.target===this)closePopup('booking-popup')"><main class="popup-panel">
+<button class="popup-close" type="button" aria-label="Tutup" onclick="closePopup('booking-popup')">×</button>
 <div class="card">
 <h2>Our Services</h2>
 <div class="services">
@@ -89,12 +102,32 @@ footer{text-align:center;padding:30px;color:#718078;font-size:13px}
 </form>
 <div id="message" role="status"></div>
 </div>
-</main>
+</main></div>
 
 <footer>
 AGUS DRIVER BOOKING · Your Journey, Our Priority.
 </footer>
 
+<script>
+function openPopup(id) {
+  const popup = document.getElementById(id);
+  if (!popup) return;
+  popup.style.display = 'flex';
+  document.body.classList.add('popup-open');
+}
+function closePopup(id) {
+  const popup = document.getElementById(id);
+  if (!popup) return;
+  popup.style.display = 'none';
+  if (!Array.from(document.querySelectorAll('.popup-overlay')).some(p => p.style.display === 'flex')) document.body.classList.remove('popup-open');
+}
+document.addEventListener('keydown', function(event) {
+  if (event.key === 'Escape') {
+    document.querySelectorAll('.popup-overlay').forEach(p => { if (p.style.display === 'flex') p.style.display = 'none'; });
+    document.body.classList.remove('popup-open');
+  }
+});
+</script>
 <script>
 const SUPABASE_URL = "https://gdtkesaijsljwpfthocj.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_GbqMaTQ3g2CgO7ft4ea2cg_ltHcRxwD";
@@ -184,7 +217,9 @@ form.addEventListener("submit", async function(event) {
 
 loadServices();
 </script>
-  <!-- OWNER LOGIN -->
+  <!-- OWNER LOGIN POPUP -->
+<div id="owner-popup" class="popup-overlay" role="dialog" aria-modal="true" aria-label="Login Owner" onclick="if(event.target===this)closePopup('owner-popup')"><div class="popup-panel login-panel">
+<button class="popup-close" type="button" aria-label="Tutup" onclick="closePopup('owner-popup')">×</button>
 <div id="owner-login" style="max-width:400px;margin:30px auto;padding:20px;background:#f4f7f2;border-radius:12px;">
   <h2>Owner Login</h2>
   <input id="owner-email" type="email" placeholder="Email Owner"
@@ -198,7 +233,7 @@ loadServices();
   <p id="owner-message"></p>
   <button type="button" onclick="sendOwnerPasswordReset()" style="width:100%;padding:10px;background:#e8efe9;color:#176b45;border:1px solid #176b45;border-radius:8px;margin-top:10px;">LUPA PASSWORD OWNER?</button>
   <p id="owner-reset-message" role="status" style="font-size:14px;"></p>
-</div>
+</div></div>
 
 <script>
 async function ownerLogin() {
@@ -231,9 +266,8 @@ async function ownerLogin() {
   }
 
   message.textContent = 'Login Owner berhasil!';
-  document.getElementById('owner-login').style.display = 'none';
-
-document.getElementById('owner-dashboard').style.display = 'block';
+  closePopup('owner-popup');
+  document.getElementById('owner-dashboard').style.display = 'block';
 
 await loadOwnerDashboard();
 }
@@ -268,6 +302,7 @@ async function driverLogin() {
 
   message.textContent = 'Login Driver berhasil!';
 
+    closePopup('driver-popup');
     document.getElementById('driver-dashboard').style.display = 'block';
 
   await loadDriverDashboard();
@@ -648,14 +683,16 @@ async function driverLogout() {
   await db.auth.signOut();
 
   document.getElementById('driver-dashboard').style.display = 'none';
-  document.getElementById('driver-login').style.display = 'block';
+  openPopup('driver-popup');
 
   document.getElementById('driver-password').value = '';
   document.getElementById('driver-login-message').textContent = '';
 }
 </script>
 
-  <!-- DRIVER LOGIN -->
+  <!-- DRIVER LOGIN POPUP -->
+<div id="driver-popup" class="popup-overlay" role="dialog" aria-modal="true" aria-label="Login Driver" onclick="if(event.target===this)closePopup('driver-popup')"><div class="popup-panel login-panel">
+<button class="popup-close" type="button" aria-label="Tutup" onclick="closePopup('driver-popup')">×</button>
 <div id="driver-login" style="max-width:400px;margin:30px auto;padding:20px;background:#f4f7f2;border-radius:12px;">
 
   <h2 style="color:#176b45;">DRIVER LOGIN</h2>
@@ -681,7 +718,7 @@ async function driverLogout() {
   </button>
   <p id="driver-reset-message" role="status" style="font-size:14px;"></p>
   
-</div>
+</div></div>
 
   
 
@@ -1131,7 +1168,7 @@ async function ownerLogout() {
     return;
   }
   document.getElementById('owner-dashboard').style.display = 'none';
-  document.getElementById('owner-login').style.display = 'block';
+  openPopup('owner-popup');
   document.getElementById('owner-password').value = '';
   document.getElementById('owner-message').textContent = 'Anda sudah logout.';
 }
