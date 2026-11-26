@@ -350,20 +350,21 @@ async function loadPublicRoutePrices() {
   });
   grouped.forEach((items,name) => {
     const group = document.createElement('div');
-    group.style.cssText = 'margin:18px 0;padding:16px;background:#f7f6f1;border:1px solid #e9e2d5;border-radius:12px;';
+    group.style.cssText = 'margin:12px 0;padding:12px;background:#f7f6f1;border:1px solid #e9e2d5;border-radius:10px;min-width:0;box-sizing:border-box;';
     const heading = document.createElement('h3');
     heading.textContent = name;
-    heading.style.cssText = 'margin:0 0 12px;color:#174635;font-size:17px;';
+    heading.style.cssText = 'margin:0 0 8px;color:#174635;font-size:15px;line-height:1.2;';
     group.appendChild(heading);
     items.forEach(route => {
       const row = document.createElement('div');
-      row.style.cssText = 'display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px solid #e2e0d7;flex-wrap:wrap;';
+      row.style.cssText = 'display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;column-gap:8px;padding:9px 0;border-bottom:1px solid #e2e0d7;min-width:0;box-sizing:border-box;';
       const path = document.createElement('div');
       path.textContent = route.origin + ' → ' + route.destination;
-      path.style.cssText = 'font-weight:600;color:#29483d;';
+      path.title = path.textContent;
+      path.style.cssText = 'min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:600;color:#29483d;font-size:clamp(11px,3.2vw,14px);line-height:1.2;';
       const price = document.createElement('div');
       price.textContent = formatIDR(route.price);
-      price.style.cssText = 'font-weight:800;color:#b18b48;white-space:nowrap;';
+      price.style.cssText = 'font-weight:800;color:#b18b48;white-space:nowrap;font-size:clamp(11px,3.2vw,14px);line-height:1.2;text-align:right;';
       row.append(path,price);
       group.appendChild(row);
     });
