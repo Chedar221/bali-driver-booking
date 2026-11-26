@@ -487,21 +487,19 @@ function closeDriverAssignment() {
 
 async function toggleDriverAvailability() {
   const button = document.getElementById('driver-online-button');
+  const message = document.getElementById('driver-dashboard-message');
   button.disabled = true;
-
-  const currentStatus =
-    document.getElementById('driver-availability').textContent === 'ONLINE';
-
-  const { data, error } = await db.rpc('set_driver_availability', {
-    p_available: !currentStatus
-  });
-
-  if (error || data !== true) {
-    alert('Gagal mengubah status. Pastikan akun sudah disetujui Owner.');
+  const currentStatus = document.getElementById('driver-availability').textContent === 'ONLINE';
+  try {
+    const { data, error } = await db.rpc('set_driver_availability', { p_available: !currentStatus });
+    if (error) throw error;
+    if (data !== true) throw new Error('Status tidak berubah. Pastikan driver sudah disetujui Owner.');
+    message.textContent = !currentStatus ? 'Driver sekarang ONLINE.' : 'Driver sekarang OFFLINE.';
+    await loadDriverDashboard();
+  } catch (error) {
+    message.textContent = 'Gagal mengubah status: ' + error.message;
+    button.disabled = false;
   }
-
-  await loadDriverDashboard();
-  button.disabled = false;
 }
 
 async function loadDriverBookings() {
@@ -567,37 +565,32 @@ async function loadDriverBookings() {
   card.appendChild(line);
 });
 
-if (booking.status === 'assigned') {
-  const acceptButton = document.createElement('button');
-
-  acceptButton.textContent = 'TERIMA BOOKING';
-  acceptButton.style.cssText =
-    'padding:12px;background:#176b45;color:white;border:0;border-radius:8px;';
-
-  acceptButton.onclick = async function () {
-    acceptButton.disabled = true;
-    acceptButton.textContent = 'MEMPROSES...';
-
-    const { data, error } = await db.rpc('update_driver_booking_status', {
-      p_booking_id: booking.id,
-      p_new_status: 'confirmed'
-    });
-
-    if (error || data !== true) {
-      alert('Gagal menerima booking: ' +
-        (error ? error.message : 'Proses tidak berhasil'));
-
-      acceptButton.disabled = false;
-      acceptButton.textContent = 'TERIMA BOOKING';
-      return;
+const nextAction = {
+      assigned: { label: 'TERIMA BOOKING', status: 'confirmed' },
+      confirmed: { label: 'MULAI PERJALANAN', status: 'in_progress' },
+      in_progress: { label: 'SELESAIKAN PERJALANAN', status: 'completed' }
+    }[booking.status];
+    if (nextAction) {
+      const actionButton = document.createElement('button');
+      actionButton.textContent = nextAction.label;
+      actionButton.style.cssText = 'padding:12px;background:#176b45;color:white;border:0;border-radius:8px;';
+      actionButton.onclick = async function() {
+        actionButton.disabled = true;
+        actionButton.textContent = 'MEMPROSES...';
+        const { data: ok, error: rpcError } = await db.rpc('update_driver_booking_status', {
+          p_booking_id: booking.id,
+          p_new_status: nextAction.status
+        });
+        if (rpcError || ok !== true) {
+          alert('Gagal memperbarui booking: ' + (rpcError?.message || 'Status tidak berubah.'));
+          actionButton.disabled = false;
+          actionButton.textContent = nextAction.label;
+          return;
+        }
+        await loadDriverDashboard();
+      };
+      card.appendChild(actionButton);
     }
-
-    alert('Booking berhasil diterima!');
-    await loadDriverDashboard();
-  };
-
-  card.appendChild(acceptButton);
-}
 
 list.appendChild(card);
   });
@@ -787,6 +780,10 @@ async function driverLogout() {
     </div>
 
   </div>
+<div style="margin-top:25px;background:white;padding:18px;border-radius:12px;">
+  <h3 style="color:#176b45;">DAFTAR DRIVER & PERSETUJUAN</h3>
+  <div id="driver-management-list">Memuat daftar driver...</div>
+</div>
 <!-- DAFTAR BOOKING -->
 <div style="margin-top:25px;background:white;padding:18px;border-radius:12px;">
 
@@ -963,48 +960,28 @@ async function loadOwnerDashboard() {
   document.getElementById('total-drivers').textContent = drivers.count ?? 0;
   document.getElementById('active-drivers').textContent = active.count ?? 0;
   document.getElementById('pending-bookings').textContent = pending.count ?? 0;
-await loadOwnerBookings();
+await Promise.all([loadOwnerBookings(), loadOwnerDrivers()]);
   message.textContent = 'Data berhasil dimuat.';
 }
 
 async function loadOwnerBookings() {
   const list = document.getElementById('booking-list');
-
   list.textContent = 'Memuat booking...';
-
-  const { data, error } = await db
-    .from('bookings')
-    .select(`id,
-      booking_code,
-      customer_name,
-      customer_phone,
-      pickup_location,
-      destination,
-      pickup_date,
-      pickup_time,
-      passenger_count,
-      status
-    `)
+  const { data, error } = await db.from('bookings')
+    .select('id, booking_code, customer_name, customer_phone, pickup_location, destination, pickup_date, pickup_time, passenger_count, status, total_price')
     .order('id', { ascending: false });
-
   if (error) {
     list.textContent = 'Gagal memuat booking: ' + error.message;
     return;
   }
-
   if (!data || data.length === 0) {
     list.textContent = 'Belum ada booking.';
     return;
   }
-
   list.innerHTML = '';
-
   data.forEach(booking => {
     const card = document.createElement('div');
-
-    card.style.cssText =
-      'padding:15px;margin:12px 0;border:1px solid #ddd;border-radius:10px;';
-
+    card.style.cssText = 'padding:15px;margin:12px 0;border:1px solid #ddd;border-radius:10px;';
     const details = [
       'Kode Booking: ' + booking.booking_code,
       'Nama: ' + booking.customer_name,
@@ -1014,68 +991,124 @@ async function loadOwnerBookings() {
       'Tanggal: ' + booking.pickup_date,
       'Jam: ' + booking.pickup_time,
       'Jumlah Penumpang: ' + booking.passenger_count,
-      'Status: ' + booking.status
+      'Status: ' + booking.status,
+      'Harga: Rp ' + Number(booking.total_price || 0).toLocaleString('id-ID')
     ];
-
     details.forEach(detail => {
       const line = document.createElement('p');
       line.textContent = detail;
       card.appendChild(line);
     });
-if (booking.status === 'pending') {
-  const confirmButton = document.createElement('button');
-
-  confirmButton.textContent = 'KONFIRMASI BOOKING';
-
-  confirmButton.style.cssText =
-    'padding:12px;background:#176b45;color:white;border:0;border-radius:8px;';
-
-  confirmButton.onclick = async function () {
-    confirmButton.disabled = true;
-    confirmButton.textContent = 'Memproses...';
-
-    const { error } = await db.rpc('owner_confirm_booking', {
-      p_booking_id: booking.id
-    });
-
-    if (error) {
-      alert('Gagal konfirmasi: ' + error.message);
-      confirmButton.disabled = false;
-      confirmButton.textContent = 'KONFIRMASI BOOKING';
-      return;
+    if (booking.status === 'pending') {
+      const btn = document.createElement('button');
+      btn.textContent = 'KONFIRMASI BOOKING';
+      btn.onclick = async () => {
+        btn.disabled = true;
+        const { data: ok, error: rpcError } = await db.rpc('owner_confirm_booking', { p_booking_id: booking.id });
+        if (rpcError || ok !== true) {
+          alert('Gagal konfirmasi: ' + (rpcError?.message || 'Status booking tidak berubah.'));
+          btn.disabled = false;
+          return;
+        }
+        await loadOwnerDashboard();
+      };
+      card.appendChild(btn);
+    } else if (booking.status === 'confirmed') {
+      const btn = document.createElement('button');
+      btn.textContent = 'ASSIGN DRIVER';
+      btn.onclick = () => window.openDriverAssignment(booking.id, booking.passenger_count);
+      card.appendChild(btn);
     }
-
-    alert('Booking berhasil dikonfirmasi!');
-    await loadOwnerDashboard();
-  };
-
-  card.appendChild(confirmButton);
-}
-if (booking.status === 'confirmed') {
-  const assignButton = document.createElement('button');
-
-  assignButton.textContent = 'ASSIGN DRIVER';
-
-  assignButton.style.cssText =
-    'padding:12px;background:#b58b28;color:white;border:0;border-radius:8px;margin-top:10px;';
-
-  assignButton.onclick = async function () {
-    
-    try {
-      await window.openDriverAssignment(
-        booking.id,
-        booking.passenger_count
-      );
-    } catch (error) {
-      alert('KESALAHAN: ' + error.message);
-    }
-  };
-
-  card.appendChild(assignButton);
-}
-    
     list.appendChild(card);
   });
+}
+
+async function loadOwnerDrivers() {
+  const list = document.getElementById('driver-management-list');
+  if (!list) return;
+  list.textContent = 'Memuat daftar driver...';
+  const { data: drivers, error } = await db.from('driver_profiles')
+    .select('id, verification_status, is_available, created_at')
+    .order('created_at', { ascending: false });
+  if (error) {
+    list.textContent = 'Gagal memuat driver: ' + error.message;
+    return;
+  }
+  if (!drivers?.length) {
+    list.textContent = 'Belum ada driver terdaftar.';
+    return;
+  }
+  const ids = drivers.map(d => d.id);
+  const [{ data: profiles, error: profileError }, { data: vehicles, error: vehicleError }] = await Promise.all([
+    db.from('profiles').select('id, full_name, phone').in('id', ids),
+    db.from('vehicles').select('id, driver_id, vehicle_name, plate_number, seats, is_active').in('driver_id', ids)
+  ]);
+  if (profileError || vehicleError) {
+    list.textContent = 'Gagal memuat detail driver: ' + (profileError?.message || vehicleError?.message);
+    return;
+  }
+  list.innerHTML = '';
+  drivers.forEach(driver => {
+    const profile = profiles.find(p => p.id === driver.id);
+    const vehicle = vehicles.find(v => v.driver_id === driver.id);
+    const card = document.createElement('div');
+    card.style.cssText = 'padding:14px;margin:10px 0;border:1px solid #d9e2dc;border-radius:10px;background:#fff;';
+    const lines = [
+      'Nama: ' + (profile?.full_name || '—'),
+      'WhatsApp: ' + (profile?.phone || '—'),
+      'Kendaraan: ' + (vehicle?.vehicle_name || '—'),
+      'Plat nomor: ' + (vehicle?.plate_number || '—'),
+      'Verifikasi: ' + driver.verification_status.toUpperCase(),
+      'Status: ' + (driver.is_available ? 'ONLINE' : 'OFFLINE')
+    ];
+    lines.forEach(value => {
+      const p = document.createElement('p');
+      p.textContent = value;
+      card.appendChild(p);
+    });
+    if (driver.verification_status === 'pending') {
+      const approve = document.createElement('button');
+      approve.textContent = 'SETUJUI DRIVER';
+      approve.style.background = '#176b45';
+      approve.onclick = () => updateDriverApproval(driver.id, 'approved');
+      card.appendChild(approve);
+      const reject = document.createElement('button');
+      reject.textContent = 'TOLAK DRIVER';
+      reject.style.background = '#a12626';
+      reject.onclick = () => updateDriverApproval(driver.id, 'rejected');
+      card.appendChild(reject);
+    } else if (driver.verification_status === 'rejected') {
+      const approve = document.createElement('button');
+      approve.textContent = 'SETUJUI DRIVER';
+      approve.onclick = () => updateDriverApproval(driver.id, 'approved');
+      card.appendChild(approve);
+    }
+    list.appendChild(card);
+  });
+}
+
+async function updateDriverApproval(driverId, status) {
+  const { error } = await db.from('driver_profiles')
+    .update({ verification_status: status, is_available: false })
+    .eq('id', driverId);
+  if (error) {
+    alert('Gagal mengubah persetujuan driver: ' + error.message);
+    return;
+  }
+  await loadOwnerDrivers();
+  await loadOwnerDashboard();
+}
+
+async function ownerLogout() {
+  const { error } = await db.auth.signOut();
+  if (error) {
+    alert('Logout gagal: ' + error.message);
+    return;
+  }
+  document.getElementById('owner-dashboard').style.display = 'none';
+  document.getElementById('owner-login').style.display = 'block';
+  document.getElementById('owner-password').value = '';
+  document.getElementById('owner-message').textContent = 'Anda sudah logout.';
 }
 </script>
 
