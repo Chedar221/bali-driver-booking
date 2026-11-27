@@ -219,6 +219,36 @@ footer{background:var(--forest);color:#d8dfd8;padding:28px 18px;margin-top:55px;
   </div>
 </main>
 
+<section id="tourist-destinations" aria-labelledby="tourist-destinations-title">
+  <div class="tour-catalog-head">
+    <span class="eyebrow">JELAJAHI PULAU DEWATA</span>
+    <h2 id="tourist-destinations-title">Destinasi Wisata Populer di Bali</h2>
+    <p>Temukan destinasi pilihan dan pesan perjalanan dengan mudah.</p>
+  </div>
+  <div id="tourist-destination-grid" class="tour-catalog-grid" aria-live="polite">
+    <div class="tour-card"><div class="tour-image-placeholder">🌴</div><div class="tour-card-body">Memuat destinasi wisata...</div></div>
+  </div>
+  <div style="text-align:center;margin:20px auto 0;">
+    <button type="button" style="max-width:280px;background:#c9a45e;color:#17352b;" onclick="openPopup('booking-popup')">PESAN PERJALANAN WISATA</button>
+  </div>
+</section>
+
+<section id="public-price-list">
+  <div class="card">
+    <div style="text-align:center;margin-bottom:20px;">
+      <span style="color:#b18b48;font-size:11px;font-weight:800;letter-spacing:2px;">TRANSPARAN & MUDAH</span>
+      <h2 style="margin:8px 0;">Daftar Tarif</h2>
+      <p style="color:#68776f;line-height:1.6;margin:0;">Lihat daftar layanan, rute perjalanan, dan tarif yang tersedia.</p>
+    </div>
+    <div id="public-route-price-list" aria-live="polite">
+      <div style="padding:18px;background:#f5f4ef;border-radius:10px;color:#65776d;">Memuat data tarif...</div>
+    </div>
+    <p class="note" style="margin:14px 0 0;">Tarif dapat dikonfirmasi kembali saat pemesanan sesuai titik jemput, tujuan, dan kebutuhan perjalanan.</p>
+    <div style="text-align:center;margin-top:16px;">
+      <button type="button" style="max-width:280px;background:#c9a45e;color:#17352b;" onclick="openPopup('booking-popup')">PESAN SEKARANG</button>
+    </div>
+  </div>
+</section>
 
 <!-- OWNER DASHBOARD -->
 <div id="owner-dashboard" style="display:none;max-width:1000px;margin:30px auto;padding:20px;background:#f4f7f2;border-radius:15px;">
