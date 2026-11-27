@@ -1947,7 +1947,7 @@ async function ownerLogout() {
     alert('Logout gagal: ' + error.message);
     return;
   }
-  document.getElementById('owner-dashboard').style.display = 'none';
+  document.getElementById('owner-dashboard').style.setProperty('display','none','important');
   openPopup('owner-popup');
   document.getElementById('owner-password').value = '';
   document.getElementById('owner-message').textContent = 'Anda sudah logout.';
@@ -2427,6 +2427,11 @@ footer{padding:18px 14px!important;margin-top:28px!important;font-size:11px!impo
 #public-price-list button {
   display: none !important;
 }
+</style>
+\n
+<style id="owner-dashboard-hidden-until-authenticated">
+/* Jangan tampilkan isi Owner Dashboard di halaman publik sebelum login Owner berhasil. */
+#owner-dashboard { display: none !important; }
 </style>
 \n</body>
 </html>
