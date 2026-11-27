@@ -722,10 +722,17 @@ async function ownerLogin() {
 
   message.textContent = 'Login Owner berhasil!';
   closePopup('owner-popup');
-  document.getElementById('owner-dashboard').style.setProperty('display','grid','important');
-  window.setupOwnerMenu?.();
+  const ownerDashboard = document.getElementById('owner-dashboard');
+  ownerDashboard.style.setProperty('display','grid','important');
 
-await loadOwnerDashboard();
+  // Rebuild Owner navigation after dashboard data has finished loading.
+  // This prevents menu tiles from remaining detached/hidden during the login transition.
+  try {
+    await loadOwnerDashboard();
+  } finally {
+    ownerDashboard.style.setProperty('display','grid','important');
+    window.setupOwnerMenu?.();
+  }
 }
 async function driverLogin() {
   const email = document.getElementById('driver-email').value;
