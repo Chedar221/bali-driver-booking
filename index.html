@@ -268,6 +268,110 @@ input:focus,select:focus,textarea:focus{border-color:#B58A70!important;box-shado
  .popup-menu-link{border-radius:6px!important}
 }
 
+
+/* CHEDAR ROYAL BURGUNDY — COMPLETE OWNER / DRIVER / BOOKING SKIN */
+:root{--cb:#351321;--cw:#572238;--cw2:#6D2945;--cc:#D8B88A;--ci:#F8F3ED;--cp:#FFFCF8;--ct:#402B34;--cm:#78656A;--cl:#E7D8CC}
+html{scroll-behavior:smooth}
+body,main{color:var(--ct)}
+footer{background:linear-gradient(110deg,#2B101B,#4B1D31)!important;color:#F5E9DE!important;border-top:1px solid #B98C73!important;letter-spacing:.3px;padding:26px 16px!important}
+button,.admin-menu-button,.popup-menu-link{transition:background .2s ease,border-color .2s ease,box-shadow .2s ease,transform .2s ease}
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid rgba(216,184,138,.65)!important;outline-offset:2px}
+button:active{transform:translateY(1px)}
+/* Owner dashboard shell */
+#owner-dashboard,#driver-dashboard{box-sizing:border-box!important;width:min(1160px,calc(100% - 28px))!important;max-width:1160px!important;margin:24px auto!important;padding:clamp(14px,2.5vw,28px)!important;background:var(--ci)!important;color:var(--ct)!important;border:1px solid #E5D5C9!important;border-radius:20px!important;box-shadow:0 18px 48px rgba(53,19,33,.09)!important;overflow:hidden}
+#owner-dashboard>h2,#driver-dashboard>h2{font-family:Georgia,"Times New Roman",serif!important;font-size:clamp(23px,4vw,34px)!important;letter-spacing:1.2px!important;color:var(--cb)!important;margin:0 0 5px!important}
+#owner-dashboard>h3,#driver-dashboard>h3{color:#8A5C61!important;letter-spacing:1.6px!important;font-size:12px!important;font-weight:800!important;margin:5px 0 12px!important}
+#owner-dashboard>p,#driver-dashboard>p{color:#78656A!important}
+#owner-dashboard h2,#owner-dashboard h3,#owner-dashboard h4,#driver-dashboard h2,#driver-dashboard h3,#driver-dashboard h4{color:var(--cb)!important}
+#owner-dashboard p,#driver-dashboard p,#owner-dashboard small,#driver-dashboard small{color:#705E64}
+/* Owner menu buttons */
+#owner-dashboard .admin-menu-button,#owner-menu-navigation .admin-menu-button{display:flex!important;align-items:center!important;gap:12px!important;width:100%!important;min-height:58px!important;margin:9px 0!important;padding:13px 16px!important;text-align:left!important;background:linear-gradient(115deg,#572238,#351321)!important;color:#FFF9F3!important;border:1px solid #B88B75!important;border-radius:12px!important;box-shadow:0 5px 14px rgba(53,19,33,.10)!important;font-size:13px!important;font-weight:800!important;letter-spacing:.35px!important}
+#owner-dashboard .admin-menu-button:hover,#owner-menu-navigation .admin-menu-button:hover{background:linear-gradient(115deg,#71314B,#472033)!important;box-shadow:0 8px 20px rgba(53,19,33,.17)!important}
+#owner-dashboard .admin-menu-icon{font-size:20px!important;flex:0 0 26px}
+#owner-dashboard .admin-menu-label{flex:1;min-width:0;line-height:1.35}
+#owner-dashboard .admin-menu-chevron{color:var(--cc)!important;font-size:20px!important}
+#owner-critical-shortcuts{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:12px!important}
+#owner-critical-shortcuts button{background:linear-gradient(145deg,#71314B,#351321)!important;color:#FFF9F3!important;border:1px solid var(--cc)!important;border-radius:13px!important;min-height:100px!important;box-shadow:0 7px 18px rgba(53,19,33,.13)!important}
+#owner-critical-shortcuts button span:last-child{color:#FFF9F3!important;letter-spacing:.5px}
+/* All owner expandable content and cards */
+#owner-dashboard .admin-menu-content{margin:8px 0 18px!important;padding:clamp(10px,2vw,18px)!important;background:#F2E8E0!important;border:1px solid #E5D5C9!important;border-radius:14px!important;box-sizing:border-box!important;min-width:0!important}
+#owner-dashboard .admin-menu-content[hidden]{display:none!important}
+#owner-dashboard .admin-menu-content>div,#owner-dashboard .admin-menu-content form>div[style*="background:white"],#owner-dashboard .admin-menu-content div[style*="background:white"],#owner-dashboard .admin-menu-content div[style*="background: white"]{background:var(--cp)!important;border:1px solid #E9DCD2!important;border-radius:12px!important;box-shadow:0 5px 18px rgba(53,19,33,.045)!important;color:var(--ct)!important;box-sizing:border-box!important;max-width:100%}
+#owner-dashboard .admin-menu-content h3,#owner-dashboard .admin-menu-content h4{color:#572238!important;font-family:Georgia,"Times New Roman",serif!important;letter-spacing:.25px}
+#owner-dashboard .admin-menu-content p{color:#78656A!important;line-height:1.6}
+#owner-dashboard label,#driver-dashboard label{display:block!important;color:#593A48!important;font-size:13px!important;font-weight:700!important;margin:12px 0 6px!important}
+#owner-dashboard input:not([type="checkbox"]):not([type="radio"]),#owner-dashboard select,#owner-dashboard textarea,#driver-dashboard input:not([type="checkbox"]):not([type="radio"]),#driver-dashboard select,#driver-dashboard textarea{box-sizing:border-box!important;width:100%!important;max-width:100%!important;min-height:43px!important;padding:11px 12px!important;background:#FFFEFC!important;color:#402B34!important;border:1px solid #DDCFC5!important;border-radius:8px!important;font:inherit!important}
+#owner-dashboard input[type="file"]{padding:9px!important;background:#F7F0E9!important}
+#owner-dashboard input::placeholder,#owner-dashboard textarea::placeholder,#driver-dashboard input::placeholder{color:#A18E91!important}
+#owner-dashboard button:not(.admin-menu-button),#driver-dashboard button{border-radius:9px!important;min-height:40px;max-width:100%;font-weight:700!important}
+#owner-dashboard form button,#driver-dashboard form button{background:var(--cb)!important;color:#FFF9F3!important;border:1px solid #8A5C61!important}
+#owner-dashboard button[style*="#176b45"],#owner-dashboard button[style*="#0f5135"],#owner-dashboard button[style*="#176b45"],#driver-dashboard button[style*="#176b45"]{background:linear-gradient(120deg,#6D2945,#351321)!important;color:#FFF9F3!important;border:1px solid #B88B75!important}
+#owner-dashboard button[style*="#68756e"],#owner-dashboard button[style*="#555"]{background:#EDE2D9!important;color:#593A48!important;border:1px solid #D8C7BC!important}
+#owner-dashboard [style*="background:#f3f7f4"],#owner-dashboard [style*="background: #f3f7f4"],#owner-dashboard [style*="background:#f4f7f2"],#owner-dashboard [style*="background:#f5f4ef"]{background:#F2E8E0!important;border:1px solid #E5D5C9!important;border-radius:10px!important}
+#owner-dashboard [style*="color:#176b45"],#owner-dashboard [style*="color: #176b45"],#owner-dashboard [style*="color:#174635"],#owner-dashboard [style*="color:#29483d"]{color:#572238!important}
+#owner-dashboard [style*="color:#a33b35"]{color:#A04A50!important}
+#owner-dashboard [style*="color:#176334"]{color:#47765D!important}
+#owner-dashboard table,#driver-dashboard table{width:100%!important;border-collapse:collapse!important;background:#FFFCF8!important;border:1px solid #E5D5C9!important;border-radius:10px!important;overflow:hidden}
+#owner-dashboard th,#driver-dashboard th{background:#512033!important;color:#FFF7EF!important;padding:11px 9px!important;text-align:left!important}
+#owner-dashboard td,#driver-dashboard td{padding:10px 9px!important;border-bottom:1px solid #EDE2D9!important;color:#513A43!important;vertical-align:middle}
+#owner-dashboard tr:nth-child(even),#driver-dashboard tr:nth-child(even){background:#F8F1EB!important}
+#owner-dashboard [role="status"],#driver-dashboard [role="status"]{overflow-wrap:anywhere}
+/* Driver area and driver activation */
+#driver-dashboard{background:var(--ci)!important}
+#driver-dashboard button{background:linear-gradient(120deg,#6D2945,#351321)!important;color:#FFF9F3!important;border:1px solid #B88B75!important}
+#driver-activation>div,#assign-driver-modal{background:#FFFCF8!important;border:1px solid #C9A27F!important;border-radius:15px!important;box-shadow:0 16px 45px rgba(53,19,33,.2)!important}
+#driver-activation h2,#assign-driver-modal h2{color:var(--cb)!important}
+#driver-activation label,#assign-driver-modal label{color:#593A48!important}
+/* All modal / popup surfaces */
+.popup-overlay,.owner-admin-popup-overlay{background:rgba(35,10,22,.82)!important;backdrop-filter:blur(5px)!important}
+.popup-panel,.owner-admin-popup-panel{box-sizing:border-box!important;background:#FFFCF8!important;color:var(--ct)!important;border:1px solid #C9A27F!important;border-radius:18px!important;box-shadow:0 24px 70px rgba(20,5,13,.32)!important}
+.popup-panel .card{background:transparent!important;color:var(--ct)!important;box-shadow:none!important;border:0!important}
+.popup-panel h2,.popup-panel h3,.owner-admin-popup-panel h2{color:var(--cb)!important;font-family:Georgia,"Times New Roman",serif!important}
+.popup-panel label{color:#593A48!important;font-weight:700!important}
+.popup-panel input,.popup-panel select,.popup-panel textarea{box-sizing:border-box!important;width:100%;max-width:100%;background:#FFFEFC!important;color:#402B34!important;border:1px solid #DDCFC5!important;border-radius:8px!important;padding:11px!important}
+.popup-panel button:not(.popup-close){border-radius:9px!important}
+.popup-panel #submitBtn,.popup-panel button[type="submit"]{background:linear-gradient(120deg,#6D2945,#351321)!important;color:#FFF9F3!important;border:1px solid #B88B75!important}
+.popup-panel .service{background:#F1E6DE!important;color:#63394A!important;border:1px solid #E5D5C9!important}
+.popup-panel .note{color:#806F70!important}
+.popup-close,.owner-admin-popup-close{background:#351321!important;color:#FFF8F1!important;border:1px solid #D8B88A!important;border-radius:50%!important}
+.owner-admin-popup-head{background:linear-gradient(110deg,#2B101B,#572238)!important;color:#FFF8F1!important;border-color:#D8B88A!important}
+#owner-login,#owner-login>div,#driver-popup .popup-panel{background:#FFFCF8!important;color:var(--ct)!important;border:1px solid #E5D5C9!important;border-radius:14px!important}
+#owner-login h2{color:var(--cb)!important}
+#owner-login input,#driver-popup input{background:#FFFEFC!important;color:#402B34!important;border-color:#DDCFC5!important}
+#owner-login button,#driver-popup button{border-radius:9px!important}
+#booking-receipt{background:#F4EDE5!important;border:1px solid #D8B88A!important;color:#513A43!important}
+#message{border-radius:9px!important}
+#location-map-modal{background:rgba(35,10,22,.84)!important}
+.location-map-panel{background:#FFFCF8!important;border:1px solid #C9A27F!important;border-radius:15px!important}
+.location-map-head{background:#351321!important;color:#FFF8F1!important}
+.location-map-head h3{color:#FFF8F1!important}
+.location-map-search button,#location-map-confirm{background:#351321!important;color:#FFF8F1!important;border:1px solid #D8B88A!important}
+#location-map-current{background:#F1E6DE!important;color:#63394A!important}
+#tour-detail-panel,.tour-detail-panel{background:#FFFCF8!important;border:1px solid #C9A27F!important}
+#floating-chat-button{background:#6D2945!important;color:#FFF8F1!important;border:1px solid #D8B88A!important}
+#chat-contact-head{background:#351321!important;color:#FFF8F1!important}
+#chat-contact-panel{background:#FFFCF8!important;border:1px solid #C9A27F!important}
+#chat-contact-body button{background:#6D2945!important;color:#FFF8F1!important}
+/* Images, tables and mobile precision */
+#tour-image-preview,.tour-admin-preview{max-width:100%!important;border-radius:10px!important;border:1px solid #E5D5C9!important}
+#owner-dashboard img,#driver-dashboard img{max-width:100%;height:auto}
+@media(max-width:700px){
+ #owner-dashboard,#driver-dashboard{width:calc(100% - 16px)!important;margin:12px auto!important;padding:12px!important;border-radius:14px!important}
+ #owner-dashboard .admin-menu-button,#owner-menu-navigation .admin-menu-button{min-height:54px!important;padding:11px 12px!important;font-size:12px!important;gap:9px!important}
+ #owner-critical-shortcuts{gap:8px!important}
+ #owner-critical-shortcuts button{min-height:88px!important;padding:10px 6px!important;font-size:11px!important}
+ #owner-dashboard .admin-menu-content{padding:9px!important}
+ #owner-dashboard .admin-menu-content>div,#owner-dashboard .admin-menu-content div[style*="background:white"],#owner-dashboard .admin-menu-content div[style*="background: white"]{padding:12px!important;margin-top:10px!important}
+ #owner-dashboard [style*="grid-template-columns:repeat(2"]{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+ #owner-dashboard table,#driver-dashboard table{display:block!important;max-width:100%!important;overflow-x:auto!important;-webkit-overflow-scrolling:touch}
+ #owner-dashboard td,#owner-dashboard th,#driver-dashboard td,#driver-dashboard th{white-space:normal!important;min-width:90px}
+ .popup-panel{width:calc(100% - 16px)!important;max-width:560px!important;max-height:calc(100dvh - 20px)!important;overflow-y:auto!important;padding:14px!important;border-radius:14px!important}
+ .popup-panel .card{padding:6px!important}
+}
+@media(min-width:701px){
+ #owner-dashboard .admin-menu-content{padding:18px!important}
+}
+
 </style>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 </head>
