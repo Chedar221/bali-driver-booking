@@ -2199,11 +2199,15 @@ footer{margin-top:30px!important;padding:20px 14px!important;font-size:11px!impo
     const chevron=document.createElement('span');chevron.className='admin-menu-chevron';chevron.textContent='＋';button.appendChild(chevron);
    }
    if(button.parentElement!==nav)nav.appendChild(button);
-   if(targetId==='admin-tourist-destinations'||targetId==='admin-route-prices'){
-    button.removeAttribute('onclick');
-    button.onclick=function(event){event.preventDefault();window.toggleAdminSection(targetId,button);};
-    button.setAttribute('data-owner-popup-menu','true');
-   }
+   // Bind every Owner menu tile directly to the popup controller.
+   // This avoids mixed inline/global handlers that can leave some panels unresponsive.
+   button.removeAttribute('onclick');
+   button.onclick=function(event){
+    event.preventDefault();
+    event.stopPropagation();
+    if(typeof window.toggleAdminSection==='function')window.toggleAdminSection(targetId,button);
+   };
+   button.setAttribute('data-owner-popup-menu','true');
    forceStyle(button,{boxSizing:'border-box',display:'flex',position:'relative',width:'100%',height:'108px',minWidth:'0',minHeight:'108px',maxHeight:'108px',margin:'0',padding:'9px 5px',border:'1px solid #d7e4d9',borderRadius:'13px',background:'linear-gradient(145deg,#572238,#351321)',color:'#fff',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:'6px',textAlign:'center',overflow:'hidden'});
    const icon=button.querySelector('.admin-menu-icon');
    if(icon)forceStyle(icon,{display:'flex',alignItems:'center',justifyContent:'center',flex:'0 0 28px',width:'100%',height:'28px',fontSize:'24px',lineHeight:'1'});
@@ -2246,8 +2250,9 @@ footer{margin-top:30px!important;padding:20px 14px!important;font-size:11px!impo
   head.append(title,close);modal.appendChild(head);panel.hidden=false;panel.classList.add('owner-admin-popup-content');modal.appendChild(panel);overlay.appendChild(modal);
   overlay.addEventListener('click',e=>{if(e.target===overlay)closeOwnerModal();});
   document.body.appendChild(overlay);document.body.classList.add('popup-open');
+  activeOwnerModal={overlay,panel,placeholder,button};
   button.setAttribute('aria-expanded','true');const c=button.querySelector('.admin-menu-chevron');if(c)c.textContent='－';
-  activeOwnerModal={overlay,panel,placeholder,button};close.focus();
+  close.focus();
  };
  window.setupOwnerMenu=setupOwnerMenu;
  document.addEventListener('keydown',e=>{if(e.key==='Escape')closeOwnerModal();});
