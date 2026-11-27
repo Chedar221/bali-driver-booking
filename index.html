@@ -263,6 +263,155 @@ footer{background:var(--forest);color:#d8dfd8;padding:28px 18px;margin-top:55px;
 </main></div>
 
 <div id="location-map-modal" role="dialog" aria-modal="true" aria-label="Pilih lokasi di peta" onclick="if(event.target===this)closeLocationMap()"><div class="location-map-panel"><div class="location-map-head"><h3 id="location-map-title">Pilih lokasi</h3><button id="location-map-close" type="button" onclick="closeLocationMap()">×</button></div><div class="location-map-search"><input id="location-map-search-input" type="search" placeholder="Cari nama tempat, hotel, alamat..."><button id="location-map-search-btn" type="button" onclick="searchMapLocation()">CARI</button></div><div id="location-map"></div><p id="location-map-status">Geser peta atau ketuk lokasi yang diinginkan.</p><div class="location-map-actions"><button id="location-map-current" type="button" onclick="useCurrentLocation()">GUNAKAN LOKASI SAYA</button><button id="location-map-confirm" type="button" onclick="confirmMapLocation()">GUNAKAN TITIK INI</button></div></div></div>
+<!-- OWNER DASHBOARD -->
+<div id="owner-dashboard" style="display:none;max-width:1000px;margin:30px auto;padding:20px;background:#f4f7f2;border-radius:15px;">
+
+  <h2 style="color:#176b45;">BALI DRIVER BOOKING</h2>
+  <h3>OWNER DASHBOARD</h3>
+  <p>Selamat datang, Owner!</p>
+
+<button type="button" class="admin-menu-button" aria-expanded="false" aria-controls="admin-create-driver" onclick="toggleAdminSection('admin-create-driver',this)"><span class="admin-menu-icon" aria-hidden="true">👥</span><span class="admin-menu-label">+ TAMBAH / KELOLA DRIVER</span><span class="admin-menu-chevron">＋</span></button>
+<div id="admin-create-driver" class="admin-menu-content" hidden>
+  <div style="margin:20px 0;background:white;padding:18px;border-radius:12px;">
+    <h3 style="color:#176b45;">MANAJEMEN DRIVER</h3>
+    <p style="color:#65776d;font-size:14px;">Buat akun Driver dari sini. Undangan untuk mengatur password akan dikirim ke email Driver.</p>
+    <form id="create-driver-form" onsubmit="createDriverAccount(event)">
+      <label for="new-driver-name">Nama Driver</label>
+      <input id="new-driver-name" required minlength="2" maxlength="100" placeholder="Nama lengkap Driver">
+      <label for="new-driver-phone">Nomor WhatsApp</label>
+      <input id="new-driver-phone" type="tel" required minlength="8" maxlength="25" placeholder="08xxxxxxxxxx">
+      <label for="new-driver-vehicle">Jenis / Tipe Mobil</label>
+      <input id="new-driver-vehicle" required minlength="2" maxlength="80" placeholder="Contoh: Suzuki Ertiga">
+      <label for="new-driver-plate">Plat Nomor Mobil</label>
+      <input id="new-driver-plate" required minlength="3" maxlength="15" placeholder="Contoh: DK 1234 ABC" style="text-transform:uppercase;">
+      <label for="new-driver-email">Email Login Driver</label>
+      <input id="new-driver-email" type="email" required maxlength="150" placeholder="email@example.com">
+      <button id="create-driver-button" type="submit" style="background:#176b45;">+ TAMBAH DRIVER & KIRIM UNDANGAN</button>
+    </form>
+    <p id="create-driver-message" role="status"></p>
+  </div>
+</div>
+
+<button type="button" class="admin-menu-button" aria-expanded="false" aria-controls="admin-overview" onclick="toggleAdminSection('admin-overview',this)"><span class="admin-menu-icon" aria-hidden="true">📊</span><span class="admin-menu-label">RINGKASAN DASHBOARD</span><span class="admin-menu-chevron">＋</span></button>
+<div id="admin-overview" class="admin-menu-content" hidden>
+  <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;">
+
+    <div style="background:white;padding:18px;border-radius:12px;">
+      <p>Total Booking</p>
+      <h2 id="total-bookings">0</h2>
+    </div>
+</div>
+
+    <div style="background:white;padding:18px;border-radius:12px;">
+      <p>Total Driver</p>
+      <h2 id="total-drivers">0</h2>
+    </div>
+
+    <div style="background:white;padding:18px;border-radius:12px;">
+      <p>Driver Tersedia</p>
+      <h2 id="active-drivers">0</h2>
+    </div>
+
+    <div style="background:white;padding:18px;border-radius:12px;">
+      <p>Booking Pending</p>
+      <h2 id="pending-bookings">0</h2>
+    </div>
+    <div style="background:white;padding:18px;border-radius:12px;">
+      <p>Perjalanan Selesai</p>
+      <h2 id="completed-bookings">0</h2>
+    </div>
+    <div style="background:white;padding:18px;border-radius:12px;">
+      <p>Omzet Booking Selesai</p>
+      <h2 id="completed-revenue">Rp 0</h2>
+    </div>
+
+  </div>
+<button type="button" class="admin-menu-button" aria-expanded="false" aria-controls="admin-driver-list" onclick="toggleAdminSection('admin-driver-list',this)"><span class="admin-menu-icon" aria-hidden="true">🧑‍✈️</span><span class="admin-menu-label">DAFTAR DRIVER & PERSETUJUAN</span><span class="admin-menu-chevron">＋</span></button>
+<div id="admin-driver-list" class="admin-menu-content" hidden>
+<div style="margin-top:25px;background:white;padding:18px;border-radius:12px;">
+  <h3 style="color:#176b45;">DAFTAR DRIVER & PERSETUJUAN</h3>
+  <div id="driver-management-list">Memuat daftar driver...</div>
+</div>
+</div>
+<button type="button" class="admin-menu-button" aria-expanded="false" aria-controls="admin-tourist-destinations" onclick="toggleAdminSection('admin-tourist-destinations',this)"><span class="admin-menu-icon" aria-hidden="true">🏝️</span><span class="admin-menu-label">PENGELOLAAN DESTINASI WISATA</span><span class="admin-menu-chevron">＋</span></button><div id="admin-tourist-destinations" class="admin-menu-content" hidden><div style="margin-top:18px;background:white;padding:18px;border-radius:12px;"><h3 style="color:#176b45;">Kelola Katalog Destinasi Wisata</h3><p style="color:#65776d;font-size:13px;">Tambahkan foto, tetapkan tarif transportasi, perbarui informasi, atau hapus destinasi.</p><form id="tour-destination-form" onsubmit="saveTourDestination(event)"><input type="hidden" id="tour-edit-id"><label for="tour-name">Nama Destinasi Wisata</label><input id="tour-name" required maxlength="120" placeholder="Contoh: Pura Lempuyang"><label for="tour-category">Kategori</label><select id="tour-category" required><option>Wisata Pura</option><option>Wisata Budaya</option><option>Wisata Alam</option><option>Adventure</option><option>Aktivitas Wisata</option><option>Pantai</option></select><label for="tour-description">Deskripsi Destinasi</label><textarea id="tour-description" rows="2" maxlength="300" placeholder="Deskripsi singkat tempat wisata"></textarea><label for="tour-price">Tarif Transportasi Mulai dari (Rupiah)</label><input id="tour-price" type="number" min="0" step="1000" required placeholder="Contoh: 600000"><label for="tour-image">Foto objek wisata</label><input id="tour-image" type="file" accept="image/*" onchange="previewTourImage(event)"><img id="tour-image-preview" class="tour-admin-preview" alt="Pratinjau foto destinasi"><p style="font-size:11px;color:#77847d;">Pilih foto JPG, PNG, atau WebP. Ukuran gambar akan disesuaikan secara otomatis. Foto wajib disertakan saat menambahkan destinasi.</p><div style="display:flex;gap:8px;flex-wrap:wrap;"><button id="tour-save-button" type="submit" style="flex:1;background:#176b45;">+ SIMPAN DESTINASI</button><button id="tour-cancel-button" type="button" onclick="cancelTourEdit()" style="display:none;flex:1;background:#68756e;">BATAL EDIT</button></div><p id="tour-admin-message" role="status" style="font-size:13px;"></p></form><h4 style="color:#29483d;margin:22px 0 8px;">Daftar Destinasi</h4><div id="tour-admin-list">Memuat daftar destinasi...</div></div></div>
+<!-- PENGELOLAAN TARIF DAN RUTE -->
+<button type="button" class="admin-menu-button" aria-expanded="false" aria-controls="admin-route-prices" onclick="toggleAdminSection('admin-route-prices',this)"><span class="admin-menu-icon" aria-hidden="true">🗺️</span><span class="admin-menu-label">PENGELOLAAN TARIF DAN RUTE</span><span class="admin-menu-chevron">＋</span></button>
+<div id="admin-route-prices" class="admin-menu-content" hidden>
+<div style="margin-top:25px;background:white;padding:18px;border-radius:12px;">
+  <h3 style="color:#176b45;">PENGELOLAAN TARIF DAN RUTE</h3>
+  <p style="color:#65776d;font-size:14px;">Tambahkan rute perjalanan dan tetapkan tarif. Contoh: Padangbai → Uluwatu = Rp600.000.</p>
+  <form id="route-price-form" onsubmit="saveServiceRoute(event)">
+    <input type="hidden" id="route-edit-id">
+    <label for="route-service">Kategori Layanan</label>
+    <select id="route-service" required></select>
+    <label for="route-origin">Dari</label>
+    <input id="route-origin" required minlength="2" maxlength="120" placeholder="Contoh: Padangbai">
+    <label for="route-destination">Tujuan</label>
+    <input id="route-destination" required minlength="2" maxlength="120" placeholder="Contoh: Uluwatu">
+    <label for="route-price">Tarif (Rupiah)</label>
+    <input id="route-price" type="number" required min="0" step="1000" placeholder="600000">
+    <div style="display:flex;gap:9px;flex-wrap:wrap;">
+      <button id="route-save-button" type="submit" style="flex:1;background:#176b45;">+ SIMPAN RUTE & HARGA</button>
+      <button id="route-cancel-button" type="button" onclick="cancelRouteEdit()" style="display:none;flex:1;background:#68756e;">BATAL EDIT</button>
+    </div>
+</div>
+  </form>
+  <p id="route-price-message" role="status" style="font-size:14px;"></p>
+  <h4 style="margin:22px 0 10px;color:#29483d;">Daftar Rute dan Tarif</h4>
+  <div id="route-price-list">Memuat daftar rute...</div>
+</div>
+<!-- COMMISSION MANAGEMENT -->
+<button type="button" class="admin-menu-button" aria-expanded="false" aria-controls="admin-commission" onclick="toggleAdminSection('admin-commission',this)"><span class="admin-menu-icon" aria-hidden="true">💰</span><span class="admin-menu-label">KOMISI DRIVER & SETORAN OWNER</span><span class="admin-menu-chevron">＋</span></button>
+<div id="admin-commission" class="admin-menu-content" hidden>
+ <div style="margin-top:18px;background:white;padding:18px;border-radius:12px;">
+  <h3 style="color:#176b45;margin-top:0;">KELola KOMISI DRIVER</h3>
+  <p style="color:#65776d;font-size:13px;">Tetapkan persentase komisi platform/Owner. Komisi akan dikunci saat perjalanan selesai, jadi perubahan persentase hanya berlaku untuk perjalanan yang selesai setelah perubahan disimpan.</p>
+  <form id="commission-settings-form" onsubmit="saveCommissionSettings(event)" style="display:flex;gap:10px;align-items:end;flex-wrap:wrap;">
+   <div style="flex:1;min-width:140px;"><label for="commission-percent">Persentase Komisi (%)</label><input id="commission-percent" type="number" min="0" max="100" step="0.25" value="10" required></div>
+   <button type="submit" id="commission-save-button" style="margin:0;min-width:130px;background:#176b45;">SIMPAN KOMISI</button>
+  </form>
+  <p id="commission-settings-message" role="status" style="font-size:13px;"></p>
+  <div id="commission-summary" style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin:14px 0;">
+   <div style="padding:14px;background:#f3f7f4;border-radius:9px;"><small>Komisi Belum Disetor</small><strong id="commission-unpaid-total" style="display:block;font-size:18px;color:#a33b35;">Rp 0</strong></div>
+   <div style="padding:14px;background:#f3f7f4;border-radius:9px;"><small>Komisi Sudah Disetor</small><strong id="commission-paid-total" style="display:block;font-size:18px;color:#176b45;">Rp 0</strong></div>
+  </div>
+  <h4 style="color:#29483d;margin:18px 0 8px;">RINCIAN KOMISI PER PERJALANAN</h4>
+  <div id="commission-ledger">Memuat catatan komisi...</div>
+ </div>
+</div>
+<!-- DAFTAR BOOKING -->
+<button type="button" class="admin-menu-button" aria-expanded="false" aria-controls="admin-bookings" onclick="toggleAdminSection('admin-bookings',this)"><span class="admin-menu-icon" aria-hidden="true">📋</span><span class="admin-menu-label">DAFTAR PEMESANAN PELANGGAN</span><span class="admin-menu-chevron">＋</span></button>
+<div id="admin-bookings" class="admin-menu-content" hidden>
+<div style="margin-top:25px;background:white;padding:18px;border-radius:12px;">
+
+  <h3 style="color:#176b45;">DAFTAR PEMESANAN PELANGGAN</h3>
+  <label for="owner-booking-filter">Filter Status Booking</label>
+  <select id="owner-booking-filter" onchange="renderOwnerBookings()" style="width:100%;padding:12px;margin:8px 0 14px;">
+    <option value="all">Semua Booking</option>
+    <option value="pending">Menunggu Konfirmasi</option>
+    <option value="confirmed">Dikonfirmasi</option>
+    <option value="assigned">Sudah Ditugaskan</option>
+    <option value="in_progress">Sedang Berjalan</option>
+    <option value="completed">Selesai</option>
+    <option value="cancelled">Dibatalkan</option>
+  </select>
+  <div id="booking-list">Memuat daftar booking...</div>
+</div>
+
+</div>
+  <button onclick="loadOwnerDashboard()"
+    style="margin-top:20px;padding:12px 20px;background:#176b45;color:white;border:0;border-radius:8px;">
+    REFRESH DATA
+  </button>
+
+  <button onclick="ownerLogout()"
+    style="margin-top:20px;padding:12px 20px;background:#555;color:white;border:0;border-radius:8px;">
+    LOGOUT
+  </button>
+
+  <p id="dashboard-message"></p>
+</div>
+
 <footer>
 BALI PRIVATE DRIVER · Kenyamanan Perjalanan Anda adalah Prioritas Kami.
 </footer>
@@ -1107,154 +1256,7 @@ function toggleAdminSection(id,button){
  if(icon)icon.textContent=willOpen?'－':'＋';
 }
 </script>
-<!-- OWNER DASHBOARD -->
-<div id="owner-dashboard" style="display:none;max-width:1000px;margin:30px auto;padding:20px;background:#f4f7f2;border-radius:15px;">
 
-  <h2 style="color:#176b45;">BALI DRIVER BOOKING</h2>
-  <h3>OWNER DASHBOARD</h3>
-  <p>Selamat datang, Owner!</p>
-
-<button type="button" class="admin-menu-button" aria-expanded="false" aria-controls="admin-create-driver" onclick="toggleAdminSection('admin-create-driver',this)"><span class="admin-menu-icon" aria-hidden="true">👥</span><span class="admin-menu-label">+ TAMBAH / KELOLA DRIVER</span><span class="admin-menu-chevron">＋</span></button>
-<div id="admin-create-driver" class="admin-menu-content" hidden>
-  <div style="margin:20px 0;background:white;padding:18px;border-radius:12px;">
-    <h3 style="color:#176b45;">MANAJEMEN DRIVER</h3>
-    <p style="color:#65776d;font-size:14px;">Buat akun Driver dari sini. Undangan untuk mengatur password akan dikirim ke email Driver.</p>
-    <form id="create-driver-form" onsubmit="createDriverAccount(event)">
-      <label for="new-driver-name">Nama Driver</label>
-      <input id="new-driver-name" required minlength="2" maxlength="100" placeholder="Nama lengkap Driver">
-      <label for="new-driver-phone">Nomor WhatsApp</label>
-      <input id="new-driver-phone" type="tel" required minlength="8" maxlength="25" placeholder="08xxxxxxxxxx">
-      <label for="new-driver-vehicle">Jenis / Tipe Mobil</label>
-      <input id="new-driver-vehicle" required minlength="2" maxlength="80" placeholder="Contoh: Suzuki Ertiga">
-      <label for="new-driver-plate">Plat Nomor Mobil</label>
-      <input id="new-driver-plate" required minlength="3" maxlength="15" placeholder="Contoh: DK 1234 ABC" style="text-transform:uppercase;">
-      <label for="new-driver-email">Email Login Driver</label>
-      <input id="new-driver-email" type="email" required maxlength="150" placeholder="email@example.com">
-      <button id="create-driver-button" type="submit" style="background:#176b45;">+ TAMBAH DRIVER & KIRIM UNDANGAN</button>
-    </form>
-    <p id="create-driver-message" role="status"></p>
-  </div>
-</div>
-
-<button type="button" class="admin-menu-button" aria-expanded="false" aria-controls="admin-overview" onclick="toggleAdminSection('admin-overview',this)"><span class="admin-menu-icon" aria-hidden="true">📊</span><span class="admin-menu-label">RINGKASAN DASHBOARD</span><span class="admin-menu-chevron">＋</span></button>
-<div id="admin-overview" class="admin-menu-content" hidden>
-  <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;">
-
-    <div style="background:white;padding:18px;border-radius:12px;">
-      <p>Total Booking</p>
-      <h2 id="total-bookings">0</h2>
-    </div>
-</div>
-
-    <div style="background:white;padding:18px;border-radius:12px;">
-      <p>Total Driver</p>
-      <h2 id="total-drivers">0</h2>
-    </div>
-
-    <div style="background:white;padding:18px;border-radius:12px;">
-      <p>Driver Tersedia</p>
-      <h2 id="active-drivers">0</h2>
-    </div>
-
-    <div style="background:white;padding:18px;border-radius:12px;">
-      <p>Booking Pending</p>
-      <h2 id="pending-bookings">0</h2>
-    </div>
-    <div style="background:white;padding:18px;border-radius:12px;">
-      <p>Perjalanan Selesai</p>
-      <h2 id="completed-bookings">0</h2>
-    </div>
-    <div style="background:white;padding:18px;border-radius:12px;">
-      <p>Omzet Booking Selesai</p>
-      <h2 id="completed-revenue">Rp 0</h2>
-    </div>
-
-  </div>
-<button type="button" class="admin-menu-button" aria-expanded="false" aria-controls="admin-driver-list" onclick="toggleAdminSection('admin-driver-list',this)"><span class="admin-menu-icon" aria-hidden="true">🧑‍✈️</span><span class="admin-menu-label">DAFTAR DRIVER & PERSETUJUAN</span><span class="admin-menu-chevron">＋</span></button>
-<div id="admin-driver-list" class="admin-menu-content" hidden>
-<div style="margin-top:25px;background:white;padding:18px;border-radius:12px;">
-  <h3 style="color:#176b45;">DAFTAR DRIVER & PERSETUJUAN</h3>
-  <div id="driver-management-list">Memuat daftar driver...</div>
-</div>
-</div>
-<button type="button" class="admin-menu-button" aria-expanded="false" aria-controls="admin-tourist-destinations" onclick="toggleAdminSection('admin-tourist-destinations',this)"><span class="admin-menu-icon" aria-hidden="true">🏝️</span><span class="admin-menu-label">PENGELOLAAN DESTINASI WISATA</span><span class="admin-menu-chevron">＋</span></button><div id="admin-tourist-destinations" class="admin-menu-content" hidden><div style="margin-top:18px;background:white;padding:18px;border-radius:12px;"><h3 style="color:#176b45;">Kelola Katalog Destinasi Wisata</h3><p style="color:#65776d;font-size:13px;">Tambahkan foto, tetapkan tarif transportasi, perbarui informasi, atau hapus destinasi.</p><form id="tour-destination-form" onsubmit="saveTourDestination(event)"><input type="hidden" id="tour-edit-id"><label for="tour-name">Nama Destinasi Wisata</label><input id="tour-name" required maxlength="120" placeholder="Contoh: Pura Lempuyang"><label for="tour-category">Kategori</label><select id="tour-category" required><option>Wisata Pura</option><option>Wisata Budaya</option><option>Wisata Alam</option><option>Adventure</option><option>Aktivitas Wisata</option><option>Pantai</option></select><label for="tour-description">Deskripsi Destinasi</label><textarea id="tour-description" rows="2" maxlength="300" placeholder="Deskripsi singkat tempat wisata"></textarea><label for="tour-price">Tarif Transportasi Mulai dari (Rupiah)</label><input id="tour-price" type="number" min="0" step="1000" required placeholder="Contoh: 600000"><label for="tour-image">Foto objek wisata</label><input id="tour-image" type="file" accept="image/*" onchange="previewTourImage(event)"><img id="tour-image-preview" class="tour-admin-preview" alt="Pratinjau foto destinasi"><p style="font-size:11px;color:#77847d;">Pilih foto JPG, PNG, atau WebP. Ukuran gambar akan disesuaikan secara otomatis. Foto wajib disertakan saat menambahkan destinasi.</p><div style="display:flex;gap:8px;flex-wrap:wrap;"><button id="tour-save-button" type="submit" style="flex:1;background:#176b45;">+ SIMPAN DESTINASI</button><button id="tour-cancel-button" type="button" onclick="cancelTourEdit()" style="display:none;flex:1;background:#68756e;">BATAL EDIT</button></div><p id="tour-admin-message" role="status" style="font-size:13px;"></p></form><h4 style="color:#29483d;margin:22px 0 8px;">Daftar Destinasi</h4><div id="tour-admin-list">Memuat daftar destinasi...</div></div></div>
-<!-- PENGELOLAAN TARIF DAN RUTE -->
-<button type="button" class="admin-menu-button" aria-expanded="false" aria-controls="admin-route-prices" onclick="toggleAdminSection('admin-route-prices',this)"><span class="admin-menu-icon" aria-hidden="true">🗺️</span><span class="admin-menu-label">PENGELOLAAN TARIF DAN RUTE</span><span class="admin-menu-chevron">＋</span></button>
-<div id="admin-route-prices" class="admin-menu-content" hidden>
-<div style="margin-top:25px;background:white;padding:18px;border-radius:12px;">
-  <h3 style="color:#176b45;">PENGELOLAAN TARIF DAN RUTE</h3>
-  <p style="color:#65776d;font-size:14px;">Tambahkan rute perjalanan dan tetapkan tarif. Contoh: Padangbai → Uluwatu = Rp600.000.</p>
-  <form id="route-price-form" onsubmit="saveServiceRoute(event)">
-    <input type="hidden" id="route-edit-id">
-    <label for="route-service">Kategori Layanan</label>
-    <select id="route-service" required></select>
-    <label for="route-origin">Dari</label>
-    <input id="route-origin" required minlength="2" maxlength="120" placeholder="Contoh: Padangbai">
-    <label for="route-destination">Tujuan</label>
-    <input id="route-destination" required minlength="2" maxlength="120" placeholder="Contoh: Uluwatu">
-    <label for="route-price">Tarif (Rupiah)</label>
-    <input id="route-price" type="number" required min="0" step="1000" placeholder="600000">
-    <div style="display:flex;gap:9px;flex-wrap:wrap;">
-      <button id="route-save-button" type="submit" style="flex:1;background:#176b45;">+ SIMPAN RUTE & HARGA</button>
-      <button id="route-cancel-button" type="button" onclick="cancelRouteEdit()" style="display:none;flex:1;background:#68756e;">BATAL EDIT</button>
-    </div>
-</div>
-  </form>
-  <p id="route-price-message" role="status" style="font-size:14px;"></p>
-  <h4 style="margin:22px 0 10px;color:#29483d;">Daftar Rute dan Tarif</h4>
-  <div id="route-price-list">Memuat daftar rute...</div>
-</div>
-<!-- COMMISSION MANAGEMENT -->
-<button type="button" class="admin-menu-button" aria-expanded="false" aria-controls="admin-commission" onclick="toggleAdminSection('admin-commission',this)"><span class="admin-menu-icon" aria-hidden="true">💰</span><span class="admin-menu-label">KOMISI DRIVER & SETORAN OWNER</span><span class="admin-menu-chevron">＋</span></button>
-<div id="admin-commission" class="admin-menu-content" hidden>
- <div style="margin-top:18px;background:white;padding:18px;border-radius:12px;">
-  <h3 style="color:#176b45;margin-top:0;">KELola KOMISI DRIVER</h3>
-  <p style="color:#65776d;font-size:13px;">Tetapkan persentase komisi platform/Owner. Komisi akan dikunci saat perjalanan selesai, jadi perubahan persentase hanya berlaku untuk perjalanan yang selesai setelah perubahan disimpan.</p>
-  <form id="commission-settings-form" onsubmit="saveCommissionSettings(event)" style="display:flex;gap:10px;align-items:end;flex-wrap:wrap;">
-   <div style="flex:1;min-width:140px;"><label for="commission-percent">Persentase Komisi (%)</label><input id="commission-percent" type="number" min="0" max="100" step="0.25" value="10" required></div>
-   <button type="submit" id="commission-save-button" style="margin:0;min-width:130px;background:#176b45;">SIMPAN KOMISI</button>
-  </form>
-  <p id="commission-settings-message" role="status" style="font-size:13px;"></p>
-  <div id="commission-summary" style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin:14px 0;">
-   <div style="padding:14px;background:#f3f7f4;border-radius:9px;"><small>Komisi Belum Disetor</small><strong id="commission-unpaid-total" style="display:block;font-size:18px;color:#a33b35;">Rp 0</strong></div>
-   <div style="padding:14px;background:#f3f7f4;border-radius:9px;"><small>Komisi Sudah Disetor</small><strong id="commission-paid-total" style="display:block;font-size:18px;color:#176b45;">Rp 0</strong></div>
-  </div>
-  <h4 style="color:#29483d;margin:18px 0 8px;">RINCIAN KOMISI PER PERJALANAN</h4>
-  <div id="commission-ledger">Memuat catatan komisi...</div>
- </div>
-</div>
-<!-- DAFTAR BOOKING -->
-<button type="button" class="admin-menu-button" aria-expanded="false" aria-controls="admin-bookings" onclick="toggleAdminSection('admin-bookings',this)"><span class="admin-menu-icon" aria-hidden="true">📋</span><span class="admin-menu-label">DAFTAR PEMESANAN PELANGGAN</span><span class="admin-menu-chevron">＋</span></button>
-<div id="admin-bookings" class="admin-menu-content" hidden>
-<div style="margin-top:25px;background:white;padding:18px;border-radius:12px;">
-
-  <h3 style="color:#176b45;">DAFTAR PEMESANAN PELANGGAN</h3>
-  <label for="owner-booking-filter">Filter Status Booking</label>
-  <select id="owner-booking-filter" onchange="renderOwnerBookings()" style="width:100%;padding:12px;margin:8px 0 14px;">
-    <option value="all">Semua Booking</option>
-    <option value="pending">Menunggu Konfirmasi</option>
-    <option value="confirmed">Dikonfirmasi</option>
-    <option value="assigned">Sudah Ditugaskan</option>
-    <option value="in_progress">Sedang Berjalan</option>
-    <option value="completed">Selesai</option>
-    <option value="cancelled">Dibatalkan</option>
-  </select>
-  <div id="booking-list">Memuat daftar booking...</div>
-</div>
-
-</div>
-  <button onclick="loadOwnerDashboard()"
-    style="margin-top:20px;padding:12px 20px;background:#176b45;color:white;border:0;border-radius:8px;">
-    REFRESH DATA
-  </button>
-
-  <button onclick="ownerLogout()"
-    style="margin-top:20px;padding:12px 20px;background:#555;color:white;border:0;border-radius:8px;">
-    LOGOUT
-  </button>
-
-  <p id="dashboard-message"></p>
-</div>
 
   
 <script>
