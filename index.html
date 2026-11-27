@@ -864,7 +864,7 @@ async function loadDriverBookings() {
   }
 
   const { data, error } = await db.from('bookings')
-    .select('id, booking_code, customer_name, customer_phone, pickup_location, destination, pickup_date, pickup_time, passenger_count, status')
+    .select('id, booking_code, customer_name, customer_phone, pickup_location, destination, pickup_date, pickup_time, passenger_count, status, total_price, commission_percent_snapshot, commission_amount, driver_net_amount')
     .eq('driver_id', authData.user.id)
     .order('id', { ascending: false });
 
@@ -897,6 +897,11 @@ async function loadDriverBookings() {
         'Penumpang: ' + booking.passenger_count,
         'Status: ' + bookingStatusLabel(booking.status)
       ];
+      if (booking.status === 'completed' && booking.commission_amount !== null) {
+        details.push('Harga perjalanan: ' + formatIDR(booking.total_price));
+        details.push('Komisi Owner (' + Number(booking.commission_percent_snapshot || 0) + '%): ' + formatIDR(booking.commission_amount));
+        details.push('Pendapatan bersih Driver: ' + formatIDR(booking.driver_net_amount));
+      }
       details.forEach(detail => {
         const line = document.createElement('p');
         line.textContent = detail;
@@ -1186,6 +1191,25 @@ function toggleAdminSection(id,button){
   <h4 style="margin:22px 0 10px;color:#29483d;">Daftar Rute dan Tarif</h4>
   <div id="route-price-list">Memuat daftar rute...</div>
 </div>
+<!-- COMMISSION MANAGEMENT -->
+<button type="button" class="admin-menu-button" aria-expanded="false" aria-controls="admin-commission" onclick="toggleAdminSection('admin-commission',this)">KOMISI DRIVER & SETORAN OWNER<span class="admin-menu-chevron">＋</span></button>
+<div id="admin-commission" class="admin-menu-content" hidden>
+ <div style="margin-top:18px;background:white;padding:18px;border-radius:12px;">
+  <h3 style="color:#176b45;margin-top:0;">KELola KOMISI DRIVER</h3>
+  <p style="color:#65776d;font-size:13px;">Tetapkan persentase komisi platform/Owner. Komisi akan dikunci saat perjalanan selesai, jadi perubahan persentase hanya berlaku untuk perjalanan yang selesai setelah perubahan disimpan.</p>
+  <form id="commission-settings-form" onsubmit="saveCommissionSettings(event)" style="display:flex;gap:10px;align-items:end;flex-wrap:wrap;">
+   <div style="flex:1;min-width:140px;"><label for="commission-percent">Persentase Komisi (%)</label><input id="commission-percent" type="number" min="0" max="100" step="0.25" value="10" required></div>
+   <button type="submit" id="commission-save-button" style="margin:0;min-width:130px;background:#176b45;">SIMPAN KOMISI</button>
+  </form>
+  <p id="commission-settings-message" role="status" style="font-size:13px;"></p>
+  <div id="commission-summary" style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin:14px 0;">
+   <div style="padding:14px;background:#f3f7f4;border-radius:9px;"><small>Komisi Belum Disetor</small><strong id="commission-unpaid-total" style="display:block;font-size:18px;color:#a33b35;">Rp 0</strong></div>
+   <div style="padding:14px;background:#f3f7f4;border-radius:9px;"><small>Komisi Sudah Disetor</small><strong id="commission-paid-total" style="display:block;font-size:18px;color:#176b45;">Rp 0</strong></div>
+  </div>
+  <h4 style="color:#29483d;margin:18px 0 8px;">RINCIAN KOMISI PER PERJALANAN</h4>
+  <div id="commission-ledger">Memuat catatan komisi...</div>
+ </div>
+</div>
 <!-- DAFTAR BOOKING -->
 <button type="button" class="admin-menu-button" aria-expanded="false" aria-controls="admin-bookings" onclick="toggleAdminSection('admin-bookings',this)">DAFTAR PEMESANAN PELANGGAN<span class="admin-menu-chevron">＋</span></button>
 <div id="admin-bookings" class="admin-menu-content" hidden>
@@ -1222,6 +1246,57 @@ function toggleAdminSection(id,button){
   
 <script>
   
+
+// DRIVER COMMISSION SETTINGS + SETTLEMENT LEDGER
+async function loadCommissionSettings(){
+ const input=document.getElementById('commission-percent');
+ if(!input)return;
+ const {data,error}=await db.from('commission_settings').select('commission_percent').eq('id',1).maybeSingle();
+ if(error){document.getElementById('commission-settings-message').textContent='Gagal membaca pengaturan komisi: '+error.message;return;}
+ if(data)input.value=Number(data.commission_percent);
+}
+async function saveCommissionSettings(event){
+ event.preventDefault();
+ const button=document.getElementById('commission-save-button'),message=document.getElementById('commission-settings-message');
+ const percent=Number(document.getElementById('commission-percent').value);
+ if(!Number.isFinite(percent)||percent<0||percent>100){message.textContent='Komisi harus antara 0 sampai 100 persen.';return;}
+ button.disabled=true;button.textContent='MENYIMPAN...';
+ const {error}=await db.from('commission_settings').upsert({id:1,commission_percent:percent,updated_at:new Date().toISOString()});
+ button.disabled=false;button.textContent='SIMPAN KOMISI';
+ if(error){message.style.color='#a12626';message.textContent='Gagal menyimpan: '+error.message;return;}
+ message.style.color='#176334';message.textContent='Komisi berhasil disimpan. Berlaku untuk perjalanan yang selesai setelah ini.';
+}
+async function loadCommissionLedger(){
+ const target=document.getElementById('commission-ledger');if(!target)return;
+ target.textContent='Memuat catatan komisi...';
+ const {data:rows,error}=await db.from('bookings').select('id,booking_code,customer_name,pickup_location,destination,pickup_date,total_price,driver_id,commission_percent_snapshot,commission_amount,driver_net_amount,commission_collected').eq('status','completed').order('pickup_date',{ascending:false});
+ if(error){target.textContent='Gagal memuat catatan komisi: '+error.message;return;}
+ const bookings=rows||[];
+ const unpaid=bookings.filter(x=>!x.commission_collected).reduce((sum,x)=>sum+Number(x.commission_amount||0),0);
+ const paid=bookings.filter(x=>x.commission_collected).reduce((sum,x)=>sum+Number(x.commission_amount||0),0);
+ document.getElementById('commission-unpaid-total').textContent=formatIDR(unpaid);
+ document.getElementById('commission-paid-total').textContent=formatIDR(paid);
+ target.innerHTML='';
+ if(!bookings.length){target.textContent='Belum ada perjalanan selesai. Komisi akan tercatat setelah Driver menyelesaikan perjalanan.';return;}
+ const ids=[...new Set(bookings.map(x=>x.driver_id).filter(Boolean))];
+ const {data:profiles,error:profileError}=ids.length?await db.from('profiles').select('id,full_name').in('id',ids):{data:[],error:null};
+ if(profileError){target.textContent='Gagal memuat nama Driver: '+profileError.message;return;}
+ const names=new Map((profiles||[]).map(p=>[p.id,p.full_name]));
+ bookings.forEach(b=>{
+  const card=document.createElement('div');card.style.cssText='border:1px solid #e3e8e3;border-radius:10px;padding:13px;margin:9px 0;background:#fbfcfa;';
+  const title=document.createElement('strong');title.textContent=(b.booking_code||'Booking')+' · '+(names.get(b.driver_id)||'Driver');title.style.cssText='display:block;color:#214a38;';
+  const info=document.createElement('div');info.style.cssText='font-size:12px;color:#63756b;line-height:1.6;margin:6px 0;';
+  info.textContent=b.pickup_location+' → '+b.destination+' · '+b.pickup_date+' · Fare '+formatIDR(b.total_price);
+  const money=document.createElement('div');money.style.cssText='font-size:13px;line-height:1.65;color:#2d5140;font-weight:700;';
+  money.textContent='Komisi '+Number(b.commission_percent_snapshot||0)+'%: '+formatIDR(b.commission_amount)+' | Driver: '+formatIDR(b.driver_net_amount);
+  const state=document.createElement('span');state.textContent=b.commission_collected?'SETORAN DITERIMA':'BELUM DISETOR';state.style.cssText='display:inline-block;margin-top:7px;padding:4px 8px;border-radius:20px;font-size:10px;font-weight:800;background:'+(b.commission_collected?'#e5f5eb':'#fff0e3')+';color:'+(b.commission_collected?'#176b45':'#9a5720');
+  card.append(title,info,money,state);
+  if(!b.commission_collected){const button=document.createElement('button');button.type='button';button.textContent='TANDA SETORAN DITERIMA';button.style.cssText='margin:9px 0 0;padding:10px;background:#176b45;font-size:11px;';button.onclick=async()=>{button.disabled=true;button.textContent='MENYIMPAN...';const {error:updateError}=await db.from('bookings').update({commission_collected:true}).eq('id',b.id).eq('status','completed');if(updateError){alert('Gagal memperbarui setoran: '+updateError.message);button.disabled=false;button.textContent='TANDA SETORAN DITERIMA';return;}await loadCommissionLedger();};card.appendChild(button);}
+  target.appendChild(card);
+ });
+}
+function formatIDR(value){return 'Rp '+Number(value||0).toLocaleString('id-ID');}
+
 async function createDriverAccount(event) {
   event.preventDefault();
   const form = document.getElementById('create-driver-form');
@@ -1285,7 +1360,7 @@ async function loadOwnerDashboard() {
   document.getElementById('completed-bookings').textContent = completedRows.length;
   const completedRevenue = completedRows.reduce((sum, row) => sum + Number(row.total_price || 0), 0);
   document.getElementById('completed-revenue').textContent = 'Rp ' + completedRevenue.toLocaleString('id-ID');
-await Promise.all([loadOwnerBookings(), loadOwnerDrivers(), loadServiceRoutes(), loadTourAdminList()]);
+await Promise.all([loadOwnerBookings(), loadOwnerDrivers(), loadServiceRoutes(), loadTourAdminList(), loadCommissionSettings(), loadCommissionLedger()]);
   message.textContent = 'Data berhasil dimuat.';
 }
 
