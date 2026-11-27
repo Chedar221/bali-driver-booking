@@ -1924,31 +1924,30 @@ footer{margin-top:30px!important;padding:20px 14px!important;font-size:11px!impo
   activeOwnerModal=null;
  }
  window.toggleAdminSection=function(id,button){
-  const panel=document.getElementById(id);if(!panel)return;
-  if(id==='admin-route-prices'||id==='admin-tourist-destinations'){
-   if(activeOwnerModal){const samePanel=activeOwnerModal.panel===panel;closeOwnerModal();if(samePanel)return;}
-   const placeholder=document.createComment('owner-popup-placeholder');
-   panel.parentNode.insertBefore(placeholder,panel);
-   const overlay=document.createElement('div');
-   overlay.className='owner-admin-popup-overlay';
-   overlay.setAttribute('role','dialog');overlay.setAttribute('aria-modal','true');
-   const modal=document.createElement('div');modal.className='owner-admin-popup-panel';
-   const head=document.createElement('div');head.className='owner-admin-popup-head';
-   const title=document.createElement('strong');
-   title.textContent=id==='admin-route-prices'?'PENGELOLAAN DAFTAR HARGA & RUTE':'PENGELOLAAN DESTINASI WISATA';
-   const close=document.createElement('button');close.type='button';close.className='owner-admin-popup-close';close.textContent='×';close.setAttribute('aria-label','Tutup popup');close.onclick=closeOwnerModal;
-   head.append(title,close);modal.appendChild(head);
-   panel.hidden=false;panel.classList.add('owner-admin-popup-content');modal.appendChild(panel);overlay.appendChild(modal);
-   overlay.addEventListener('click',e=>{if(e.target===overlay)closeOwnerModal();});
-   document.body.appendChild(overlay);document.body.classList.add('popup-open');
-   button.setAttribute('aria-expanded','true');const c=button.querySelector('.admin-menu-chevron');if(c)c.textContent='－';
-   activeOwnerModal={overlay,panel,placeholder,button};
-   close.focus();return;
+  const panel=document.getElementById(id);if(!panel||!button)return;
+  if(activeOwnerModal){
+   const samePanel=activeOwnerModal.panel===panel;
+   closeOwnerModal();
+   if(samePanel)return;
   }
-  const willOpen=panel.hidden;
-  panel.hidden=!willOpen;
-  button.setAttribute('aria-expanded',String(willOpen));
-  const icon=button.querySelector('.admin-menu-chevron');if(icon)icon.textContent=willOpen?'－':'＋';
+  const placeholder=document.createComment('owner-popup-placeholder');
+  panel.parentNode.insertBefore(placeholder,panel);
+  const overlay=document.createElement('div');
+  overlay.className='owner-admin-popup-overlay';
+  overlay.setAttribute('role','dialog');overlay.setAttribute('aria-modal','true');
+  const modal=document.createElement('div');modal.className='owner-admin-popup-panel';
+  const head=document.createElement('div');head.className='owner-admin-popup-head';
+  const title=document.createElement('strong');
+  const label=button.querySelector('.admin-menu-label');
+  title.textContent=label?(label.textContent||'MENU OWNER').replace(/^\+\s*/,'').trim():'MENU OWNER';
+  const close=document.createElement('button');close.type='button';close.className='owner-admin-popup-close';close.textContent='×';close.setAttribute('aria-label','Tutup popup');close.onclick=closeOwnerModal;
+  head.append(title,close);modal.appendChild(head);
+  panel.hidden=false;panel.classList.add('owner-admin-popup-content');modal.appendChild(panel);overlay.appendChild(modal);
+  overlay.addEventListener('click',e=>{if(e.target===overlay)closeOwnerModal();});
+  document.body.appendChild(overlay);document.body.classList.add('popup-open');
+  button.setAttribute('aria-expanded','true');const c=button.querySelector('.admin-menu-chevron');if(c)c.textContent='－';
+  activeOwnerModal={overlay,panel,placeholder,button};
+  close.focus();
  };
  document.addEventListener('keydown',e=>{if(e.key==='Escape')closeOwnerModal();});
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',setupOwnerMenu);
