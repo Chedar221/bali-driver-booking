@@ -1086,6 +1086,16 @@ async function driverLogout() {
 #owner-dashboard>h2,#owner-dashboard>h3,#owner-dashboard>p{grid-column:1/-1;margin-bottom:4px;}
 @media(max-width:520px){.admin-menu-button{min-height:76px;padding:9px 5px;font-size:10.5px;border-radius:11px;gap:5px;}#owner-dashboard{padding:14px!important;gap:8px;}}
 </style>
+<style id="owner-menu-square-icons">
+/* Equal owner menu tiles with clear icons and consistent sizing */
+#owner-dashboard:not([style*="display: none"]){grid-template-columns:repeat(3,minmax(0,1fr));}
+#owner-dashboard .admin-menu-button{height:116px!important;min-height:116px!important;max-height:116px!important;padding:10px 6px!important;display:flex!important;flex-direction:column!important;justify-content:center!important;align-items:center!important;gap:7px!important;border-radius:13px!important;text-align:center!important;overflow:hidden!important;}
+#owner-dashboard .admin-menu-icon{display:block!important;font-size:27px!important;line-height:1!important;height:30px!important;flex:0 0 30px!important;}
+#owner-dashboard .admin-menu-label{display:flex!important;align-items:center!important;justify-content:center!important;font-size:10.5px!important;font-weight:800!important;line-height:1.2!important;letter-spacing:.15px!important;height:30px!important;overflow:hidden!important;}
+#owner-dashboard .admin-menu-chevron{display:none!important;}
+#owner-dashboard .admin-menu-content{grid-column:1/-1!important;width:100%!important;}
+@media(max-width:520px){#owner-dashboard:not([style*="display: none"]){gap:8px!important;}#owner-dashboard .admin-menu-button{height:104px!important;min-height:104px!important;max-height:104px!important;padding:8px 4px!important;border-radius:11px!important;gap:6px!important;}#owner-dashboard .admin-menu-icon{font-size:24px!important;height:27px!important;flex-basis:27px!important;}#owner-dashboard .admin-menu-label{font-size:9.5px!important;line-height:1.15!important;height:28px!important;}}
+</style>
 <script>
 function toggleAdminSection(id,button){
  const panel=document.getElementById(id);
@@ -1104,7 +1114,7 @@ function toggleAdminSection(id,button){
   <h3>OWNER DASHBOARD</h3>
   <p>Selamat datang, Owner!</p>
 
-<button type="button" class="admin-menu-button" aria-expanded="false" aria-controls="admin-create-driver" onclick="toggleAdminSection('admin-create-driver',this)">+ TAMBAH / KELOLA DRIVER<span class="admin-menu-chevron">＋</span></button>
+<button type="button" class="admin-menu-button" aria-expanded="false" aria-controls="admin-create-driver" onclick="toggleAdminSection('admin-create-driver',this)"><span class="admin-menu-icon" aria-hidden="true">👥</span><span class="admin-menu-label">+ TAMBAH / KELOLA DRIVER</span><span class="admin-menu-chevron">＋</span></button>
 <div id="admin-create-driver" class="admin-menu-content" hidden>
   <div style="margin:20px 0;background:white;padding:18px;border-radius:12px;">
     <h3 style="color:#176b45;">MANAJEMEN DRIVER</h3>
@@ -1126,7 +1136,7 @@ function toggleAdminSection(id,button){
   </div>
 </div>
 
-<button type="button" class="admin-menu-button" aria-expanded="false" aria-controls="admin-overview" onclick="toggleAdminSection('admin-overview',this)">RINGKASAN DASHBOARD<span class="admin-menu-chevron">＋</span></button>
+<button type="button" class="admin-menu-button" aria-expanded="false" aria-controls="admin-overview" onclick="toggleAdminSection('admin-overview',this)"><span class="admin-menu-icon" aria-hidden="true">📊</span><span class="admin-menu-label">RINGKASAN DASHBOARD</span><span class="admin-menu-chevron">＋</span></button>
 <div id="admin-overview" class="admin-menu-content" hidden>
   <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;">
 
@@ -1160,16 +1170,16 @@ function toggleAdminSection(id,button){
     </div>
 
   </div>
-<button type="button" class="admin-menu-button" aria-expanded="false" aria-controls="admin-driver-list" onclick="toggleAdminSection('admin-driver-list',this)">DAFTAR DRIVER & PERSETUJUAN<span class="admin-menu-chevron">＋</span></button>
+<button type="button" class="admin-menu-button" aria-expanded="false" aria-controls="admin-driver-list" onclick="toggleAdminSection('admin-driver-list',this)"><span class="admin-menu-icon" aria-hidden="true">🧑‍✈️</span><span class="admin-menu-label">DAFTAR DRIVER & PERSETUJUAN</span><span class="admin-menu-chevron">＋</span></button>
 <div id="admin-driver-list" class="admin-menu-content" hidden>
 <div style="margin-top:25px;background:white;padding:18px;border-radius:12px;">
   <h3 style="color:#176b45;">DAFTAR DRIVER & PERSETUJUAN</h3>
   <div id="driver-management-list">Memuat daftar driver...</div>
 </div>
 </div>
-<button type="button" class="admin-menu-button" aria-expanded="false" aria-controls="admin-tourist-destinations" onclick="toggleAdminSection('admin-tourist-destinations',this)">PENGELOLAAN DESTINASI WISATA<span class="admin-menu-chevron">＋</span></button><div id="admin-tourist-destinations" class="admin-menu-content" hidden><div style="margin-top:18px;background:white;padding:18px;border-radius:12px;"><h3 style="color:#176b45;">Kelola Katalog Destinasi Wisata</h3><p style="color:#65776d;font-size:13px;">Tambahkan foto, tetapkan tarif transportasi, perbarui informasi, atau hapus destinasi.</p><form id="tour-destination-form" onsubmit="saveTourDestination(event)"><input type="hidden" id="tour-edit-id"><label for="tour-name">Nama Destinasi Wisata</label><input id="tour-name" required maxlength="120" placeholder="Contoh: Pura Lempuyang"><label for="tour-category">Kategori</label><select id="tour-category" required><option>Wisata Pura</option><option>Wisata Budaya</option><option>Wisata Alam</option><option>Adventure</option><option>Aktivitas Wisata</option><option>Pantai</option></select><label for="tour-description">Deskripsi Destinasi</label><textarea id="tour-description" rows="2" maxlength="300" placeholder="Deskripsi singkat tempat wisata"></textarea><label for="tour-price">Tarif Transportasi Mulai dari (Rupiah)</label><input id="tour-price" type="number" min="0" step="1000" required placeholder="Contoh: 600000"><label for="tour-image">Foto objek wisata</label><input id="tour-image" type="file" accept="image/*" onchange="previewTourImage(event)"><img id="tour-image-preview" class="tour-admin-preview" alt="Pratinjau foto destinasi"><p style="font-size:11px;color:#77847d;">Pilih foto JPG, PNG, atau WebP. Ukuran gambar akan disesuaikan secara otomatis. Foto wajib disertakan saat menambahkan destinasi.</p><div style="display:flex;gap:8px;flex-wrap:wrap;"><button id="tour-save-button" type="submit" style="flex:1;background:#176b45;">+ SIMPAN DESTINASI</button><button id="tour-cancel-button" type="button" onclick="cancelTourEdit()" style="display:none;flex:1;background:#68756e;">BATAL EDIT</button></div><p id="tour-admin-message" role="status" style="font-size:13px;"></p></form><h4 style="color:#29483d;margin:22px 0 8px;">Daftar Destinasi</h4><div id="tour-admin-list">Memuat daftar destinasi...</div></div></div>
+<button type="button" class="admin-menu-button" aria-expanded="false" aria-controls="admin-tourist-destinations" onclick="toggleAdminSection('admin-tourist-destinations',this)"><span class="admin-menu-icon" aria-hidden="true">🏝️</span><span class="admin-menu-label">PENGELOLAAN DESTINASI WISATA</span><span class="admin-menu-chevron">＋</span></button><div id="admin-tourist-destinations" class="admin-menu-content" hidden><div style="margin-top:18px;background:white;padding:18px;border-radius:12px;"><h3 style="color:#176b45;">Kelola Katalog Destinasi Wisata</h3><p style="color:#65776d;font-size:13px;">Tambahkan foto, tetapkan tarif transportasi, perbarui informasi, atau hapus destinasi.</p><form id="tour-destination-form" onsubmit="saveTourDestination(event)"><input type="hidden" id="tour-edit-id"><label for="tour-name">Nama Destinasi Wisata</label><input id="tour-name" required maxlength="120" placeholder="Contoh: Pura Lempuyang"><label for="tour-category">Kategori</label><select id="tour-category" required><option>Wisata Pura</option><option>Wisata Budaya</option><option>Wisata Alam</option><option>Adventure</option><option>Aktivitas Wisata</option><option>Pantai</option></select><label for="tour-description">Deskripsi Destinasi</label><textarea id="tour-description" rows="2" maxlength="300" placeholder="Deskripsi singkat tempat wisata"></textarea><label for="tour-price">Tarif Transportasi Mulai dari (Rupiah)</label><input id="tour-price" type="number" min="0" step="1000" required placeholder="Contoh: 600000"><label for="tour-image">Foto objek wisata</label><input id="tour-image" type="file" accept="image/*" onchange="previewTourImage(event)"><img id="tour-image-preview" class="tour-admin-preview" alt="Pratinjau foto destinasi"><p style="font-size:11px;color:#77847d;">Pilih foto JPG, PNG, atau WebP. Ukuran gambar akan disesuaikan secara otomatis. Foto wajib disertakan saat menambahkan destinasi.</p><div style="display:flex;gap:8px;flex-wrap:wrap;"><button id="tour-save-button" type="submit" style="flex:1;background:#176b45;">+ SIMPAN DESTINASI</button><button id="tour-cancel-button" type="button" onclick="cancelTourEdit()" style="display:none;flex:1;background:#68756e;">BATAL EDIT</button></div><p id="tour-admin-message" role="status" style="font-size:13px;"></p></form><h4 style="color:#29483d;margin:22px 0 8px;">Daftar Destinasi</h4><div id="tour-admin-list">Memuat daftar destinasi...</div></div></div>
 <!-- PENGELOLAAN TARIF DAN RUTE -->
-<button type="button" class="admin-menu-button" aria-expanded="false" aria-controls="admin-route-prices" onclick="toggleAdminSection('admin-route-prices',this)">PENGELOLAAN TARIF DAN RUTE<span class="admin-menu-chevron">＋</span></button>
+<button type="button" class="admin-menu-button" aria-expanded="false" aria-controls="admin-route-prices" onclick="toggleAdminSection('admin-route-prices',this)"><span class="admin-menu-icon" aria-hidden="true">🗺️</span><span class="admin-menu-label">PENGELOLAAN TARIF DAN RUTE</span><span class="admin-menu-chevron">＋</span></button>
 <div id="admin-route-prices" class="admin-menu-content" hidden>
 <div style="margin-top:25px;background:white;padding:18px;border-radius:12px;">
   <h3 style="color:#176b45;">PENGELOLAAN TARIF DAN RUTE</h3>
@@ -1195,7 +1205,7 @@ function toggleAdminSection(id,button){
   <div id="route-price-list">Memuat daftar rute...</div>
 </div>
 <!-- COMMISSION MANAGEMENT -->
-<button type="button" class="admin-menu-button" aria-expanded="false" aria-controls="admin-commission" onclick="toggleAdminSection('admin-commission',this)">KOMISI DRIVER & SETORAN OWNER<span class="admin-menu-chevron">＋</span></button>
+<button type="button" class="admin-menu-button" aria-expanded="false" aria-controls="admin-commission" onclick="toggleAdminSection('admin-commission',this)"><span class="admin-menu-icon" aria-hidden="true">💰</span><span class="admin-menu-label">KOMISI DRIVER & SETORAN OWNER</span><span class="admin-menu-chevron">＋</span></button>
 <div id="admin-commission" class="admin-menu-content" hidden>
  <div style="margin-top:18px;background:white;padding:18px;border-radius:12px;">
   <h3 style="color:#176b45;margin-top:0;">KELola KOMISI DRIVER</h3>
@@ -1214,7 +1224,7 @@ function toggleAdminSection(id,button){
  </div>
 </div>
 <!-- DAFTAR BOOKING -->
-<button type="button" class="admin-menu-button" aria-expanded="false" aria-controls="admin-bookings" onclick="toggleAdminSection('admin-bookings',this)">DAFTAR PEMESANAN PELANGGAN<span class="admin-menu-chevron">＋</span></button>
+<button type="button" class="admin-menu-button" aria-expanded="false" aria-controls="admin-bookings" onclick="toggleAdminSection('admin-bookings',this)"><span class="admin-menu-icon" aria-hidden="true">📋</span><span class="admin-menu-label">DAFTAR PEMESANAN PELANGGAN</span><span class="admin-menu-chevron">＋</span></button>
 <div id="admin-bookings" class="admin-menu-content" hidden>
 <div style="margin-top:25px;background:white;padding:18px;border-radius:12px;">
 
