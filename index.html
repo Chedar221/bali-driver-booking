@@ -194,75 +194,6 @@ footer{background:var(--forest);color:#d8dfd8;padding:28px 18px;margin-top:55px;
 <nav class="popup-nav" aria-label="Menu utama"><button class="popup-menu-link booking-link" type="button" onclick="openPopup('booking-popup')">BUAT PEMESANAN</button><button class="popup-menu-link" type="button" onclick="openPopup('owner-popup')">MASUK OWNER</button><a class="popup-menu-link driver-popup-link" href="#driver-popup">MASUK DRIVER</a></nav>
 </header>
 
-
-
-<section id="tourist-destinations"><div class="tour-catalog-head"><div class="eyebrow">PILIHAN DESTINASI WISATA</div><h2 style="margin:7px 0;color:#173d2f;">Destinasi Wisata Populer di Bali</h2><p style="margin:0;color:#6b7a72;font-size:14px;">Temukan destinasi pilihan dan pesan perjalanan dengan mudah.</p></div><div id="tourist-destination-grid" class="tour-catalog-grid"><div style="grid-column:1/-1;text-align:center;padding:24px;color:#718078;">Memuat pilihan destinasi...</div></div></section>
-<section id="public-price-list" style="max-width:1000px;margin:38px auto;padding:0 18px;">
-  <div style="background:#fff;border:1px solid #e8e1d2;border-radius:16px;padding:clamp(20px,4vw,32px);box-shadow:0 18px 50px #20382d0c;">
-    <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px;">
-      <div><p style="color:#b18b48;font-weight:800;letter-spacing:2px;font-size:12px;margin:0 0 8px;">INFORMASI TARIF</p><h2 style="margin:0;">Daftar Tarif</h2></div>
-      <button type="button" onclick="openPopup('booking-popup')" style="width:auto;margin:0;padding:12px 18px;background:#c9a45e;color:#17352b;">Pesan Sekarang</button>
-    </div>
-    <p class="note">Harga perjalanan berdasarkan rute yang tersedia. Hubungi kami jika tujuan Anda belum tercantum.</p>
-    <div id="public-route-price-list" style="margin-top:18px;">Memuat daftar harga...</div>
-  </div>
-</section>
-
-<div id="booking-popup" class="popup-overlay" role="dialog" aria-modal="true" aria-label="Form booking" onclick="if(event.target===this)closePopup('booking-popup')"><main class="popup-panel">
-<button class="popup-close" type="button" aria-label="Tutup" onclick="closePopup('booking-popup')">×</button>
-<div class="card">
-<h2>Pilihan Layanan</h2>
-<div class="services">
-<div class="service">✈️ Antar-Jemput Bandara</div>
-<div class="service">🌴 Wisata Pribadi</div>
-<div class="service">🚘 Antar Lokasi</div>
-<div class="service">⭐ Sewa Kendaraan dengan Pengemudi</div>
-</div>
-
-<h2>Formulir Pemesanan</h2>
-<form id="bookingForm">
-<label>Nama Lengkap</label>
-<input id="name" required maxlength="100">
-
-<label>Nomor WhatsApp</label>
-<input id="phone" required maxlength="25">
-
-<label>Alamat Email (Opsional)</label>
-<input id="email" type="email" maxlength="150">
-
-<label>Kategori Layanan</label>
-<select id="service" required>
-<option value="">Memuat pilihan layanan...</option>
-</select>
-
-<label>Lokasi Penjemputan</label>
-<div class="location-field"><input id="pickup" required maxlength="250" placeholder="Pilih titik penjemputan"><button class="location-map-btn" type="button" onclick="openLocationMap(&quot;pickup&quot;)">Pilih pada Peta</button></div>
-
-<label>Lokasi Tujuan</label>
-<div class="location-field"><input id="destination" required maxlength="250" placeholder="Pilih lokasi tujuan"><button class="location-map-btn" type="button" onclick="openLocationMap(&quot;destination&quot;)">Pilih pada Peta</button></div>
-<p id="route-price-preview" class="note" style="margin:8px 0 14px;">Harga rute akan muncul jika asal dan tujuan cocok dengan daftar harga.</p>
-
-<label>Tanggal Penjemputan</label>
-<input id="date" type="date" required>
-
-<label>Waktu Penjemputan</label>
-<input id="time" type="time" required>
-
-<label>Jumlah Penumpang</label>
-<input id="passengers" type="number" min="1" max="20" value="1" required>
-
-<label>Catatan Tambahan</label>
-<textarea id="notes" rows="3" maxlength="1000"></textarea>
-
-<button id="submitBtn" type="submit">Kirim Permintaan Pemesanan</button>
-<p class="note">Permintaan Anda akan ditinjau oleh tim kami. Tarif akhir akan dikonfirmasi sebelum perjalanan.</p>
-</form>
-<div id="message" role="status"></div>
-<div id="booking-receipt" style="display:none;margin-top:14px;padding:18px;border:1px solid #c8e3d2;border-radius:14px;background:#f0faf3;"></div>
-</div>
-</main></div>
-
-<div id="location-map-modal" role="dialog" aria-modal="true" aria-label="Pilih lokasi di peta" onclick="if(event.target===this)closeLocationMap()"><div class="location-map-panel"><div class="location-map-head"><h3 id="location-map-title">Pilih lokasi</h3><button id="location-map-close" type="button" onclick="closeLocationMap()">×</button></div><div class="location-map-search"><input id="location-map-search-input" type="search" placeholder="Cari nama tempat, hotel, alamat..."><button id="location-map-search-btn" type="button" onclick="searchMapLocation()">CARI</button></div><div id="location-map"></div><p id="location-map-status">Geser peta atau ketuk lokasi yang diinginkan.</p><div class="location-map-actions"><button id="location-map-current" type="button" onclick="useCurrentLocation()">GUNAKAN LOKASI SAYA</button><button id="location-map-confirm" type="button" onclick="confirmMapLocation()">GUNAKAN TITIK INI</button></div></div></div>
 <!-- OWNER DASHBOARD -->
 <div id="owner-dashboard" style="display:none;max-width:1000px;margin:30px auto;padding:20px;background:#f4f7f2;border-radius:15px;">
 
@@ -354,11 +285,11 @@ footer{background:var(--forest);color:#d8dfd8;padding:28px 18px;margin-top:55px;
       <button id="route-save-button" type="submit" style="flex:1;background:#176b45;">+ SIMPAN RUTE & HARGA</button>
       <button id="route-cancel-button" type="button" onclick="cancelRouteEdit()" style="display:none;flex:1;background:#68756e;">BATAL EDIT</button>
     </div>
-</div>
   </form>
   <p id="route-price-message" role="status" style="font-size:14px;"></p>
   <h4 style="margin:22px 0 10px;color:#29483d;">Daftar Rute dan Tarif</h4>
   <div id="route-price-list">Memuat daftar rute...</div>
+</div>
 </div>
 <!-- COMMISSION MANAGEMENT -->
 <button type="button" class="admin-menu-button" aria-expanded="false" aria-controls="admin-commission" onclick="toggleAdminSection('admin-commission',this)"><span class="admin-menu-icon" aria-hidden="true">💰</span><span class="admin-menu-label">KOMISI DRIVER & SETORAN OWNER</span><span class="admin-menu-chevron">＋</span></button>
@@ -411,6 +342,78 @@ footer{background:var(--forest);color:#d8dfd8;padding:28px 18px;margin-top:55px;
 
   <p id="dashboard-message"></p>
 </div>
+
+
+
+
+<section id="tourist-destinations"><div class="tour-catalog-head"><div class="eyebrow">PILIHAN DESTINASI WISATA</div><h2 style="margin:7px 0;color:#173d2f;">Destinasi Wisata Populer di Bali</h2><p style="margin:0;color:#6b7a72;font-size:14px;">Temukan destinasi pilihan dan pesan perjalanan dengan mudah.</p></div><div id="tourist-destination-grid" class="tour-catalog-grid"><div style="grid-column:1/-1;text-align:center;padding:24px;color:#718078;">Memuat pilihan destinasi...</div></div></section>
+<section id="public-price-list" style="max-width:1000px;margin:38px auto;padding:0 18px;">
+  <div style="background:#fff;border:1px solid #e8e1d2;border-radius:16px;padding:clamp(20px,4vw,32px);box-shadow:0 18px 50px #20382d0c;">
+    <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px;">
+      <div><p style="color:#b18b48;font-weight:800;letter-spacing:2px;font-size:12px;margin:0 0 8px;">INFORMASI TARIF</p><h2 style="margin:0;">Daftar Tarif</h2></div>
+      <button type="button" onclick="openPopup('booking-popup')" style="width:auto;margin:0;padding:12px 18px;background:#c9a45e;color:#17352b;">Pesan Sekarang</button>
+    </div>
+    <p class="note">Harga perjalanan berdasarkan rute yang tersedia. Hubungi kami jika tujuan Anda belum tercantum.</p>
+    <div id="public-route-price-list" style="margin-top:18px;">Memuat daftar harga...</div>
+  </div>
+</section>
+
+<div id="booking-popup" class="popup-overlay" role="dialog" aria-modal="true" aria-label="Form booking" onclick="if(event.target===this)closePopup('booking-popup')"><main class="popup-panel">
+<button class="popup-close" type="button" aria-label="Tutup" onclick="closePopup('booking-popup')">×</button>
+<div class="card">
+<h2>Pilihan Layanan</h2>
+<div class="services">
+<div class="service">✈️ Antar-Jemput Bandara</div>
+<div class="service">🌴 Wisata Pribadi</div>
+<div class="service">🚘 Antar Lokasi</div>
+<div class="service">⭐ Sewa Kendaraan dengan Pengemudi</div>
+</div>
+
+<h2>Formulir Pemesanan</h2>
+<form id="bookingForm">
+<label>Nama Lengkap</label>
+<input id="name" required maxlength="100">
+
+<label>Nomor WhatsApp</label>
+<input id="phone" required maxlength="25">
+
+<label>Alamat Email (Opsional)</label>
+<input id="email" type="email" maxlength="150">
+
+<label>Kategori Layanan</label>
+<select id="service" required>
+<option value="">Memuat pilihan layanan...</option>
+</select>
+
+<label>Lokasi Penjemputan</label>
+<div class="location-field"><input id="pickup" required maxlength="250" placeholder="Pilih titik penjemputan"><button class="location-map-btn" type="button" onclick="openLocationMap(&quot;pickup&quot;)">Pilih pada Peta</button></div>
+
+<label>Lokasi Tujuan</label>
+<div class="location-field"><input id="destination" required maxlength="250" placeholder="Pilih lokasi tujuan"><button class="location-map-btn" type="button" onclick="openLocationMap(&quot;destination&quot;)">Pilih pada Peta</button></div>
+<p id="route-price-preview" class="note" style="margin:8px 0 14px;">Harga rute akan muncul jika asal dan tujuan cocok dengan daftar harga.</p>
+
+<label>Tanggal Penjemputan</label>
+<input id="date" type="date" required>
+
+<label>Waktu Penjemputan</label>
+<input id="time" type="time" required>
+
+<label>Jumlah Penumpang</label>
+<input id="passengers" type="number" min="1" max="20" value="1" required>
+
+<label>Catatan Tambahan</label>
+<textarea id="notes" rows="3" maxlength="1000"></textarea>
+
+<button id="submitBtn" type="submit">Kirim Permintaan Pemesanan</button>
+<p class="note">Permintaan Anda akan ditinjau oleh tim kami. Tarif akhir akan dikonfirmasi sebelum perjalanan.</p>
+</form>
+<div id="message" role="status"></div>
+<div id="booking-receipt" style="display:none;margin-top:14px;padding:18px;border:1px solid #c8e3d2;border-radius:14px;background:#f0faf3;"></div>
+</div>
+</main></div>
+
+<div id="location-map-modal" role="dialog" aria-modal="true" aria-label="Pilih lokasi di peta" onclick="if(event.target===this)closeLocationMap()"><div class="location-map-panel"><div class="location-map-head"><h3 id="location-map-title">Pilih lokasi</h3><button id="location-map-close" type="button" onclick="closeLocationMap()">×</button></div><div class="location-map-search"><input id="location-map-search-input" type="search" placeholder="Cari nama tempat, hotel, alamat..."><button id="location-map-search-btn" type="button" onclick="searchMapLocation()">CARI</button></div><div id="location-map"></div><p id="location-map-status">Geser peta atau ketuk lokasi yang diinginkan.</p><div class="location-map-actions"><button id="location-map-current" type="button" onclick="useCurrentLocation()">GUNAKAN LOKASI SAYA</button><button id="location-map-confirm" type="button" onclick="confirmMapLocation()">GUNAKAN TITIK INI</button></div></div></div>
+
 
 <footer>
 BALI PRIVATE DRIVER · Kenyamanan Perjalanan Anda adalah Prioritas Kami.
