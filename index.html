@@ -379,7 +379,7 @@ button:active{transform:translateY(1px)}
 
 <header>
 <div class="logo"><div class="brand-copy"><span class="brand-title">CHEDAR</span><span class="brand-subtitle">BALI DRIVER BOOKING · PRIVATE JOURNEYS</span></div></div>
-<nav class="popup-nav" aria-label="Menu utama"><button class="popup-menu-link booking-link" type="button" onclick="openPopup('booking-popup')">BUAT PEMESANAN</button><button class="popup-menu-link" type="button" onclick="openPopup('owner-popup')">MASUK OWNER</button><a class="popup-menu-link driver-popup-link" href="#driver-popup">MASUK DRIVER</a></nav>
+<nav class="popup-nav" aria-label="Menu utama"><button class="popup-menu-link booking-link" type="button" onclick="openPopup('booking-popup')">BOOKING</button><button class="popup-menu-link" type="button" onclick="openPopup('owner-popup')">MASUK OWNER</button><a class="popup-menu-link driver-popup-link" href="#driver-popup">MASUK DRIVER</a></nav>
 </header>
 
 <section class="hero" aria-labelledby="home-hero-title">
@@ -2418,5 +2418,15 @@ footer{padding:18px 14px!important;margin-top:28px!important;font-size:11px!impo
 }
 </style>
 
-</body>
+
+<style id="public-home-only-three-actions">
+/* Halaman utama: pertahankan hanya tiga tombol navigasi di header */
+.hero .hero-booking-cta,
+.home-intro button,
+#tourist-destinations button,
+#public-price-list button {
+  display: none !important;
+}
+</style>
+\n</body>
 </html>
