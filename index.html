@@ -1941,7 +1941,12 @@ footer{margin-top:30px!important;padding:20px 14px!important;font-size:11px!impo
    if(chevron)forceStyle(chevron,{display:'block',fontSize:'12px',lineHeight:'1',opacity:'.85'});
   });
   forceStyle(nav,{display:'grid',gridTemplateColumns:'repeat(3,minmax(0,1fr))',alignItems:'stretch',gap:'9px',width:'100%',minWidth:'0',margin:'10px 0 14px',padding:'0'});
-  forceStyle(dashboard,{display:'grid',gridTemplateColumns:'minmax(0,1fr)',alignItems:'start'});
+  // Do not expose the Owner dashboard on the public homepage during page initialization.
+  if(dashboard.style.display!=='none'){
+   forceStyle(dashboard,{display:'grid',gridTemplateColumns:'minmax(0,1fr)',alignItems:'start'});
+  }else{
+   dashboard.style.setProperty('display','none','important');
+  }
   dashboard.classList.add('owner-menu-ready');
  }
  function closeOwnerModal(){
