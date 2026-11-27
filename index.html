@@ -1908,79 +1908,71 @@ footer{margin-top:30px!important;padding:20px 14px!important;font-size:11px!impo
 <script id="owner-navigation-popup-upgrade">
 (function(){
  let activeOwnerModal=null;
+ function forceStyle(el,styles){
+  for(const [k,v] of Object.entries(styles))el.style.setProperty(k,v,'important');
+ }
  function setupOwnerMenu(){
   const dashboard=document.getElementById('owner-dashboard');
   if(!dashboard)return;
   let nav=document.getElementById('owner-menu-navigation');
   if(!nav){
-   nav=document.createElement('div');
-   nav.id='owner-menu-navigation';
+   nav=document.createElement('div');nav.id='owner-menu-navigation';
    nav.setAttribute('aria-label','Navigasi Owner Dashboard');
   }
   const welcome=[...dashboard.children].find(el=>el.matches('p'));
   if(nav.parentElement!==dashboard){
    if(welcome)welcome.insertAdjacentElement('afterend',nav);
-   else dashboard.appendChild(nav);
+   else dashboard.insertBefore(nav,dashboard.firstChild);
   }else if(welcome&&welcome.nextElementSibling!==nav){
    welcome.insertAdjacentElement('afterend',nav);
   }
-  // Only the seven top-level Owner navigation buttons belong in this grid.
-  const buttons=[...dashboard.querySelectorAll('button.admin-menu-button[aria-controls]')];
+  // Include every actual Owner menu button; do not depend on optional attributes.
+  const buttons=[...dashboard.querySelectorAll('.admin-menu-button')].filter(el=>el.tagName==='BUTTON');
   buttons.forEach(button=>{
+   const targetId=button.getAttribute('aria-controls')||((button.getAttribute('onclick')||'').match(/toggleAdminSection\(['"]([^'"]+)/)||[])[1];
+   if(!targetId||!document.getElementById(targetId))return;
    if(button.parentElement!==nav)nav.appendChild(button);
+   forceStyle(button,{boxSizing:'border-box',display:'flex',position:'relative',width:'100%',height:'108px',minWidth:'0',minHeight:'108px',maxHeight:'108px',margin:'0',padding:'9px 5px',border:'1px solid #d7e4d9',borderRadius:'13px',background:'linear-gradient(145deg,#176b45,#0f5135)',color:'#fff',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:'6px',textAlign:'center',overflow:'hidden'});
+   const icon=button.querySelector('.admin-menu-icon');
+   if(icon)forceStyle(icon,{display:'flex',alignItems:'center',justifyContent:'center',flex:'0 0 28px',width:'100%',height:'28px',fontSize:'24px',lineHeight:'1'});
+   const label=button.querySelector('.admin-menu-label');
+   if(label)forceStyle(label,{display:'-webkit-box',WebkitBoxOrient:'vertical',WebkitLineClamp:'2',overflow:'hidden',width:'100%',minHeight:'2.4em',maxHeight:'2.4em',fontSize:'9px',fontWeight:'800',lineHeight:'1.2',textAlign:'center',overflowWrap:'anywhere'});
+   const chevron=button.querySelector('.admin-menu-chevron');
+   if(chevron)forceStyle(chevron,{display:'block',fontSize:'12px',lineHeight:'1',opacity:'.85'});
   });
+  forceStyle(nav,{display:'grid',gridTemplateColumns:'repeat(3,minmax(0,1fr))',alignItems:'stretch',gap:'9px',width:'100%',minWidth:'0',margin:'10px 0 14px',padding:'0'});
+  forceStyle(dashboard,{display:'grid',gridTemplateColumns:'minmax(0,1fr)',alignItems:'start'});
   dashboard.classList.add('owner-menu-ready');
-  nav.style.display='grid';
-  nav.style.gridTemplateColumns='repeat(3,minmax(0,1fr))';
-  nav.style.gap='10px';
-  nav.style.width='100%';
-  nav.style.margin='10px 0 14px';
  }
  function closeOwnerModal(){
   if(!activeOwnerModal)return;
   const {overlay,panel,placeholder,button}=activeOwnerModal;
   if(placeholder.parentNode)placeholder.parentNode.insertBefore(panel,placeholder);
-  placeholder.remove();
-  overlay.remove();
-  document.body.classList.remove('popup-open');
-  if(button){
-   button.setAttribute('aria-expanded','false');
-   const c=button.querySelector('.admin-menu-chevron');if(c)c.textContent='＋';
-  }
+  placeholder.remove();overlay.remove();document.body.classList.remove('popup-open');
+  if(button){button.setAttribute('aria-expanded','false');const c=button.querySelector('.admin-menu-chevron');if(c)c.textContent='＋';}
   activeOwnerModal=null;
  }
  window.toggleAdminSection=function(id,button){
   const panel=document.getElementById(id);if(!panel||!button)return;
-  if(activeOwnerModal){
-   const same=activeOwnerModal.panel===panel;
-   closeOwnerModal();
-   if(same)return;
-  }
+  if(activeOwnerModal){const same=activeOwnerModal.panel===panel;closeOwnerModal();if(same)return;}
   const placeholder=document.createComment('owner-popup-placeholder');
   panel.parentNode.insertBefore(placeholder,panel);
-  const overlay=document.createElement('div');
-  overlay.className='owner-admin-popup-overlay';
+  const overlay=document.createElement('div');overlay.className='owner-admin-popup-overlay';
   overlay.setAttribute('role','dialog');overlay.setAttribute('aria-modal','true');
   const modal=document.createElement('div');modal.className='owner-admin-popup-panel';
   const head=document.createElement('div');head.className='owner-admin-popup-head';
-  const title=document.createElement('strong');
-  const label=button.querySelector('.admin-menu-label');
+  const title=document.createElement('strong');const label=button.querySelector('.admin-menu-label');
   title.textContent=label?(label.textContent||'MENU OWNER').replace(/^\+\s*/,'').trim():'MENU OWNER';
   const close=document.createElement('button');close.type='button';close.className='owner-admin-popup-close';close.textContent='×';close.setAttribute('aria-label','Tutup popup');close.onclick=closeOwnerModal;
-  head.append(title,close);modal.appendChild(head);
-  panel.hidden=false;panel.classList.add('owner-admin-popup-content');modal.appendChild(panel);
-  overlay.appendChild(modal);
+  head.append(title,close);modal.appendChild(head);panel.hidden=false;panel.classList.add('owner-admin-popup-content');modal.appendChild(panel);overlay.appendChild(modal);
   overlay.addEventListener('click',e=>{if(e.target===overlay)closeOwnerModal();});
   document.body.appendChild(overlay);document.body.classList.add('popup-open');
-  button.setAttribute('aria-expanded','true');
-  const c=button.querySelector('.admin-menu-chevron');if(c)c.textContent='－';
-  activeOwnerModal={overlay,panel,placeholder,button};
-  close.focus();
+  button.setAttribute('aria-expanded','true');const c=button.querySelector('.admin-menu-chevron');if(c)c.textContent='－';
+  activeOwnerModal={overlay,panel,placeholder,button};close.focus();
  };
  window.setupOwnerMenu=setupOwnerMenu;
  document.addEventListener('keydown',e=>{if(e.key==='Escape')closeOwnerModal();});
- if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',setupOwnerMenu);
- else setupOwnerMenu();
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',setupOwnerMenu);else setupOwnerMenu();
  window.addEventListener('load',setupOwnerMenu,{once:true});
 })();
 </script>
@@ -1999,30 +1991,17 @@ footer{margin-top:30px!important;padding:20px 14px!important;font-size:11px!impo
 @media(max-width:520px){#owner-menu-navigation{gap:7px}#owner-menu-navigation .admin-menu-button{height:96px!important;min-height:96px!important;max-height:96px!important}.owner-admin-popup-overlay{padding:8px}.owner-admin-popup-panel{max-height:94vh;padding:13px;border-radius:12px}.owner-admin-popup-head{top:-13px;margin:-13px -13px 10px;padding:11px 12px}.owner-admin-popup-head strong{font-size:11px}}
 </style>
 <style id="owner-menu-tile-alignment-fix">
-/* Definitive Owner menu layout: equal 3-column tiles, including Destinations and Routes */
-#owner-dashboard.owner-menu-ready{display:grid!important;grid-template-columns:minmax(0,1fr)!important;align-items:start!important;}
-#owner-dashboard.owner-menu-ready>#owner-menu-navigation{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:10px!important;width:100%!important;min-width:0!important;grid-column:1/-1!important;margin:10px 0 14px!important;padding:0!important;}
-#owner-dashboard.owner-menu-ready>#owner-menu-navigation>button.admin-menu-button{box-sizing:border-box!important;display:flex!important;position:relative!important;width:100%!important;height:108px!important;min-width:0!important;min-height:108px!important;max-height:108px!important;margin:0!important;padding:9px 5px!important;border:1px solid #d7e4d9!important;border-radius:13px!important;background:linear-gradient(145deg,#176b45,#0f5135)!important;color:#fff!important;box-shadow:0 4px 12px #173b2920!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;gap:6px!important;text-align:center!important;overflow:hidden!important;}
-#owner-dashboard.owner-menu-ready>#owner-menu-navigation>button.admin-menu-button .admin-menu-icon{display:flex!important;align-items:center!important;justify-content:center!important;flex:0 0 29px!important;width:100%!important;height:29px!important;font-size:25px!important;line-height:1!important;}
-#owner-dashboard.owner-menu-ready>#owner-menu-navigation>button.admin-menu-button .admin-menu-label{display:-webkit-box!important;-webkit-box-orient:vertical!important;-webkit-line-clamp:2!important;overflow:hidden!important;width:100%!important;min-height:2.4em!important;max-height:2.4em!important;font-size:9.5px!important;font-weight:800!important;line-height:1.2!important;text-align:center!important;overflow-wrap:anywhere!important;}
-#owner-dashboard.owner-menu-ready>#owner-menu-navigation>button.admin-menu-button .admin-menu-chevron{display:block!important;font-size:12px!important;line-height:1!important;opacity:.85!important;}
-#owner-dashboard.owner-menu-ready>.admin-menu-content{grid-column:1/-1!important;width:100%!important;}
+#owner-menu-navigation{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:9px!important;width:100%!important;min-width:0!important;}
+#owner-menu-navigation>.admin-menu-button{width:100%!important;height:108px!important;min-height:108px!important;max-height:108px!important;margin:0!important;}
+#owner-menu-navigation .admin-menu-icon{font-size:24px!important;}
+#owner-menu-navigation .admin-menu-label{font-size:9px!important;line-height:1.2!important;}
+@media(max-width:520px){#owner-menu-navigation{gap:7px!important;}#owner-menu-navigation>.admin-menu-button{height:96px!important;min-height:96px!important;max-height:96px!important;padding:7px 3px!important;}#owner-menu-navigation .admin-menu-icon{font-size:22px!important;}}
 .owner-admin-popup-overlay{position:fixed;inset:0;z-index:150000;display:flex;align-items:center;justify-content:center;padding:10px;background:rgba(5,20,15,.78);backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px);}
 .owner-admin-popup-panel{position:relative;width:min(100%,760px);max-height:92vh;overflow:auto;background:#f8faf8;border:1px solid #c9a45e;border-radius:16px;padding:16px;box-shadow:0 28px 90px #0009;}
 .owner-admin-popup-head{position:sticky;top:-16px;z-index:3;display:flex;align-items:center;justify-content:space-between;gap:12px;margin:-16px -16px 12px;padding:12px 14px;background:#143d30;color:#fff;border-bottom:1px solid #c9a45e;}
-.owner-admin-popup-head strong{font-size:13px;letter-spacing:.4px;}
-.owner-admin-popup-close{flex:0 0 36px;width:36px;height:36px;margin:0;padding:0;border-radius:50%;background:#f5f1e7;color:#173d30;font-size:25px;line-height:1;}
-.owner-admin-popup-content{display:block!important;grid-column:auto!important;width:100%!important;padding:0!important;}
-.owner-admin-popup-content>div{margin:0!important;padding:12px!important;}
+.owner-admin-popup-close{flex:0 0 36px;width:36px;height:36px;border-radius:50%;background:#f5f1e7;color:#173d30;font-size:25px;line-height:1;}
+.owner-admin-popup-content{display:block!important;width:100%!important;padding:0!important;}
 .owner-admin-popup-content[hidden]{display:block!important;}
-@media(max-width:520px){
- #owner-dashboard.owner-menu-ready>#owner-menu-navigation{gap:7px!important;}
- #owner-dashboard.owner-menu-ready>#owner-menu-navigation>button.admin-menu-button{height:100px!important;min-height:100px!important;max-height:100px!important;padding:7px 3px!important;border-radius:11px!important;gap:5px!important;}
- #owner-dashboard.owner-menu-ready>#owner-menu-navigation>button.admin-menu-button .admin-menu-icon{flex-basis:26px!important;height:26px!important;font-size:22px!important;}
- #owner-dashboard.owner-menu-ready>#owner-menu-navigation>button.admin-menu-button .admin-menu-label{font-size:8.5px!important;}
- .owner-admin-popup-panel{max-height:94vh;padding:12px;border-radius:12px;}
- .owner-admin-popup-head{top:-12px;margin:-12px -12px 10px;padding:10px;}
-}
 </style>
 
 </body>
