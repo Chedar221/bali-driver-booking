@@ -1926,7 +1926,7 @@ footer{margin-top:30px!important;padding:20px 14px!important;font-size:11px!impo
  window.toggleAdminSection=function(id,button){
   const panel=document.getElementById(id);if(!panel)return;
   if(id==='admin-route-prices'||id==='admin-tourist-destinations'){
-   if(activeOwnerModal){closeOwnerModal();if(activeOwnerModal?.panel===panel)return;}
+   if(activeOwnerModal){const samePanel=activeOwnerModal.panel===panel;closeOwnerModal();if(samePanel)return;}
    const placeholder=document.createComment('owner-popup-placeholder');
    panel.parentNode.insertBefore(placeholder,panel);
    const overlay=document.createElement('div');
