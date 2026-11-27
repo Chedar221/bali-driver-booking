@@ -1249,13 +1249,14 @@ async function driverLogout() {
 @media(max-width:520px){#owner-dashboard:not([style*="display: none"]){gap:8px!important;}#owner-dashboard .admin-menu-button{height:104px!important;min-height:104px!important;max-height:104px!important;padding:8px 4px!important;border-radius:11px!important;gap:6px!important;}#owner-dashboard .admin-menu-icon{font-size:24px!important;height:27px!important;flex-basis:27px!important;}#owner-dashboard .admin-menu-label{font-size:9.5px!important;line-height:1.15!important;height:28px!important;}}
 </style>
 <script>
-function toggleAdminSection(id,button){
+/* Legacy inline panel toggle renamed so it cannot overwrite the popup handler. */
+function toggleAdminSectionLegacy(id,button){
  const panel=document.getElementById(id);
  if(!panel)return;
  const willOpen=panel.hidden;
  panel.hidden=!willOpen;
- button.setAttribute('aria-expanded',String(willOpen));
- const icon=button.querySelector('.admin-menu-chevron');
+ if(button)button.setAttribute('aria-expanded',String(willOpen));
+ const icon=button&&button.querySelector('.admin-menu-chevron');
  if(icon)icon.textContent=willOpen?'－':'＋';
 }
 </script>
