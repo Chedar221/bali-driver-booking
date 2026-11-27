@@ -1903,14 +1903,18 @@ footer{margin-top:30px!important;padding:20px 14px!important;font-size:11px!impo
  let activeOwnerModal=null;
  function setupOwnerMenu(){
   const dashboard=document.getElementById('owner-dashboard');
-  if(!dashboard||dashboard.dataset.navReordered==='1')return;
-  const buttons=[...dashboard.querySelectorAll(':scope > .admin-menu-button')];
-  if(!buttons.length)return;
-  const nav=document.createElement('div');
-  nav.id='owner-menu-navigation';
-  nav.setAttribute('aria-label','Navigasi Owner Dashboard');
-  buttons[0].parentNode.insertBefore(nav,buttons[0]);
-  buttons.forEach(button=>nav.appendChild(button));
+  if(!dashboard)return;
+  let nav=dashboard.querySelector(':scope > #owner-menu-navigation');
+  if(!nav){
+   nav=document.createElement('div');
+   nav.id='owner-menu-navigation';
+   nav.setAttribute('aria-label','Navigasi Owner Dashboard');
+  }
+  const header=[...dashboard.children].find(el=>el.matches('p'))||[...dashboard.children].find(el=>el.matches('h3'))||dashboard.firstElementChild;
+  if(header&&header.nextElementSibling!==nav)header.insertAdjacentElement('afterend',nav);
+  else if(!header&&nav.parentNode!==dashboard)dashboard.prepend(nav);
+  const buttons=[...dashboard.querySelectorAll(':scope > .admin-menu-button, :scope > #owner-menu-navigation > .admin-menu-button')];
+  buttons.forEach(button=>{if(button.parentElement!==nav)nav.appendChild(button);});
   dashboard.dataset.navReordered='1';
  }
  function closeOwnerModal(){
