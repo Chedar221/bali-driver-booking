@@ -722,7 +722,7 @@ async function ownerLogin() {
 
   message.textContent = 'Login Owner berhasil!';
   closePopup('owner-popup');
-  document.getElementById('owner-dashboard').style.display = 'block';
+  document.getElementById('owner-dashboard').style.setProperty('display','grid','important');
   window.setupOwnerMenu?.();
 
 await loadOwnerDashboard();
@@ -1950,7 +1950,9 @@ footer{margin-top:30px!important;padding:20px 14px!important;font-size:11px!impo
   if(dashboard.style.display!=='none'){
    forceStyle(dashboard,{display:'grid',gridTemplateColumns:'minmax(0,1fr)',alignItems:'start'});
   }else{
-   dashboard.style.setProperty('display','none','important');
+   // Keep the initial hidden state non-important so a successful Owner login can reveal it.
+   dashboard.style.removeProperty('display');
+   dashboard.style.display='none';
   }
   dashboard.classList.add('owner-menu-ready');
  }
