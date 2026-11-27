@@ -1269,7 +1269,7 @@ async function saveCommissionSettings(event){
 async function loadCommissionLedger(){
  const target=document.getElementById('commission-ledger');if(!target)return;
  target.textContent='Memuat catatan komisi...';
- const {data:rows,error}=await db.from('bookings').select('id,booking_code,customer_name,pickup_location,destination,pickup_date,total_price,driver_id,commission_percent_snapshot,commission_amount,driver_net_amount,commission_collected').eq('status','completed').order('pickup_date',{ascending:false});
+ const {data:rows,error}=await db.from('bookings').select('id,booking_code,customer_name,pickup_location,destination,pickup_date,total_price,driver_id,commission_percent_snapshot,commission_amount,driver_net_amount,commission_collected').eq('status','completed').not('commission_percent_snapshot','is',null).order('pickup_date',{ascending:false});
  if(error){target.textContent='Gagal memuat catatan komisi: '+error.message;return;}
  const bookings=rows||[];
  const unpaid=bookings.filter(x=>!x.commission_collected).reduce((sum,x)=>sum+Number(x.commission_amount||0),0);
