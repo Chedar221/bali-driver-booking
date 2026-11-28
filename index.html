@@ -2256,6 +2256,9 @@ footer{margin-top:30px!important;padding:20px 14px!important;font-size:11px!impo
   if(!activeOwnerModal)return;
   const {overlay,panel,placeholder,button}=activeOwnerModal;
   if(placeholder.parentNode)placeholder.parentNode.insertBefore(panel,placeholder);
+  // A closed submenu must remain hidden in the dashboard, not reappear inline below its tile.
+  panel.hidden=true;
+  panel.classList.remove('owner-admin-popup-content');
   placeholder.remove();overlay.remove();document.body.classList.remove('popup-open');
   if(button){button.setAttribute('aria-expanded','false');const c=button.querySelector('.admin-menu-chevron');if(c)c.textContent='＋';}
   activeOwnerModal=null;
@@ -2296,7 +2299,8 @@ footer{margin-top:30px!important;padding:20px 14px!important;font-size:11px!impo
 .owner-admin-popup-close{flex:0 0 36px;width:36px;height:36px;margin:0;padding:0;border-radius:50%;background:#f5f1e7;color:#173d30;font-size:25px;line-height:1}
 .owner-admin-popup-content{display:block!important;grid-column:auto!important;width:100%!important;padding:0!important}
 .owner-admin-popup-content>div{margin:0!important;padding:12px!important}
-.owner-admin-popup-content[hidden]{display:block!important}
+/* Native [hidden] must win after a popup closes. */
+.owner-admin-popup-content[hidden]{display:none!important}
 @media(max-width:520px){#owner-menu-navigation{gap:7px}#owner-menu-navigation .admin-menu-button{height:96px!important;min-height:96px!important;max-height:96px!important}.owner-admin-popup-overlay{padding:8px}.owner-admin-popup-panel{max-height:94vh;padding:13px;border-radius:12px}.owner-admin-popup-head{top:-13px;margin:-13px -13px 10px;padding:11px 12px}.owner-admin-popup-head strong{font-size:11px}}
 </style>
 <style id="owner-menu-tile-alignment-fix">
