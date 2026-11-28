@@ -2626,5 +2626,125 @@ body:not(.owner-mode) .owner-admin-popup-overlay{display:none!important}
 }
 </style>
 
+
+<style id="bilingual-language-switcher-style">
+#site-language-switcher{position:fixed;top:12px;right:14px;z-index:100000;display:flex;align-items:center;gap:3px;padding:4px;border:1px solid #D8B88A;border-radius:999px;background:#351321;box-shadow:0 5px 18px #1b0b1280}
+#site-language-switcher button{min-width:38px;padding:7px 9px;border:0;border-radius:999px;background:transparent!important;color:#FFF8F1!important;font-size:11px;font-weight:800;line-height:1;cursor:pointer}
+#site-language-switcher button[aria-pressed="true"]{background:#D8B88A!important;color:#351321!important}
+body{padding-top:0}
+@media(max-width:650px){#site-language-switcher{top:8px;right:8px}#site-language-switcher button{min-width:34px;padding:7px 8px}}
+</style>
+<div id="site-language-switcher" role="group" aria-label="Choose language">
+  <button type="button" data-site-lang="id" aria-pressed="true">ID</button>
+  <button type="button" data-site-lang="en" aria-pressed="false">EN</button>
+</div>
+<script id="chedar-bilingual-language-engine">
+(function(){
+  const translations = {
+    "Menu utama":"Main menu","BOOKING":"BOOKING","MASUK OWNER":"OWNER LOGIN","MASUK DRIVER":"DRIVER LOGIN",
+    "Jelajahi Keindahan Bali dengan Nyaman":"Explore the Beauty of Bali in Comfort",
+    "Nikmati perjalanan wisata, antar-jemput bandara, dan perjalanan pribadi bersama pengemudi lokal yang ramah dan profesional.":"Enjoy sightseeing, airport transfers, and private journeys with friendly, professional local drivers.",
+    "PESAN PERJALANAN":"BOOK A RIDE","BALI PRIVATE DRIVER":"BALI PRIVATE DRIVER",
+    "Perjalanan Lebih Mudah, Nyaman, dan Berkesan":"Travel Made Easier, More Comfortable, and Memorable",
+    "Pilih layanan yang sesuai dengan kebutuhan perjalanan Anda. Isi formulir pemesanan untuk mengatur jadwal dan tujuan perjalanan di Bali.":"Choose a service that suits your travel needs. Complete the booking form to arrange your schedule and destinations in Bali.",
+    "🚗 Private Driver":"🚗 Private Driver","✈️ Antar Jemput Bandara":"✈️ Airport Transfer","🏝️ Wisata Seharian":"🏝️ Full-Day Tour","🧳 Perjalanan Antar Kota":"🧳 Intercity Transfer",
+    "BUAT PEMESANAN SEKARANG":"BOOK YOUR RIDE NOW","JELAJAHI PULAU DEWATA":"EXPLORE THE ISLAND OF THE GODS",
+    "Destinasi Wisata Populer di Bali":"Popular Destinations in Bali","Temukan destinasi pilihan dan pesan perjalanan dengan mudah.":"Discover selected destinations and book your ride with ease.",
+    "Memuat destinasi wisata...":"Loading destinations...","PESAN PERJALANAN WISATA":"BOOK A TOUR",
+    "TRANSPARAN & MUDAH":"CLEAR & SIMPLE","Daftar Tarif":"Price List","Lihat daftar layanan, rute perjalanan, dan tarif yang tersedia.":"View available services, routes, and prices.",
+    "Memuat data tarif...":"Loading prices...","Daftar harga sedang tidak tersedia. Silakan hubungi Owner.":"Price list is currently unavailable. Please contact the Owner.",
+    "Harga rute akan segera tersedia. Silakan hubungi kami untuk mendapatkan penawaran.":"Route prices will be available soon. Please contact us for a quote.",
+    "Tarif dapat dikonfirmasi kembali saat pemesanan sesuai titik jemput, tujuan, dan kebutuhan perjalanan.":"The final fare can be confirmed when booking, based on your pickup point, destination, and travel needs.",
+    "PESAN SEKARANG":"BOOK NOW","BALI PRIVATE DRIVER · Kenyamanan Perjalanan Anda adalah Prioritas Kami.":"BALI PRIVATE DRIVER · Your comfort is our priority.",
+    "Pilihan Layanan":"Our Services","Antar-Jemput Bandara":"Airport Transfer","Wisata Pribadi":"Private Tour","Antar Lokasi":"Point-to-Point Transfer","Sewa Kendaraan dengan Pengemudi":"Car Rental with Driver",
+    "Formulir Pemesanan":"Booking Form","Nama Lengkap":"Full Name","Nomor WhatsApp":"WhatsApp Number","Alamat Email (Opsional)":"Email Address (Optional)",
+    "Kategori Layanan":"Service Category","Memuat pilihan layanan...":"Loading services...","Lokasi Penjemputan":"Pickup Location","Pilih titik penjemputan":"Choose pickup location",
+    "Pilih pada Peta":"Select on Map","Lokasi Tujuan":"Destination","Pilih lokasi tujuan":"Choose destination","Harga rute akan muncul jika asal dan tujuan cocok dengan daftar harga.":"Route pricing will appear when your pickup and destination match a listed route.",
+    "Tanggal Penjemputan":"Pickup Date","Waktu Penjemputan":"Pickup Time","Jumlah Penumpang":"Number of Passengers","Catatan Tambahan":"Additional Notes",
+    "Kirim Permintaan Pemesanan":"SUBMIT BOOKING REQUEST","Permintaan Anda akan ditinjau oleh tim kami. Tarif akhir akan dikonfirmasi sebelum perjalanan.":"Your request will be reviewed by our team. The final fare will be confirmed before your trip.",
+    "Pilih lokasi":"Select a location","Cari nama tempat, hotel, alamat...":"Search for a place, hotel, address...","CARI":"SEARCH",
+    "Geser peta atau ketuk lokasi yang diinginkan.":"Move the map or tap your preferred location.","GUNAKAN LOKASI SAYA":"USE MY LOCATION","GUNAKAN TITIK INI":"USE THIS LOCATION",
+    "BALI DRIVER BOOKING":"BALI DRIVER BOOKING","OWNER DASHBOARD":"OWNER DASHBOARD","Selamat datang, Owner!":"Welcome, Owner!",
+    "DESTINASI WISATA":"TOURIST DESTINATIONS","DAFTAR TARIF":"PRICE LIST","+ TAMBAH / KELOLA DRIVER":"+ ADD / MANAGE DRIVERS",
+    "MANAJEMEN DRIVER":"DRIVER MANAGEMENT","Buat akun Driver dari sini. Undangan untuk mengatur password akan dikirim ke email Driver.":"Create Driver accounts here. An invitation to set a password will be sent to the Driver's email.",
+    "Nama Driver":"Driver Name","Nomor WhatsApp":"WhatsApp Number","Jenis / Tipe Mobil":"Vehicle Type","Plat Nomor Mobil":"License Plate",
+    "Email Login Driver":"Driver Login Email","+ TAMBAH DRIVER & KIRIM UNDANGAN":"+ ADD DRIVER & SEND INVITATION",
+    "RINGKASAN DASHBOARD":"DASHBOARD SUMMARY","Total Booking":"Total Bookings","Total Driver":"Total Drivers","Driver Tersedia":"Available Drivers",
+    "Booking Pending":"Pending Bookings","Perjalanan Selesai":"Completed Trips","Omzet Booking Selesai":"Completed Booking Revenue",
+    "↻ RESET ANGKA RINGKASAN":"↻ RESET SUMMARY NUMBERS","DAFTAR DRIVER & PERSETUJUAN":"DRIVERS & APPROVALS",
+    "Kelola Katalog Destinasi Wisata":"Manage Tourist Destinations","Tambahkan foto, tetapkan tarif transportasi, perbarui informasi, atau hapus destinasi.":"Add photos, set transport fares, update information, or delete destinations.",
+    "Nama Destinasi Wisata":"Destination Name","Kategori":"Category","Wisata Pura":"Temple Tourism","Wisata Budaya":"Cultural Tourism","Wisata Alam":"Nature Tourism",
+    "Aktivitas Wisata":"Tour Activities","Pantai":"Beach","Deskripsi Destinasi":"Destination Description","Tarif Transportasi Mulai dari (Rupiah)":"Starting Transport Fare (IDR)",
+    "Foto objek wisata":"Destination Photo","Pilih foto JPG, PNG, atau WebP. Ukuran gambar akan disesuaikan secara otomatis. Foto wajib disertakan saat menambahkan destinasi.":"Choose a JPG, PNG, or WebP photo. Image size will be optimized automatically. A photo is required when adding a destination.",
+    "+ SIMPAN DESTINASI":"+ SAVE DESTINATION","BATAL EDIT":"CANCEL EDIT","Daftar Destinasi":"Destination List",
+    "PENGELOLAAN TARIF DAN RUTE":"FARE & ROUTE MANAGEMENT","Tambahkan rute perjalanan dan tetapkan tarif. Contoh: Padangbai → Uluwatu = Rp600.000.":"Add a travel route and set its fare. Example: Padangbai → Uluwatu = IDR 600,000.",
+    "Kategori Layanan":"Service Category","Dari":"From","Tujuan":"Destination","Tarif (Rupiah)":"Fare (IDR)",
+    "+ SIMPAN RUTE & HARGA":"+ SAVE ROUTE & FARE","Daftar Rute dan Tarif":"Routes & Fares",
+    "KOMISI DRIVER & SETORAN OWNER":"DRIVER COMMISSION & OWNER PAYMENTS","KELola KOMISI DRIVER":"MANAGE DRIVER COMMISSION",
+    "Tetapkan persentase komisi platform/Owner. Komisi akan dikunci saat perjalanan selesai, jadi perubahan persentase hanya berlaku untuk perjalanan yang selesai setelah perubahan disimpan.":"Set the platform/Owner commission percentage. Commission is locked when a trip is completed, so changes only apply to trips completed after the update is saved.",
+    "Persentase Komisi (%)":"Commission Percentage (%)","SIMPAN KOMISI":"SAVE COMMISSION","Komisi Belum Disetor":"Unpaid Commission","Komisi Sudah Disetor":"Paid Commission",
+    "RINCIAN KOMISI PER PERJALANAN":"COMMISSION DETAILS BY TRIP","DAFTAR PEMESANAN PELANGGAN":"CUSTOMER BOOKINGS","Filter Status Booking":"Filter Booking Status",
+    "Semua Booking":"All Bookings","Menunggu Konfirmasi":"Awaiting Confirmation","Dikonfirmasi":"Confirmed","Sudah Ditugaskan":"Assigned",
+    "Sedang Berjalan":"In Progress","Selesai":"Completed","Dibatalkan":"Cancelled","REFRESH DATA":"REFRESH DATA","LOGOUT":"LOG OUT",
+    "Form booking":"Booking form","Tutup":"Close","Pilih lokasi di peta":"Select a location on the map",
+    "Pilih titik penjemputan":"Choose pickup point","Pilih lokasi tujuan":"Choose destination",
+    "Memuat daftar driver...":"Loading driver list...","Memuat daftar booking...":"Loading bookings...","Memuat daftar destinasi...":"Loading destinations...",
+    "Memuat daftar rute...":"Loading routes...","Memuat catatan komisi...":"Loading commission records...","Memuat data...":"Loading data...",
+    "Data berhasil dimuat.":"Data loaded successfully.","Gagal memuat data:":"Failed to load data:",
+    "Daftar booking tidak tersedia.":"Booking list is unavailable.","KONFIRMASI BOOKING":"CONFIRM BOOKING","ASSIGN DRIVER":"ASSIGN DRIVER",
+    "EDIT PEMESANAN":"EDIT BOOKING","HAPUS PEMESANAN":"DELETE BOOKING","Kode Booking:":"Booking Code:","Nama:":"Name:",
+    "Telepon:":"Phone:","Penjemputan:":"Pickup:","Tujuan:":"Destination:","Tanggal:":"Date:","Jam:":"Time:",
+    "Jumlah Penumpang:":"Passengers:","Status:":"Status:","Harga:":"Fare:","Harga Estimasi:":"Estimated Fare:",
+    "TAMBAH DRIVER":"ADD DRIVER","SETUJUI":"APPROVE","TOLAK":"REJECT","HAPUS":"DELETE","EDIT":"EDIT"
+  };
+  const reverse = Object.fromEntries(Object.entries(translations).map(([id,en])=>[en,id]));
+  let current = 'id';
+  let applying = false;
+  function translateValue(value, lang) {
+    const trimmed = value.trim();
+    if (!trimmed) return value;
+    const translated = lang === 'en' ? translations[trimmed] : reverse[trimmed];
+    if (!translated) return value;
+    const start = value.match(/^\s*/)?.[0] || '';
+    const end = value.match(/\s*$/)?.[0] || '';
+    return start + translated + end;
+  }
+  function walk(root, lang) {
+    if (!root) return;
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+    const nodes=[];
+    while(walker.nextNode()) nodes.push(walker.currentNode);
+    nodes.forEach(node=>{const next=translateValue(node.nodeValue,lang);if(next!==node.nodeValue)node.nodeValue=next;});
+    root.querySelectorAll?.('input[placeholder],textarea[placeholder],button[aria-label],*[title],*[aria-label],select option').forEach(el=>{
+      ['placeholder','aria-label','title'].forEach(attr=>{if(el.hasAttribute(attr)){const v=el.getAttribute(attr);const n=translateValue(v,lang);if(n!==v)el.setAttribute(attr,n);}});
+    });
+  }
+  function applyLanguage(lang) {
+    current = lang === 'en' ? 'en' : 'id';
+    applying = true;
+    document.documentElement.lang = current;
+    walk(document.body,current);
+    document.querySelectorAll('#site-language-switcher button').forEach(btn=>btn.setAttribute('aria-pressed',String(btn.dataset.siteLang===current)));
+    try { localStorage.setItem('chedar-bali-language',current); } catch(_){}
+    applying = false;
+  }
+  document.querySelectorAll('#site-language-switcher button').forEach(btn=>btn.addEventListener('click',()=>applyLanguage(btn.dataset.siteLang)));
+  let saved='id';
+  try { saved=localStorage.getItem('chedar-bali-language') || 'id'; } catch(_){}
+  applyLanguage(saved);
+  const observer = new MutationObserver(records=>{
+    if(applying) return;
+    applying=true;
+    records.forEach(record=>{
+      if(record.type==='childList') record.addedNodes.forEach(node=>{if(node.nodeType===Node.ELEMENT_NODE)walk(node,current);else if(node.nodeType===Node.TEXT_NODE){const n=translateValue(node.nodeValue,current);if(n!==node.nodeValue)node.nodeValue=n;}});
+      else if(record.type==='characterData'){const n=translateValue(record.target.nodeValue,current);if(n!==record.target.nodeValue)record.target.nodeValue=n;}
+    });
+    applying=false;
+  });
+  observer.observe(document.body,{subtree:true,childList:true,characterData:true});
+  window.setSiteLanguage=applyLanguage;
+})();
+</script>
+
 </body>
 </html>
