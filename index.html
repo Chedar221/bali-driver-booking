@@ -715,6 +715,12 @@ button:active{transform:translateY(1px)}
 <label>Catatan Tambahan</label>
 <textarea id="notes" rows="3" maxlength="1000"></textarea>
 
+<label for="payment-method">Metode Pembayaran</label>
+<select id="payment-method" required><option value="">Pilih metode pembayaran</option><option value="bank_transfer">Transfer Bank SeaBank</option><option value="cash">Tunai kepada Driver</option></select>
+<div id="transfer-payment-info" style="display:none;grid-column:1/-1;padding:14px;background:#fff8f1;border:1px solid #e5d5c9;border-radius:12px;color:#402b34;">
+<strong style="color:#572238;">Pembayaran Transfer SeaBank</strong><p style="margin:8px 0 4px;">Bank: SeaBank</p><p style="margin:4px 0;">Nama penerima: <strong>I NENGAH DARSANA</strong></p><p style="margin:4px 0 10px;">Nomor rekening: <strong>901595714604</strong></p>
+<label for="payment-proof" style="display:block;margin:8px 0 5px;">Unggah bukti transfer (JPG/PNG/WEBP, maks. 5 MB)</label><input id="payment-proof" type="file" accept="image/jpeg,image/png,image/webp"><small>Bukti akan diperiksa Owner sebelum pembayaran dinyatakan lunas.</small></div>
+<div id="cash-payment-info" style="display:none;grid-column:1/-1;padding:14px;background:#fff8f1;border:1px solid #e5d5c9;border-radius:12px;color:#402b34;"><strong style="color:#572238;">Pembayaran Tunai</strong><p style="margin:6px 0 0;">Bayar langsung kepada Driver. Driver akan menandai pembayaran setelah perjalanan selesai dan uang diterima.</p></div>
 <button id="submitBtn" type="submit">Kirim Permintaan Pemesanan</button>
 <p class="note">Permintaan Anda akan ditinjau oleh tim kami. Tarif akhir akan dikonfirmasi sebelum perjalanan.</p>
 </form>
@@ -905,6 +911,14 @@ async function loadServices() {
 }
 
 
+const paymentMethodSelect = document.getElementById('payment-method');
+const paymentProofInput = document.getElementById('payment-proof');
+paymentMethodSelect.addEventListener('change', () => {
+  const transfer = paymentMethodSelect.value === 'bank_transfer';
+  document.getElementById('transfer-payment-info').style.display = transfer ? 'block' : 'none';
+  document.getElementById('cash-payment-info').style.display = paymentMethodSelect.value === 'cash' ? 'block' : 'none';
+  paymentProofInput.required = transfer;
+});
 document.getElementById('pickup').addEventListener('change', refreshRoutePricePreview);
 document.getElementById('destination').addEventListener('change', refreshRoutePricePreview);
 serviceSelect.addEventListener('change', refreshRoutePricePreview);
@@ -933,8 +947,22 @@ form.addEventListener("submit", async function(event) {
     const phone = document.getElementById("phone").value.trim();
     if (phone.replace(/\\D/g,"").length < 8) throw new Error("Nomor WhatsApp pelanggan belum valid.");
     await refreshRoutePricePreview();
+    const paymentMethod = paymentMethodSelect.value;
+    if (!['bank_transfer','cash'].includes(paymentMethod)) throw new Error('Pilih metode pembayaran terlebih dahulu.');
+    let paymentProofPath = null;
+    if (paymentMethod === 'bank_transfer') {
+      const proof = paymentProofInput.files && paymentProofInput.files[0];
+      if (!proof) throw new Error('Unggah bukti transfer SeaBank terlebih dahulu.');
+      if (!['image/jpeg','image/png','image/webp'].includes(proof.type) || proof.size > 5 * 1024 * 1024) throw new Error('Bukti transfer harus berupa JPG, PNG, atau WEBP maksimal 5 MB.');
+      const extension = proof.type === 'image/jpeg' ? 'jpg' : proof.type.split('/')[1];
+      paymentProofPath = bookingCode + '/payment-proof.' + extension;
+      const { error: uploadError } = await db.storage.from('payment-proofs').upload(paymentProofPath, proof, {contentType:proof.type,cacheControl:'3600',upsert:false});
+      if (uploadError) throw new Error('Gagal mengunggah bukti transfer: ' + uploadError.message);
+    }
     const booking = {
       booking_code: bookingCode,
+      payment_method: paymentMethod,
+      payment_proof_path: paymentProofPath,
       customer_name: document.getElementById("name").value.trim(),
       customer_phone: phone,
       customer_email: document.getElementById("email").value.trim() || null,
@@ -949,11 +977,15 @@ form.addEventListener("submit", async function(event) {
       total_price: matchedRoutePrice > 0 ? matchedRoutePrice : 0
     };
     const { error } = await db.from("bookings").insert(booking);
-    if (error) throw error;
+    if (error) {
+      if (paymentProofPath) await db.storage.from('payment-proofs').remove([paymentProofPath]);
+      throw error;
+    }
     showMessage("Booking request berhasil dikirim. Simpan kode booking Anda.", true);
     const priceText = booking.total_price > 0 ? formatIDR(booking.total_price) : "Menunggu penentuan tarif khusus dari Owner";
+    const paymentText = paymentMethod === 'bank_transfer' ? 'Transfer SeaBank · Menunggu verifikasi bukti' : 'Tunai kepada Driver · Belum dibayar';
     const safeText = value => String(value || "").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#39;");
-    receipt.innerHTML = '<div style="font-weight:800;color:#572238;font-size:18px;margin-bottom:6px;">BOOKING BERHASIL DIKIRIM</div><p style="margin:5px 0;color:#375c48;">Simpan kode booking ini untuk konfirmasi:</p><div style="font-size:22px;font-weight:900;letter-spacing:1.2px;color:#351321;padding:10px;background:white;border-radius:9px;text-align:center;">'+bookingCode+'</div><p style="margin:10px 0 4px;color:#375c48;">'+safeText(booking.customer_name)+' · '+booking.pickup_date+' · '+booking.pickup_time+'</p><p style="margin:4px 0;color:#375c48;">'+safeText(booking.pickup_location)+' → '+safeText(booking.destination)+'</p><p style="margin:4px 0;color:#375c48;">Estimasi harga: <strong>'+priceText+'</strong></p><p style="font-size:12px;color:#526b5d;margin:9px 0;">Status saat ini: MENUNGGU KONFIRMASI. Owner akan menghubungi Anda.</p><button type="button" id="booking-receipt-whatsapp" style="margin-top:8px;background:#572238;">KIRIM DETAIL BOOKING KE OWNER</button>';
+    receipt.innerHTML = '<div style="font-weight:800;color:#572238;font-size:18px;margin-bottom:6px;">BOOKING BERHASIL DIKIRIM</div><p style="margin:5px 0;color:#375c48;">Simpan kode booking ini untuk konfirmasi:</p><div style="font-size:22px;font-weight:900;letter-spacing:1.2px;color:#351321;padding:10px;background:white;border-radius:9px;text-align:center;">'+bookingCode+'</div><p style="margin:10px 0 4px;color:#375c48;">'+safeText(booking.customer_name)+' · '+booking.pickup_date+' · '+booking.pickup_time+'</p><p style="margin:4px 0;color:#375c48;">'+safeText(booking.pickup_location)+' → '+safeText(booking.destination)+'</p><p style="margin:4px 0;color:#375c48;">Estimasi harga: <strong>'+priceText+'</strong></p><p style="margin:4px 0;color:#375c48;">Metode pembayaran: <strong>'+paymentText+'</strong></p><p style="font-size:12px;color:#526b5d;margin:9px 0;">Status booking: MENUNGGU KONFIRMASI. Owner akan menghubungi Anda.</p><button type="button" id="booking-receipt-whatsapp" style="margin-top:8px;background:#572238;">KIRIM DETAIL BOOKING KE OWNER</button>';
     receipt.style.display = "block";
     document.getElementById("booking-receipt-whatsapp").onclick = () => {
       const msg = "Halo Owner, saya konfirmasi booking\
@@ -1485,7 +1517,7 @@ async function loadDriverBookings() {
   }
 
   const { data, error } = await db.from('bookings')
-    .select('id, booking_code, customer_name, customer_phone, pickup_location, destination, pickup_date, pickup_time, passenger_count, status, total_price, commission_percent_snapshot, commission_amount, driver_net_amount')
+    .select('id, booking_code, customer_name, customer_phone, pickup_location, destination, pickup_date, pickup_time, passenger_count, status, total_price, commission_percent_snapshot, commission_amount, driver_net_amount, payment_method, payment_status')
     .eq('driver_id', authData.user.id)
     .order('id', { ascending: false });
 
@@ -1516,7 +1548,9 @@ async function loadDriverBookings() {
         'Tanggal: ' + booking.pickup_date,
         'Jam: ' + booking.pickup_time,
         'Penumpang: ' + booking.passenger_count,
-        'Status: ' + bookingStatusLabel(booking.status)
+        'Status Perjalanan: ' + bookingStatusLabel(booking.status),
+        'Metode Pembayaran: ' + (booking.payment_method === 'bank_transfer' ? 'Transfer SeaBank' : booking.payment_method === 'cash' ? 'Tunai kepada Driver' : 'Belum dipilih'),
+        'Status Pembayaran: ' + paymentStatusLabel(booking.payment_status)
       ];
       if (booking.status === 'completed' && booking.commission_amount !== null) {
         details.push('Harga perjalanan: ' + formatIDR(booking.total_price));
@@ -1528,6 +1562,13 @@ async function loadDriverBookings() {
         line.textContent = detail;
         card.appendChild(line);
       });
+      if (allowActions && booking.status === 'completed' && booking.payment_method === 'cash' && booking.payment_status === 'awaiting_payment') {
+        const cashButton=document.createElement('button');
+        cashButton.textContent='KONFIRMASI UANG TUNAI DITERIMA';
+        cashButton.style.cssText='padding:12px;margin-top:8px;background:#2f7657;color:white;border:0;border-radius:8px;';
+        cashButton.onclick=async()=>{if(!confirm('Pastikan uang tunai dari pelanggan sudah benar-benar diterima. Lanjutkan?'))return;cashButton.disabled=true;const {data,error}=await db.rpc('driver_mark_cash_received',{p_booking_id:booking.id});if(error||data!==true){alert('Gagal mengonfirmasi pembayaran tunai: '+(error?.message||'Status pembayaran tidak berubah.'));cashButton.disabled=false;return;}await loadDriverDashboard();};
+        card.appendChild(cashButton);
+      }
       const nextAction = allowActions ? ({
         assigned: { label: 'TERIMA BOOKING', status: 'confirmed' },
         confirmed: { label: 'MULAI PERJALANAN', status: 'in_progress' },
@@ -2084,6 +2125,10 @@ async function deleteTourDestination(id){if(!confirm('Hapus destinasi ini dari k
 
 let ownerBookingsCache = [];
 
+function paymentStatusLabel(status) {
+  return ({awaiting_payment:'BELUM DIBAYAR',pending_verification:'MENUNGGU VERIFIKASI OWNER',paid:'LUNAS',rejected:'BUKTI DITOLAK'})[status] || 'BELUM DIBAYAR';
+}
+
 function bookingStatusLabel(status) {
   return ({
     pending: 'MENUNGGU KONFIRMASI',
@@ -2099,7 +2144,7 @@ async function loadOwnerBookings() {
   const list = document.getElementById('booking-list');
   list.textContent = 'Memuat booking...';
   const { data, error } = await db.from('bookings')
-    .select('id, booking_code, customer_name, customer_phone, pickup_location, destination, pickup_date, pickup_time, passenger_count, status, total_price, driver_id, vehicle_id, notes')
+    .select('id, booking_code, customer_name, customer_phone, pickup_location, destination, pickup_date, pickup_time, passenger_count, status, total_price, driver_id, vehicle_id, notes, payment_method, payment_status, payment_proof_path, payment_rejection_note')
     .order('id', { ascending: false });
   if (error) {
     list.textContent = 'Gagal memuat booking: ' + error.message;
@@ -2133,6 +2178,9 @@ function renderOwnerBookings() {
       'Jumlah Penumpang: ' + booking.passenger_count,
       'Status: ' + (Number(booking.total_price || 0) <= 0 && booking.status === 'pending' ? 'MENUNGGU PENENTUAN TARIF KHUSUS' : bookingStatusLabel(booking.status)),
       'Harga: ' + (Number(booking.total_price || 0) > 0 ? formatIDR(booking.total_price) : 'Menunggu penentuan tarif dari Owner'),
+      'Metode Pembayaran: ' + (booking.payment_method === 'bank_transfer' ? 'Transfer SeaBank' : booking.payment_method === 'cash' ? 'Tunai kepada Driver' : 'Belum dipilih'),
+      'Status Pembayaran: ' + paymentStatusLabel(booking.payment_status),
+      ...(booking.payment_rejection_note ? ['Alasan penolakan: ' + booking.payment_rejection_note] : []),
       ...(booking.notes ? ['Catatan / Rencana Rute: ' + booking.notes] : [])
     ];
     details.forEach(detail => {
@@ -2140,6 +2188,23 @@ function renderOwnerBookings() {
       line.textContent = detail;
       card.appendChild(line);
     });
+    if (booking.payment_method === 'bank_transfer' && booking.payment_status === 'pending_verification' && booking.payment_proof_path) {
+      const proofButton = document.createElement('button');
+      proofButton.type='button'; proofButton.textContent='LIHAT BUKTI TRANSFER';
+      proofButton.style.cssText='background:#fff8f1;color:#572238;border:1px solid #D8B88A;border-radius:8px;padding:10px 14px;margin:8px 6px 0 0;';
+      proofButton.onclick=async()=>{const {data,error}=await db.storage.from('payment-proofs').createSignedUrl(booking.payment_proof_path,300);if(error||!data?.signedUrl){alert('Bukti transfer tidak dapat dibuka: '+(error?.message||'URL tidak tersedia.'));return;}window.open(data.signedUrl,'_blank','noopener');};
+      card.appendChild(proofButton);
+      const verifyButton=document.createElement('button');
+      verifyButton.type='button';verifyButton.textContent='TANDAI LUNAS';
+      verifyButton.style.cssText='background:#2f7657;color:#fff;border:1px solid #D8B88A;border-radius:8px;padding:10px 14px;margin:8px 6px 0 0;';
+      verifyButton.onclick=async()=>{if(!confirm('Verifikasi bukti transfer dan tandai pembayaran ini LUNAS?'))return;verifyButton.disabled=true;const {data:auth}=await db.auth.getUser();const {error}=await db.from('bookings').update({payment_status:'paid',payment_verified_at:new Date().toISOString(),payment_verified_by:auth.user?.id||null,payment_rejection_note:null}).eq('id',booking.id);if(error){alert('Gagal memverifikasi pembayaran: '+error.message);verifyButton.disabled=false;return;}await loadOwnerBookings();};
+      card.appendChild(verifyButton);
+      const rejectButton=document.createElement('button');
+      rejectButton.type='button';rejectButton.textContent='TOLAK BUKTI';
+      rejectButton.style.cssText='background:#8f2638;color:#fff;border:1px solid #D8B88A;border-radius:8px;padding:10px 14px;margin:8px 6px 0 0;';
+      rejectButton.onclick=async()=>{const reason=prompt('Alasan bukti transfer ditolak (wajib diisi):');if(reason===null)return;if(!reason.trim()){alert('Alasan penolakan wajib diisi.');return;}rejectButton.disabled=true;const {error}=await db.from('bookings').update({payment_status:'rejected',payment_rejection_note:reason.trim(),payment_verified_at:null,payment_verified_by:null}).eq('id',booking.id);if(error){alert('Gagal menolak bukti: '+error.message);rejectButton.disabled=false;return;}await loadOwnerBookings();};
+      card.appendChild(rejectButton);
+    }
     if (booking.status === 'pending' && Number(booking.total_price || 0) <= 0) {
       const fareButton = document.createElement('button');
       fareButton.type = 'button';
