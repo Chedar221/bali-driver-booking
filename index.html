@@ -506,6 +506,10 @@ button:active{transform:translateY(1px)}
     </div>
 
   </div>
+  <div style="margin-top:14px;padding:14px;border:1px solid #d8b88a;border-radius:12px;background:#fff8f1;">
+    <button type="button" id="reset-booking-summary-button" onclick="resetOwnerBookingSummary()" style="width:100%;padding:12px 16px;border-radius:9px;font-weight:800;">↻ RESET ANGKA RINGKASAN</button>
+    <p style="margin:8px 0 0;font-size:11px;line-height:1.4;color:#806f70;">Reset hanya menyembunyikan hitungan booking lama dari ringkasan pada browser ini. Data booking dan driver tetap aman/tidak dihapus.</p>
+  </div>
 <button type="button" class="admin-menu-button" aria-expanded="false" aria-controls="admin-driver-list" onclick="toggleAdminSection('admin-driver-list',this)"><span class="admin-menu-icon" aria-hidden="true">🧑‍✈️</span><span class="admin-menu-label">DAFTAR DRIVER & PERSETUJUAN</span><span class="admin-menu-chevron">＋</span></button>
 <div id="admin-driver-list" class="admin-menu-content" hidden>
 <div style="margin-top:25px;background:white;padding:18px;border-radius:12px;">
@@ -1624,16 +1628,44 @@ async function createDriverAccount(event) {
   await loadOwnerDashboard();
 }
 
+function getOwnerBookingSummaryResetAt() {
+  try { return localStorage.getItem('chedar_owner_booking_summary_reset_at') || ''; }
+  catch (_) { return ''; }
+}
+
+async function resetOwnerBookingSummary() {
+  const confirmed = confirm('Reset angka Total Booking, Booking Pending, Perjalanan Selesai, dan Omzet Booking Selesai? Data pemesanan pelanggan TIDAK akan dihapus. Reset berlaku pada browser/perangkat ini saja.');
+  if (!confirmed) return;
+  try {
+    localStorage.setItem('chedar_owner_booking_summary_reset_at', new Date().toISOString());
+  } catch (error) {
+    alert('Browser tidak mengizinkan penyimpanan reset. Silakan izinkan penyimpanan situs lalu coba lagi.');
+    return;
+  }
+  await loadOwnerDashboard();
+  alert('Angka ringkasan berhasil di-reset. Data booking tetap aman.');
+}
+
 async function loadOwnerDashboard() {
   const message = document.getElementById('dashboard-message');
   message.textContent = 'Memuat data...';
+  const resetAt = getOwnerBookingSummaryResetAt();
+
+  let bookingQuery = db.from('bookings').select('id', {count:'exact', head:true});
+  let pendingQuery = db.from('bookings').select('id', {count:'exact', head:true}).eq('status','pending');
+  let completedQuery = db.from('bookings').select('total_price').eq('status','completed');
+  if (resetAt) {
+    bookingQuery = bookingQuery.gte('created_at', resetAt);
+    pendingQuery = pendingQuery.gte('created_at', resetAt);
+    completedQuery = completedQuery.gte('created_at', resetAt);
+  }
 
   const [bookings, drivers, active, pending, completed] = await Promise.all([
-    db.from('bookings').select('id', {count:'exact', head:true}),
+    bookingQuery,
     db.from('profiles').select('id', {count:'exact', head:true}).eq('role','driver'),
     db.from('driver_profiles').select('id', {count:'exact', head:true}).eq('is_available',true).eq('verification_status','approved'),
-    db.from('bookings').select('id', {count:'exact', head:true}).eq('status','pending'),
-    db.from('bookings').select('total_price').eq('status','completed')
+    pendingQuery,
+    completedQuery
   ]);
 
   const error = bookings.error || drivers.error || active.error || pending.error || completed.error;
