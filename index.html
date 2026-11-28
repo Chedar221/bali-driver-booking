@@ -919,12 +919,12 @@ form.addEventListener("submit", async function(event) {
       passenger_count: Number(document.getElementById("passengers").value),
       notes: document.getElementById("notes").value.trim() || null,
       status: "pending",
-      total_price: matchedRoutePrice
+      total_price: matchedRoutePrice > 0 ? matchedRoutePrice : 0
     };
     const { error } = await db.from("bookings").insert(booking);
     if (error) throw error;
     showMessage("Booking request berhasil dikirim. Simpan kode booking Anda.", true);
-    const priceText = booking.total_price ? formatIDR(booking.total_price) : "Menunggu konfirmasi Owner";
+    const priceText = booking.total_price > 0 ? formatIDR(booking.total_price) : "Menunggu penentuan tarif khusus dari Owner";
     const safeText = value => String(value || "").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#39;");
     receipt.innerHTML = '<div style="font-weight:800;color:#572238;font-size:18px;margin-bottom:6px;">BOOKING BERHASIL DIKIRIM</div><p style="margin:5px 0;color:#375c48;">Simpan kode booking ini untuk konfirmasi:</p><div style="font-size:22px;font-weight:900;letter-spacing:1.2px;color:#351321;padding:10px;background:white;border-radius:9px;text-align:center;">'+bookingCode+'</div><p style="margin:10px 0 4px;color:#375c48;">'+safeText(booking.customer_name)+' · '+booking.pickup_date+' · '+booking.pickup_time+'</p><p style="margin:4px 0;color:#375c48;">'+safeText(booking.pickup_location)+' → '+safeText(booking.destination)+'</p><p style="margin:4px 0;color:#375c48;">Estimasi harga: <strong>'+priceText+'</strong></p><p style="font-size:12px;color:#526b5d;margin:9px 0;">Status saat ini: MENUNGGU KONFIRMASI. Owner akan menghubungi Anda.</p><button type="button" id="booking-receipt-whatsapp" style="margin-top:8px;background:#572238;">KIRIM DETAIL BOOKING KE OWNER</button>';
     receipt.style.display = "block";
@@ -2024,7 +2024,7 @@ async function loadOwnerBookings() {
   const list = document.getElementById('booking-list');
   list.textContent = 'Memuat booking...';
   const { data, error } = await db.from('bookings')
-    .select('id, booking_code, customer_name, customer_phone, pickup_location, destination, pickup_date, pickup_time, passenger_count, status, total_price, driver_id, vehicle_id')
+    .select('id, booking_code, customer_name, customer_phone, pickup_location, destination, pickup_date, pickup_time, passenger_count, status, total_price, driver_id, vehicle_id, notes')
     .order('id', { ascending: false });
   if (error) {
     list.textContent = 'Gagal memuat booking: ' + error.message;
@@ -2056,15 +2056,23 @@ function renderOwnerBookings() {
       'Tanggal: ' + booking.pickup_date,
       'Jam: ' + booking.pickup_time,
       'Jumlah Penumpang: ' + booking.passenger_count,
-      'Status: ' + bookingStatusLabel(booking.status),
-      'Harga: Rp ' + Number(booking.total_price || 0).toLocaleString('id-ID')
+      'Status: ' + (Number(booking.total_price || 0) <= 0 && booking.status === 'pending' ? 'MENUNGGU PENENTUAN TARIF KHUSUS' : bookingStatusLabel(booking.status)),
+      'Harga: ' + (Number(booking.total_price || 0) > 0 ? formatIDR(booking.total_price) : 'Menunggu penentuan tarif dari Owner'),
+      ...(booking.notes ? ['Catatan / Rencana Rute: ' + booking.notes] : [])
     ];
     details.forEach(detail => {
       const line = document.createElement('p');
       line.textContent = detail;
       card.appendChild(line);
     });
-    if (booking.status === 'pending') {
+    if (booking.status === 'pending' && Number(booking.total_price || 0) <= 0) {
+      const fareButton = document.createElement('button');
+      fareButton.type = 'button';
+      fareButton.textContent = '💰 TENTUKAN TARIF KHUSUS';
+      fareButton.style.cssText = 'background:#572238;color:#fff;border:1px solid #D8B88A;border-radius:8px;padding:11px 14px;margin-top:8px;';
+      fareButton.onclick = () => setOwnerSpecialFare(booking.id);
+      card.appendChild(fareButton);
+    } else if (booking.status === 'pending') {
       const btn = document.createElement('button');
       btn.textContent = 'KONFIRMASI BOOKING';
       btn.onclick = async () => {
@@ -2101,6 +2109,38 @@ function renderOwnerBookings() {
     card.appendChild(actionRow);
     list.appendChild(card);
   });
+}
+
+
+async function setOwnerSpecialFare(bookingId) {
+  const booking = ownerBookingsCache.find(item => String(item.id) === String(bookingId));
+  if (!booking) { alert('Data pemesanan tidak ditemukan. Muat ulang daftar booking.'); return; }
+  const raw = window.prompt(
+    'Masukkan tarif khusus untuk rute ' + booking.pickup_location + ' → ' + booking.destination + '\\nMasukkan angka Rupiah tanpa titik atau simbol.',
+    Number(booking.total_price || 0) > 0 ? String(booking.total_price) : ''
+  );
+  if (raw === null) return;
+  const price = Number(String(raw).replace(/[^0-9]/g, ''));
+  if (!Number.isSafeInteger(price) || price <= 0) {
+    alert('Tarif khusus harus berupa angka lebih besar dari Rp0.');
+    return;
+  }
+  const { data, error } = await db.from('bookings')
+    .update({ total_price: price })
+    .eq('id', bookingId)
+    .select('id,total_price')
+    .maybeSingle();
+  if (error) {
+    alert('Gagal menyimpan tarif khusus: ' + error.message);
+    return;
+  }
+  if (!data) {
+    alert('Tarif belum tersimpan. Periksa izin akses Owner pada data booking.');
+    return;
+  }
+  booking.total_price = Number(data.total_price);
+  renderOwnerBookings();
+  alert('Tarif khusus berhasil disimpan: ' + formatIDR(price) + '. Sekarang Owner dapat mengonfirmasi booking.');
 }
 
 
