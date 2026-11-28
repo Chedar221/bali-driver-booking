@@ -378,7 +378,7 @@ button:active{transform:translateY(1px)}
 <body>
 
 <header>
-<div class="logo"><div class="brand-copy"><span class="brand-title">CHEDAR</span><span class="brand-subtitle">BALI DRIVER BOOKING · PRIVATE JOURNEYS</span></div></div>
+<a class="logo" href="/" aria-label="CHEDAR PRIVATE BALI JOURNEYS - Beranda"><img class="brand-logo" src="/assets/chedar-logo.webp" alt="CHEDAR PRIVATE BALI JOURNEYS — Your Trusted Bali Driver"></a>
 <nav class="popup-nav" aria-label="Menu utama"><button class="popup-menu-link booking-link" type="button" onclick="openPopup('booking-popup')">BOOKING</button><button class="popup-menu-link" type="button" onclick="openPopup('owner-popup')">MASUK OWNER</button><a class="popup-menu-link driver-popup-link" href="#driver-popup">MASUK DRIVER</a><button class="popup-menu-link language-link" type="button" id="site-language-toggle" aria-label="Change language">ID / EN</button></nav>
 </header>
 
@@ -3295,6 +3295,16 @@ body:not(.owner-mode) .owner-admin-popup-overlay{display:none!important}
 .travel-plan-total{font-weight:800;color:#572238;margin:10px 0 0}
 .travel-tools-note{text-align:center;color:#806f70;font-size:11px;line-height:1.5;max-width:820px;margin:14px auto 0}
 @media(max-width:700px){#travel-tools{margin:22px auto;padding:0 12px}.travel-tools-grid{grid-template-columns:1fr;gap:12px}.travel-tool-card{padding:16px}.travel-tools-heading h2{font-size:24px}.travel-destination-choices{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* HEADER LOGO IMAGE */
+.logo{display:flex!important;align-items:center!important;flex:0 0 auto!important;width:auto!important;padding:0!important;text-decoration:none!important;gap:0!important}
+.logo:before{content:none!important;display:none!important}
+.brand-logo{display:block;width:142px;height:94px;max-width:100%;object-fit:contain;object-position:left center}
+header{min-height:106px!important}
+@media(max-width:650px){
+ header{min-height:0!important;align-items:center!important}
+ .brand-logo{width:112px;height:74px}
+}
 </style>
 
 </body>
