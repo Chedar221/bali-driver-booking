@@ -379,7 +379,7 @@ button:active{transform:translateY(1px)}
 
 <header>
 <div class="logo"><div class="brand-copy"><span class="brand-title">CHEDAR</span><span class="brand-subtitle">BALI DRIVER BOOKING · PRIVATE JOURNEYS</span></div></div>
-<nav class="popup-nav" aria-label="Menu utama"><button class="popup-menu-link booking-link" type="button" onclick="openPopup('booking-popup')">BOOKING</button><button class="popup-menu-link" type="button" onclick="openPopup('owner-popup')">MASUK OWNER</button><a class="popup-menu-link driver-popup-link" href="#driver-popup">MASUK DRIVER</a><button class="popup-menu-link language-link" type="button" data-site-lang="id" aria-pressed="true">ID</button><button class="popup-menu-link language-link" type="button" data-site-lang="en" aria-pressed="false">EN</button></nav>
+<nav class="popup-nav" aria-label="Menu utama"><button class="popup-menu-link booking-link" type="button" onclick="openPopup('booking-popup')">BOOKING</button><button class="popup-menu-link" type="button" onclick="openPopup('owner-popup')">MASUK OWNER</button><a class="popup-menu-link driver-popup-link" href="#driver-popup">MASUK DRIVER</a><button class="popup-menu-link language-link" type="button" id="site-language-toggle" aria-label="Change language">ID / EN</button></nav>
 </header>
 
 <section class="hero" aria-labelledby="home-hero-title">
@@ -2723,11 +2723,11 @@ body:not(.owner-mode) .owner-admin-popup-overlay{display:none!important}
     applying = true;
     document.documentElement.lang = current;
     walk(document.body,current);
-    document.querySelectorAll('[data-site-lang]').forEach(btn=>btn.setAttribute('aria-pressed',String(btn.dataset.siteLang===current)));
+    const languageToggle=document.getElementById('site-language-toggle');if(languageToggle){languageToggle.textContent=current==='id'?'ID / EN':'EN / ID';languageToggle.setAttribute('aria-label',current==='id'?'Change language to English':'Ganti bahasa ke Indonesia');}
     try { localStorage.setItem('chedar-bali-language',current); } catch(_){}
     applying = false;
   }
-  document.querySelectorAll('[data-site-lang]').forEach(btn=>btn.addEventListener('click',()=>applyLanguage(btn.dataset.siteLang)));
+  document.getElementById('site-language-toggle')?.addEventListener('click',()=>applyLanguage(current==='id'?'en':'id'));
   let saved='id';
   try { saved=localStorage.getItem('chedar-bali-language') || 'id'; } catch(_){}
   applyLanguage(saved);
