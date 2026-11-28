@@ -2745,5 +2745,72 @@ body:not(.owner-mode) .owner-admin-popup-overlay{display:none!important}
 })();
 </script>
 
+
+<style id="mobile-horizontal-overflow-and-fit-fix">
+/* Keep every page inside the phone viewport without changing desktop layout. */
+@media(max-width:700px){
+ html,body{
+  width:100%!important;max-width:100%!important;
+  overflow-x:hidden!important;overscroll-behavior-x:none;
+ }
+ body{position:relative}
+ *,*::before,*::after{box-sizing:border-box!important}
+ img,video,canvas,iframe,svg{max-width:100%;height:auto}
+ header,main,section,footer,.hero,.hero-content,.home-intro,
+ #owner-dashboard,#driver-dashboard,#driver-activation,
+ .popup-panel,.popup-overlay,.owner-admin-popup-overlay{
+  max-width:100%!important;min-width:0!important;
+ }
+ header{width:100%!important;min-width:0!important}
+ .logo,.brand-copy,.popup-nav{min-width:0!important;max-width:100%!important}
+ .popup-nav{
+  width:100%!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;
+  gap:6px!important
+ }
+ .popup-nav .popup-menu-link{
+  min-width:0!important;width:100%!important;max-width:100%!important;
+  padding:10px 2px!important;font-size:clamp(9px,2.7vw,11px)!important;
+  letter-spacing:0!important;white-space:normal!important;overflow-wrap:anywhere;
+ }
+ #owner-dashboard,#driver-dashboard{
+  width:calc(100% - 16px)!important;max-width:calc(100% - 16px)!important;
+  min-width:0!important;margin:10px auto!important;padding:12px!important;
+  overflow-x:hidden!important;
+ }
+ #owner-dashboard *,#driver-dashboard *{min-width:0}
+ #owner-dashboard img,#driver-dashboard img{max-width:100%;object-fit:cover}
+ #owner-dashboard table,#driver-dashboard table{
+  display:block!important;width:100%!important;max-width:100%!important;
+  overflow-x:auto!important;-webkit-overflow-scrolling:touch;
+ }
+ #owner-dashboard th,#owner-dashboard td,
+ #driver-dashboard th,#driver-dashboard td{
+  white-space:normal!important;overflow-wrap:anywhere;word-break:normal;
+ }
+ #owner-dashboard input,#owner-dashboard select,#owner-dashboard textarea,
+ #driver-dashboard input,#driver-dashboard select,#driver-dashboard textarea{
+  width:100%!important;max-width:100%!important;min-width:0!important;
+ }
+ #owner-dashboard button,#driver-dashboard button{
+  max-width:100%!important;overflow-wrap:anywhere;white-space:normal;
+ }
+ .popup-overlay,.owner-admin-popup-overlay{
+  width:100%!important;max-width:100%!important;padding:8px!important;
+  overflow-x:hidden!important;
+ }
+ .popup-panel{
+  width:100%!important;max-width:100%!important;min-width:0!important;
+  margin:0 auto!important;overflow-x:hidden!important;
+ }
+ #booking-popup #bookingForm{min-width:0!important;max-width:100%!important}
+ #booking-popup #bookingForm>*{min-width:0!important;max-width:100%!important}
+ .location-field,.location-map-search{min-width:0!important;max-width:100%!important}
+ .location-field input,.location-map-search input{min-width:0!important}
+ .tour-catalog-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+ .tour-card{min-width:0!important;max-width:100%!important}
+ .services{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+}
+</style>
+
 </body>
 </html>
