@@ -379,7 +379,7 @@ button:active{transform:translateY(1px)}
 
 <header>
 <div class="logo"><div class="brand-copy"><span class="brand-title">CHEDAR</span><span class="brand-subtitle">BALI DRIVER BOOKING · PRIVATE JOURNEYS</span></div></div>
-<nav class="popup-nav" aria-label="Menu utama"><button class="popup-menu-link booking-link" type="button" onclick="openPopup('booking-popup')">BOOKING</button><button class="popup-menu-link" type="button" onclick="openPopup('owner-popup')">MASUK OWNER</button><a class="popup-menu-link driver-popup-link" href="#driver-popup">MASUK DRIVER</a></nav>
+<nav class="popup-nav" aria-label="Menu utama"><button class="popup-menu-link booking-link" type="button" onclick="openPopup('booking-popup')">BOOKING</button><button class="popup-menu-link" type="button" onclick="openPopup('owner-popup')">MASUK OWNER</button><a class="popup-menu-link driver-popup-link" href="#driver-popup">MASUK DRIVER</a><button class="popup-menu-link language-link" type="button" data-site-lang="id" aria-pressed="true">ID</button><button class="popup-menu-link language-link" type="button" data-site-lang="en" aria-pressed="false">EN</button></nav>
 </header>
 
 <section class="hero" aria-labelledby="home-hero-title">
@@ -2628,16 +2628,15 @@ body:not(.owner-mode) .owner-admin-popup-overlay{display:none!important}
 
 
 <style id="bilingual-language-switcher-style">
-#site-language-switcher{position:fixed;top:12px;right:14px;z-index:100000;display:flex;align-items:center;gap:3px;padding:4px;border:1px solid #D8B88A;border-radius:999px;background:#351321;box-shadow:0 5px 18px #1b0b1280}
-#site-language-switcher button{min-width:38px;padding:7px 9px;border:0;border-radius:999px;background:transparent!important;color:#FFF8F1!important;font-size:11px;font-weight:800;line-height:1;cursor:pointer}
-#site-language-switcher button[aria-pressed="true"]{background:#D8B88A!important;color:#351321!important}
-body{padding-top:0}
-@media(max-width:650px){#site-language-switcher{top:8px;right:8px}#site-language-switcher button{min-width:34px;padding:7px 8px}}
+/* Language controls are ordinary navigation buttons, aligned with the three primary actions. */
+.popup-nav [data-site-lang]{min-width:58px}
+.popup-nav [data-site-lang][aria-pressed="true"]{background:#D8B88A!important;color:#351321!important;border-color:#D8B88A!important}
+@media(max-width:650px){
+ .popup-nav{grid-template-columns:repeat(4,minmax(0,1fr))!important}
+ .popup-nav .popup-menu-link{min-width:0;padding:10px 3px;font-size:10px;letter-spacing:0}
+ .popup-nav [data-site-lang]{min-width:0}
+}
 </style>
-<div id="site-language-switcher" role="group" aria-label="Choose language">
-  <button type="button" data-site-lang="id" aria-pressed="true">ID</button>
-  <button type="button" data-site-lang="en" aria-pressed="false">EN</button>
-</div>
 <script id="chedar-bilingual-language-engine">
 (function(){
   const translations = {
@@ -2724,11 +2723,11 @@ body{padding-top:0}
     applying = true;
     document.documentElement.lang = current;
     walk(document.body,current);
-    document.querySelectorAll('#site-language-switcher button').forEach(btn=>btn.setAttribute('aria-pressed',String(btn.dataset.siteLang===current)));
+    document.querySelectorAll('[data-site-lang]').forEach(btn=>btn.setAttribute('aria-pressed',String(btn.dataset.siteLang===current)));
     try { localStorage.setItem('chedar-bali-language',current); } catch(_){}
     applying = false;
   }
-  document.querySelectorAll('#site-language-switcher button').forEach(btn=>btn.addEventListener('click',()=>applyLanguage(btn.dataset.siteLang)));
+  document.querySelectorAll('[data-site-lang]').forEach(btn=>btn.addEventListener('click',()=>applyLanguage(btn.dataset.siteLang)));
   let saved='id';
   try { saved=localStorage.getItem('chedar-bali-language') || 'id'; } catch(_){}
   applyLanguage(saved);
