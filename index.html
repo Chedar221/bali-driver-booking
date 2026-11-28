@@ -985,7 +985,7 @@ function travelToolFillRouteOptions(){
 function travelToolFillDestinations(){
   const container=document.getElementById('travel-plan-destinations');if(!container)return;
   container.innerHTML='';
-  const list=(tourDestinationsCache||[]).filter(item=>item&&item.name&&!String(item.id||'').startsWith('fallback-'));
+  const list=(tourDestinationsCache||[]).filter(item=>item&&item.name);
   if(!list.length){container.textContent='Destinasi belum tersedia. Silakan hubungi kami untuk rekomendasi.';return;}
   list.forEach((item,index)=>{
     const label=document.createElement('label');label.className='travel-destination-option';
@@ -2834,8 +2834,7 @@ body:not(.owner-mode) .owner-admin-popup-overlay{display:none!important}
     "Rencana perjalanan":"Itinerary","Perlu konfirmasi":"To be confirmed",
     "Total estimasi tarif:":"Estimated total fare:","Beberapa rute belum memiliki tarif tersimpan. Harga keseluruhan perlu dikonfirmasi oleh tim kami.":"Some routes do not have saved fares. The total price must be confirmed by our team.",
     "Estimasi tarif:":"Estimated fare:","Pilih layanan, penjemputan, dan tujuan.":"Choose a service, pickup point, and destination.",
-    "Tarif untuk rute ini belum tersedia. Tim kami akan membantu memberikan penawaran.":"A fare is not available for this route. Our team will help provide a quote."
-
+    "Tarif untuk rute ini belum tersedia. Tim kami akan membantu memberikan penawaran.":"A fare is not available for this route. Our team will help provide a quote.",
     "Destinasi Wisata Populer di Bali":"Popular Destinations in Bali","Temukan destinasi pilihan dan pesan perjalanan dengan mudah.":"Discover selected destinations and book your ride with ease.",
     "Memuat destinasi wisata...":"Loading destinations...","PESAN PERJALANAN WISATA":"BOOK A TOUR",
     "TRANSPARAN & MUDAH":"CLEAR & SIMPLE","Daftar Tarif":"Price List","Lihat daftar layanan, rute perjalanan, dan tarif yang tersedia.":"View available services, routes, and prices.",
