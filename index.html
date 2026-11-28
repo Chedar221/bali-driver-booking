@@ -551,6 +551,33 @@ button:active{transform:translateY(1px)}
     <button type="button" id="reset-booking-summary-button" onclick="resetOwnerBookingSummary()" style="width:100%;padding:12px 16px;border-radius:9px;font-weight:800;">↻ RESET ANGKA RINGKASAN</button>
     <p style="margin:8px 0 0;font-size:11px;line-height:1.4;color:#806f70;">Reset hanya menyembunyikan hitungan booking lama dari ringkasan pada browser ini. Data booking dan driver tetap aman/tidak dihapus.</p>
   </div>
+
+<button type="button" class="admin-menu-button" aria-expanded="false" aria-controls="admin-financial-report" onclick="toggleAdminSection('admin-financial-report',this)"><span class="admin-menu-icon" aria-hidden="true">📈</span><span class="admin-menu-label">LAPORAN KEUANGAN OWNER</span><span class="admin-menu-chevron">＋</span></button>
+<div id="admin-financial-report" class="admin-menu-content" hidden>
+  <div style="margin-top:18px;background:#fff;padding:18px;border-radius:12px;">
+    <h3 style="color:#572238;margin-top:0;">LAPORAN KEUANGAN OWNER</h3>
+    <p style="color:#78656a;font-size:13px;">Ringkasan berdasarkan booking yang berstatus selesai. Pilih periode untuk melihat transaksi.</p>
+    <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin:12px 0;">
+      <div><label for="finance-start-date">Dari tanggal</label><input type="date" id="finance-start-date" style="width:100%;padding:10px;border:1px solid #d8b88a;border-radius:8px;"></div>
+      <div><label for="finance-end-date">Sampai tanggal</label><input type="date" id="finance-end-date" style="width:100%;padding:10px;border:1px solid #d8b88a;border-radius:8px;"></div>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;">
+      <button type="button" id="finance-filter-button" onclick="loadOwnerFinancialReport()" style="flex:1;background:#572238;">TAMPILKAN LAPORAN</button>
+      <button type="button" id="finance-export-button" onclick="exportOwnerFinancialReport()" style="flex:1;background:#806044;">EKSPOR CSV</button>
+    </div>
+    <p id="finance-report-message" role="status" style="font-size:13px;color:#78656a;">Memuat laporan...</p>
+    <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;">
+      <div style="padding:13px;background:#f8f3ed;border:1px solid #e5d5c9;border-radius:9px;"><small>Total Omzet Selesai</small><strong id="finance-gross-total" style="display:block;font-size:18px;color:#572238;">Rp 0</strong></div>
+      <div style="padding:13px;background:#f8f3ed;border:1px solid #e5d5c9;border-radius:9px;"><small>Komisi Owner</small><strong id="finance-owner-commission" style="display:block;font-size:18px;color:#572238;">Rp 0</strong></div>
+      <div style="padding:13px;background:#f8f3ed;border:1px solid #e5d5c9;border-radius:9px;"><small>Bagian Driver</small><strong id="finance-driver-share" style="display:block;font-size:18px;color:#572238;">Rp 0</strong></div>
+      <div style="padding:13px;background:#f8f3ed;border:1px solid #e5d5c9;border-radius:9px;"><small>Komisi Belum Disetor</small><strong id="finance-commission-unpaid" style="display:block;font-size:18px;color:#9a5720;">Rp 0</strong></div>
+    </div>
+    <p style="font-size:11px;line-height:1.5;color:#806f70;margin:10px 0;">Catatan: Komisi dan bagian Driver dijumlahkan dari catatan komisi yang sudah tersimpan. Booking lama tanpa catatan komisi tetap masuk omzet, tetapi tidak dihitung sebagai komisi Owner/Driver. Pengeluaran operasional belum termasuk karena sistem saat ini belum memiliki pencatatan pengeluaran.</p>
+    <h4 style="color:#572238;margin:20px 0 8px;">RINCIAN TRANSAKSI SELESAI</h4>
+    <div id="finance-report-transactions">Memuat transaksi...</div>
+  </div>
+</div>
+
 <button type="button" class="admin-menu-button" aria-expanded="false" aria-controls="admin-driver-list" onclick="toggleAdminSection('admin-driver-list',this)"><span class="admin-menu-icon" aria-hidden="true">🧑‍✈️</span><span class="admin-menu-label">DAFTAR DRIVER & PERSETUJUAN</span><span class="admin-menu-chevron">＋</span></button>
 <div id="admin-driver-list" class="admin-menu-content" hidden>
 <div style="margin-top:25px;background:white;padding:18px;border-radius:12px;">
@@ -1756,6 +1783,54 @@ async function loadCommissionLedger(){
   target.appendChild(card);
  });
 }
+
+let ownerFinancialReportRows = [];
+async function loadOwnerFinancialReport(){
+ const target=document.getElementById('finance-report-transactions');
+ const message=document.getElementById('finance-report-message');
+ if(!target||!message)return;
+ const start=document.getElementById('finance-start-date')?.value||'';
+ const end=document.getElementById('finance-end-date')?.value||'';
+ if(start&&end&&start>end){message.textContent='Tanggal awal tidak boleh melewati tanggal akhir.';return;}
+ target.textContent='Memuat transaksi...';message.textContent='Mengambil data transaksi selesai...';
+ let query=db.from('bookings').select('id,booking_code,customer_name,pickup_location,destination,pickup_date,total_price,driver_id,commission_percent_snapshot,commission_amount,driver_net_amount,commission_collected,status').eq('status','completed').order('pickup_date',{ascending:false});
+ if(start)query=query.gte('pickup_date',start);
+ if(end)query=query.lte('pickup_date',end);
+ const {data,error}=await query;
+ if(error){message.textContent='Gagal memuat laporan: '+error.message;target.textContent='Data transaksi tidak dapat dimuat.';return;}
+ ownerFinancialReportRows=data||[];
+ const gross=ownerFinancialReportRows.reduce((sum,row)=>sum+Number(row.total_price||0),0);
+ const known=ownerFinancialReportRows.filter(row=>row.commission_percent_snapshot!==null&&row.commission_percent_snapshot!==undefined);
+ const ownerShare=known.reduce((sum,row)=>sum+Number(row.commission_amount||0),0);
+ const driverShare=known.reduce((sum,row)=>sum+Number(row.driver_net_amount||0),0);
+ const unpaid=known.filter(row=>!row.commission_collected).reduce((sum,row)=>sum+Number(row.commission_amount||0),0);
+ document.getElementById('finance-gross-total').textContent=formatIDR(gross);
+ document.getElementById('finance-owner-commission').textContent=formatIDR(ownerShare);
+ document.getElementById('finance-driver-share').textContent=formatIDR(driverShare);
+ document.getElementById('finance-commission-unpaid').textContent=formatIDR(unpaid);
+ message.textContent=ownerFinancialReportRows.length+' transaksi selesai ditemukan'+(start||end?' pada periode yang dipilih.':'.');
+ target.innerHTML='';
+ if(!ownerFinancialReportRows.length){target.textContent='Belum ada transaksi selesai pada periode ini.';return;}
+ ownerFinancialReportRows.forEach(row=>{
+  const card=document.createElement('div');card.style.cssText='padding:12px;margin:9px 0;border:1px solid #e5d5c9;border-radius:9px;background:#fbf8f4;';
+  const title=document.createElement('strong');title.textContent=(row.booking_code||'Booking')+' · '+(row.customer_name||'Customer');title.style.cssText='display:block;color:#572238;';
+  const route=document.createElement('div');route.textContent=(row.pickup_location||'')+' → '+(row.destination||'')+' · '+(row.pickup_date||'');route.style.cssText='font-size:12px;color:#78656a;margin:5px 0;';
+  const total=document.createElement('div');total.textContent='Omzet: '+formatIDR(row.total_price);total.style.cssText='font-weight:800;color:#572238;font-size:14px;';
+  const commission=document.createElement('div');commission.style.cssText='font-size:12px;color:#78656a;margin-top:4px;';
+  commission.textContent=row.commission_percent_snapshot!==null&&row.commission_percent_snapshot!==undefined?'Komisi Owner: '+formatIDR(row.commission_amount)+' · Driver: '+formatIDR(row.driver_net_amount)+' · '+(row.commission_collected?'Setoran diterima':'Belum disetor'):'Rincian komisi belum tersedia untuk transaksi ini.';
+  card.append(title,route,total,commission);target.appendChild(card);
+ });
+}
+function exportOwnerFinancialReport(){
+ if(!ownerFinancialReportRows.length){alert('Tidak ada transaksi untuk diekspor. Tampilkan laporan terlebih dahulu.');return;}
+ const cells=[['Kode Booking','Customer','Penjemputan','Tujuan','Tanggal','Omzet','Komisi Owner','Bagian Driver','Status Setoran']];
+ const esc=value=>'"'+String(value??'').replace(/"/g,'""')+'"';
+ ownerFinancialReportRows.forEach(row=>cells.push([row.booking_code,row.customer_name,row.pickup_location,row.destination,row.pickup_date,Number(row.total_price||0),row.commission_percent_snapshot!==null&&row.commission_percent_snapshot!==undefined?Number(row.commission_amount||0):'',row.commission_percent_snapshot!==null&&row.commission_percent_snapshot!==undefined?Number(row.driver_net_amount||0):'',row.commission_collected?'Diterima':'Belum disetor']));
+ const csv='\uFEFF'+cells.map(row=>row.map(esc).join(',')).join('\r\n');
+ const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});
+ const url=URL.createObjectURL(blob);const link=document.createElement('a');link.href=url;link.download='laporan-keuangan-owner.csv';document.body.appendChild(link);link.click();link.remove();URL.revokeObjectURL(url);
+}
+
 function formatIDR(value){return 'Rp '+Number(value||0).toLocaleString('id-ID');}
 
 async function createDriverAccount(event) {
@@ -1849,7 +1924,7 @@ async function loadOwnerDashboard() {
   document.getElementById('completed-bookings').textContent = completedRows.length;
   const completedRevenue = completedRows.reduce((sum, row) => sum + Number(row.total_price || 0), 0);
   document.getElementById('completed-revenue').textContent = 'Rp ' + completedRevenue.toLocaleString('id-ID');
-await Promise.all([loadOwnerBookings(), loadOwnerDrivers(), loadServiceRoutes(), loadTourAdminList(), loadCommissionSettings(), loadCommissionLedger()]);
+await Promise.all([loadOwnerBookings(), loadOwnerDrivers(), loadServiceRoutes(), loadTourAdminList(), loadCommissionSettings(), loadCommissionLedger(), loadOwnerFinancialReport()]);
   message.textContent = 'Data berhasil dimuat.';
 }
 
@@ -2974,6 +3049,11 @@ body:not(.owner-mode) .owner-admin-popup-overlay{display:none!important}
 </script>
 
 
+<style id="owner-financial-report-mobile-style">
+#admin-financial-report input{box-sizing:border-box;min-width:0}
+#admin-financial-report #finance-report-transactions{min-width:0;overflow-wrap:anywhere}
+@media(max-width:520px){#admin-financial-report>div{padding:13px!important}#admin-financial-report [style*="grid-template-columns:repeat(2"]{gap:7px!important}#admin-financial-report strong[id^="finance-"]{font-size:15px!important}}
+</style>
 <style id="mobile-horizontal-overflow-and-fit-fix">
 /* Keep every page inside the phone viewport without changing desktop layout. */
 @media(max-width:700px){
