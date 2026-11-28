@@ -1886,8 +1886,94 @@ function renderOwnerBookings() {
       btn.onclick = () => window.openDriverAssignment(booking.id, booking.passenger_count);
       card.appendChild(btn);
     }
+
+    const actionRow = document.createElement('div');
+    actionRow.style.cssText = 'display:flex;flex-wrap:wrap;gap:8px;margin-top:14px;';
+    const editButton = document.createElement('button');
+    editButton.type = 'button';
+    editButton.textContent = '✏️ EDIT PEMESANAN';
+    editButton.style.cssText = 'background:#572238;color:#fff;border:1px solid #D8B88A;border-radius:8px;padding:10px 14px;';
+    editButton.onclick = () => editOwnerBooking(booking.id);
+    const deleteButton = document.createElement('button');
+    deleteButton.type = 'button';
+    deleteButton.textContent = '🗑️ HAPUS PEMESANAN';
+    deleteButton.style.cssText = 'background:#8f2638;color:#fff;border:1px solid #D8B88A;border-radius:8px;padding:10px 14px;';
+    deleteButton.onclick = () => deleteOwnerBooking(booking.id, booking.booking_code);
+    actionRow.append(editButton, deleteButton);
+    card.appendChild(actionRow);
     list.appendChild(card);
   });
+}
+
+
+async function editOwnerBooking(bookingId) {
+  const booking = ownerBookingsCache.find(item => String(item.id) === String(bookingId));
+  if (!booking) { alert('Data pemesanan tidak ditemukan. Muat ulang daftar booking.'); return; }
+  const ask = (label, current) => window.prompt(label, current == null ? '' : String(current));
+  const customerName = ask('Edit nama pelanggan:', booking.customer_name);
+  if (customerName === null) return;
+  const customerPhone = ask('Edit nomor WhatsApp:', booking.customer_phone);
+  if (customerPhone === null) return;
+  const pickupLocation = ask('Edit lokasi penjemputan:', booking.pickup_location);
+  if (pickupLocation === null) return;
+  const destination = ask('Edit tujuan perjalanan:', booking.destination);
+  if (destination === null) return;
+  const pickupDate = ask('Edit tanggal penjemputan (YYYY-MM-DD):', booking.pickup_date);
+  if (pickupDate === null) return;
+  const pickupTime = ask('Edit jam penjemputan (HH:MM):', booking.pickup_time);
+  if (pickupTime === null) return;
+  const passengerCount = ask('Edit jumlah penumpang:', booking.passenger_count);
+  if (passengerCount === null) return;
+  const totalPrice = ask('Edit total harga (angka saja):', booking.total_price ?? 0);
+  if (totalPrice === null) return;
+
+  const passengers = Number(passengerCount);
+  const price = Number(totalPrice);
+  if (!customerName.trim() || !customerPhone.trim() || !pickupLocation.trim() || !destination.trim()) {
+    alert('Nama, nomor WhatsApp, lokasi jemput, dan tujuan wajib diisi.');
+    return;
+  }
+  if (!/^\\d{4}-\\d{2}-\\d{2}$/.test(pickupDate.trim()) || !/^\\d{2}:\\d{2}$/.test(pickupTime.trim())) {
+    alert('Format tanggal harus YYYY-MM-DD dan jam HH:MM.');
+    return;
+  }
+  if (!Number.isInteger(passengers) || passengers < 1 || passengers > 20 || !Number.isFinite(price) || price < 0) {
+    alert('Jumlah penumpang harus 1–20 dan harga tidak boleh negatif.');
+    return;
+  }
+
+  const saveButton = document.activeElement;
+  if (saveButton) saveButton.disabled = true;
+  const { error } = await db.from('bookings').update({
+    customer_name: customerName.trim(),
+    customer_phone: customerPhone.trim(),
+    pickup_location: pickupLocation.trim(),
+    destination: destination.trim(),
+    pickup_date: pickupDate.trim(),
+    pickup_time: pickupTime.trim(),
+    passenger_count: passengers,
+    total_price: price
+  }).eq('id', bookingId);
+  if (error) {
+    alert('Gagal menyimpan perubahan: ' + error.message);
+    if (saveButton) saveButton.disabled = false;
+    return;
+  }
+  alert('Data pemesanan berhasil diperbarui.');
+  await loadOwnerDashboard();
+}
+
+async function deleteOwnerBooking(bookingId, bookingCode) {
+  const confirmed = window.confirm('Hapus pemesanan ' + (bookingCode || '#' + bookingId) + '?\\n\\nData yang dihapus tidak dapat dikembalikan.');
+  if (!confirmed) return;
+  const { error } = await db.from('bookings').delete().eq('id', bookingId);
+  if (error) {
+    alert('Gagal menghapus pemesanan: ' + error.message);
+    return;
+  }
+  ownerBookingsCache = ownerBookingsCache.filter(item => String(item.id) !== String(bookingId));
+  renderOwnerBookings();
+  alert('Pemesanan berhasil dihapus.');
 }
 
 async function loadOwnerDrivers() {
