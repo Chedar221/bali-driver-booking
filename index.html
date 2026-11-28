@@ -435,6 +435,47 @@ button:active{transform:translateY(1px)}
   </div>
 </section>
 
+<section id="travel-tools" aria-labelledby="travel-tools-title">
+  <div class="travel-tools-heading">
+    <span class="travel-eyebrow">PLAN YOUR BALI JOURNEY</span>
+    <h2 id="travel-tools-title">Rencanakan Perjalanan Anda</h2>
+    <p>Periksa estimasi tarif dan susun destinasi wisata Bali dalam satu tempat.</p>
+  </div>
+  <div class="travel-tools-grid">
+    <article class="travel-tool-card" aria-labelledby="fare-tool-title">
+      <div class="travel-tool-icon" aria-hidden="true">🧮</div>
+      <h3 id="fare-tool-title">Kalkulator Harga</h3>
+      <p class="travel-tool-description">Pilih layanan dan rute untuk melihat tarif yang tersedia.</p>
+      <label for="travel-fare-service">Jenis layanan</label>
+      <select id="travel-fare-service"><option value="">Memuat layanan...</option></select>
+      <label for="travel-fare-origin">Lokasi penjemputan</label>
+      <select id="travel-fare-origin" disabled><option value="">Pilih penjemputan</option></select>
+      <label for="travel-fare-destination">Destinasi tujuan</label>
+      <select id="travel-fare-destination" disabled><option value="">Pilih tujuan</option></select>
+      <div id="travel-fare-result" class="travel-tool-result" role="status" aria-live="polite">Pilih layanan dan rute untuk melihat estimasi harga.</div>
+      <button type="button" class="travel-tool-button" id="travel-fare-book" disabled>LANJUTKAN BOOKING</button>
+    </article>
+
+    <article class="travel-tool-card" aria-labelledby="itinerary-tool-title">
+      <div class="travel-tool-icon" aria-hidden="true">🗺️</div>
+      <h3 id="itinerary-tool-title">Perencana Perjalanan</h3>
+      <p class="travel-tool-description">Pilih titik jemput dan hingga 4 destinasi untuk menyusun rencana perjalanan.</p>
+      <label for="travel-plan-service">Jenis layanan</label>
+      <select id="travel-plan-service"><option value="">Memuat layanan...</option></select>
+      <label for="travel-plan-origin">Lokasi awal / penjemputan</label>
+      <input id="travel-plan-origin" type="text" maxlength="120" placeholder="Contoh: Ubud atau nama hotel">
+      <span class="travel-choice-label">Pilih destinasi (maksimal 4)</span>
+      <div id="travel-plan-destinations" class="travel-destination-choices" aria-live="polite">
+        <span>Memuat destinasi wisata...</span>
+      </div>
+      <button type="button" class="travel-tool-button" id="travel-plan-build">BUAT RENCANA PERJALANAN</button>
+      <div id="travel-plan-result" class="travel-tool-result" role="status" aria-live="polite">Rencana perjalanan dan estimasi tarif akan muncul di sini.</div>
+      <button type="button" class="travel-tool-button travel-tool-secondary" id="travel-plan-book" disabled>BOOKING RUTE INI</button>
+    </article>
+  </div>
+  <p class="travel-tools-note">Estimasi tarif mengikuti daftar rute aktif. Harga akhir, durasi perjalanan, tiket masuk, dan biaya tambahan akan dikonfirmasi oleh tim kami.</p>
+</section>
+
 <!-- OWNER DASHBOARD -->
 <div id="owner-dashboard" style="display:none;max-width:1000px;margin:30px auto;padding:20px;background:#f8f3ed;border-radius:15px;">
 
@@ -912,6 +953,130 @@ Harga estimasi: "+priceText;
 });
 
 loadServices();
+
+/* Customer travel tools: read-only use of the existing services, routes and destination catalog. */
+let travelToolServices=[],travelToolRoutes=[],travelPlanLastDestination='';
+const travelToolNormalize=value=>String(value||'').trim().toLocaleLowerCase('id-ID');
+function travelToolExactRoute(serviceId,origin,destination){
+  return travelToolRoutes.find(route=>String(route.service_id)===String(serviceId)&&travelToolNormalize(route.origin)===travelToolNormalize(origin)&&travelToolNormalize(route.destination)===travelToolNormalize(destination));
+}
+function travelToolFillServices(){
+  ['travel-fare-service','travel-plan-service'].forEach(id=>{
+    const select=document.getElementById(id);if(!select)return;
+    select.innerHTML='<option value="">Pilih jenis layanan</option>';
+    travelToolServices.forEach(service=>{const option=document.createElement('option');option.value=service.id;option.textContent=service.name;select.appendChild(option);});
+  });
+}
+function travelToolFillRouteOptions(){
+  const serviceId=document.getElementById('travel-fare-service')?.value;
+  const originSelect=document.getElementById('travel-fare-origin');
+  const destinationSelect=document.getElementById('travel-fare-destination');
+  if(!originSelect||!destinationSelect)return;
+  const routes=travelToolRoutes.filter(route=>String(route.service_id)===String(serviceId));
+  const origins=[...new Set(routes.map(route=>route.origin).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'id'));
+  originSelect.innerHTML='<option value="">Pilih penjemputan</option>';
+  origins.forEach(value=>{const option=document.createElement('option');option.value=value;option.textContent=value;originSelect.appendChild(option);});
+  originSelect.disabled=!origins.length;
+  destinationSelect.innerHTML='<option value="">Pilih tujuan</option>';
+  destinationSelect.disabled=true;
+  document.getElementById('travel-fare-result').textContent=routes.length?'Pilih lokasi penjemputan dan tujuan.':'Tarif untuk layanan ini belum tersedia. Silakan hubungi kami untuk konfirmasi.';
+  document.getElementById('travel-fare-book').disabled=true;
+}
+function travelToolFillDestinations(){
+  const container=document.getElementById('travel-plan-destinations');if(!container)return;
+  container.innerHTML='';
+  const list=(tourDestinationsCache||[]).filter(item=>item&&item.name&&!String(item.id||'').startsWith('fallback-'));
+  if(!list.length){container.textContent='Destinasi belum tersedia. Silakan hubungi kami untuk rekomendasi.';return;}
+  list.forEach((item,index)=>{
+    const label=document.createElement('label');label.className='travel-destination-option';
+    const input=document.createElement('input');input.type='checkbox';input.name='travel-plan-destination';input.value=item.name;
+    input.addEventListener('change',()=>{
+      const selected=[...container.querySelectorAll('input:checked')];
+      if(selected.length>4){input.checked=false;document.getElementById('travel-plan-result').textContent='Maksimal 4 destinasi dalam satu rencana.';}
+      document.getElementById('travel-plan-book').disabled=true;
+    });
+    const text=document.createElement('span');text.textContent=item.name;
+    label.append(input,text);container.appendChild(label);
+  });
+}
+async function loadTravelToolsData(){
+  const result=await Promise.all([
+    db.from('services').select('id,name').eq('is_active',true).order('id'),
+    db.from('service_routes').select('service_id,origin,destination,price').eq('is_active',true).order('origin')
+  ]);
+  if(result[0].error||result[1].error){
+    document.getElementById('travel-fare-result').textContent='Data tarif belum dapat dimuat. Silakan hubungi kami.';
+    document.getElementById('travel-plan-result').textContent='Data layanan belum dapat dimuat. Silakan hubungi kami.';
+    return;
+  }
+  travelToolServices=result[0].data||[];
+  travelToolRoutes=result[1].data||[];
+  travelToolFillServices();
+  travelToolFillRouteOptions();
+  travelToolFillDestinations();
+}
+function travelToolCalculateFare(){
+  const serviceId=document.getElementById('travel-fare-service').value;
+  const origin=document.getElementById('travel-fare-origin').value;
+  const destination=document.getElementById('travel-fare-destination').value;
+  const result=document.getElementById('travel-fare-result');
+  const button=document.getElementById('travel-fare-book');
+  const route=travelToolExactRoute(serviceId,origin,destination);
+  button.disabled=!route;
+  if(!serviceId||!origin||!destination){result.textContent='Pilih layanan, penjemputan, dan tujuan.';return;}
+  result.textContent=route?'Estimasi tarif: '+formatIDR(route.price):'Tarif untuk rute ini belum tersedia. Tim kami akan membantu memberikan penawaran.';
+}
+function travelToolBuildPlan(){
+  const serviceId=document.getElementById('travel-plan-service').value;
+  const origin=document.getElementById('travel-plan-origin').value.trim();
+  const selected=[...document.querySelectorAll('#travel-plan-destinations input:checked')].map(input=>input.value);
+  const result=document.getElementById('travel-plan-result');
+  const book=document.getElementById('travel-plan-book');
+  book.disabled=true;travelPlanLastDestination='';
+  if(!serviceId||!origin||!selected.length){result.textContent='Lengkapi jenis layanan, lokasi awal, dan pilih minimal satu destinasi.';return;}
+  if(selected.length>4){result.textContent='Maksimal 4 destinasi dalam satu rencana.';return;}
+  const stops=[origin,...selected];
+  const legs=[];
+  let total=0,allPriced=true;
+  for(let i=0;i<stops.length-1;i++){
+    const route=travelToolExactRoute(serviceId,stops[i],stops[i+1]);
+    if(route){total+=Number(route.price||0);legs.push({from:stops[i],to:stops[i+1],price:formatIDR(route.price)});}
+    else{allPriced=false;legs.push({from:stops[i],to:stops[i+1],price:'Perlu konfirmasi'});}
+  }
+  travelPlanLastDestination=selected[selected.length-1];
+  const list=document.createElement('ol');list.className='travel-plan-legs';
+  legs.forEach(leg=>{const li=document.createElement('li');li.textContent=leg.from+' → '+leg.to+' · '+leg.price;list.appendChild(li);});
+  result.innerHTML='';
+  const intro=document.createElement('strong');intro.textContent='Rencana perjalanan';result.append(intro,list);
+  const summary=document.createElement('p');summary.className='travel-plan-total';
+  summary.textContent=allPriced?'Total estimasi tarif: '+formatIDR(total):'Beberapa rute belum memiliki tarif tersimpan. Harga keseluruhan perlu dikonfirmasi oleh tim kami.';
+  result.appendChild(summary);
+  book.disabled=false;
+}
+function travelToolContinueBooking(kind){
+  const serviceId=kind==='plan'?document.getElementById('travel-plan-service').value:document.getElementById('travel-fare-service').value;
+  const origin=kind==='plan'?document.getElementById('travel-plan-origin').value.trim():document.getElementById('travel-fare-origin').value;
+  const destination=kind==='plan'?travelPlanLastDestination:document.getElementById('travel-fare-destination').value;
+  if(!origin||!destination)return;
+  openPopup('booking-popup');
+  const service=document.getElementById('service');if(service){service.value=serviceId;service.dispatchEvent(new Event('change',{bubbles:true}));}
+  const pickup=document.getElementById('pickup');if(pickup){pickup.value=origin;pickup.dispatchEvent(new Event('input',{bubbles:true}));pickup.dispatchEvent(new Event('change',{bubbles:true}));}
+  const target=document.getElementById('destination');if(target){target.value=destination;target.dispatchEvent(new Event('input',{bubbles:true}));target.dispatchEvent(new Event('change',{bubbles:true}));}
+}
+document.getElementById('travel-fare-service')?.addEventListener('change',travelToolFillRouteOptions);
+document.getElementById('travel-fare-origin')?.addEventListener('change',()=>{
+  const serviceId=document.getElementById('travel-fare-service').value,origin=document.getElementById('travel-fare-origin').value;
+  const destination=document.getElementById('travel-fare-destination');
+  const options=[...new Set(travelToolRoutes.filter(route=>String(route.service_id)===String(serviceId)&&travelToolNormalize(route.origin)===travelToolNormalize(origin)).map(route=>route.destination))].sort((a,b)=>a.localeCompare(b,'id'));
+  destination.innerHTML='<option value="">Pilih tujuan</option>';
+  options.forEach(value=>{const option=document.createElement('option');option.value=value;option.textContent=value;destination.appendChild(option);});
+  destination.disabled=!options.length;travelToolCalculateFare();
+});
+document.getElementById('travel-fare-destination')?.addEventListener('change',travelToolCalculateFare);
+document.getElementById('travel-fare-book')?.addEventListener('click',()=>travelToolContinueBooking('fare'));
+document.getElementById('travel-plan-build')?.addEventListener('click',travelToolBuildPlan);
+document.getElementById('travel-plan-book')?.addEventListener('click',()=>travelToolContinueBooking('plan'));
+loadTravelToolsData();
 loadPublicRoutePrices();
 </script>
   <!-- OWNER LOGIN POPUP -->
@@ -1830,7 +1995,7 @@ async function loadTourDestinations(attempt=0){const grid=document.getElementByI
 tourDestinationsCache=tourDestinationsFallback;
 renderTourDestinations();
 loadTourDestinations();
-function renderTourDestinations(){const grid=document.getElementById('tourist-destination-grid');if(!grid)return;grid.innerHTML='';if(!tourDestinationsCache.length){grid.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:25px;background:#fff;border:1px dashed #e5d5c9;border-radius:14px;color:#78656a;">Destinasi wisata akan segera ditambahkan. Silakan hubungi kami untuk rekomendasi perjalanan.</div>';return;}tourDestinationsCache.forEach(item=>{const card=document.createElement('article');card.className='tour-card';const image=document.createElement('img');image.src=getTourImage(item);image.alt=item.name||'Destinasi wisata Bali';image.loading='lazy';image.onerror=()=>{if(image.dataset.defaultTried!=='1'){image.dataset.defaultTried='1';image.src=TOUR_DEFAULT_IMAGE;}else{image.style.display='none';const placeholder=document.createElement('div');placeholder.className='tour-image-placeholder tour-card-image';placeholder.textContent='🌴';placeholder.setAttribute('aria-label','Foto destinasi belum tersedia');image.replaceWith(placeholder);}};image.classList.add('tour-card-image');image.setAttribute('role','button');image.setAttribute('tabindex','0');image.setAttribute('aria-label','Lihat foto dan informasi '+item.name);image.onclick=()=>openTourDetail(item);image.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openTourDetail(item);}};card.appendChild(image);const body=document.createElement('div');body.className='tour-card-body';const h=document.createElement('h3');h.textContent=item.name;const b=document.createElement('button');b.type='button';b.className='tour-book-btn';b.textContent='PESAN SEKARANG';b.onclick=()=>bookTourDestination(item.name);body.append(h,b);card.appendChild(body);grid.appendChild(card);});}
+function renderTourDestinations(){const grid=document.getElementById('tourist-destination-grid');if(!grid)return;grid.innerHTML='';if(!tourDestinationsCache.length){grid.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:25px;background:#fff;border:1px dashed #e5d5c9;border-radius:14px;color:#78656a;">Destinasi wisata akan segera ditambahkan. Silakan hubungi kami untuk rekomendasi perjalanan.</div>';return;}tourDestinationsCache.forEach(item=>{const card=document.createElement('article');card.className='tour-card';const image=document.createElement('img');image.src=getTourImage(item);image.alt=item.name||'Destinasi wisata Bali';image.loading='lazy';image.onerror=()=>{if(image.dataset.defaultTried!=='1'){image.dataset.defaultTried='1';image.src=TOUR_DEFAULT_IMAGE;}else{image.style.display='none';const placeholder=document.createElement('div');placeholder.className='tour-image-placeholder tour-card-image';placeholder.textContent='🌴';placeholder.setAttribute('aria-label','Foto destinasi belum tersedia');image.replaceWith(placeholder);}};image.classList.add('tour-card-image');image.setAttribute('role','button');image.setAttribute('tabindex','0');image.setAttribute('aria-label','Lihat foto dan informasi '+item.name);image.onclick=()=>openTourDetail(item);image.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openTourDetail(item);}};card.appendChild(image);const body=document.createElement('div');body.className='tour-card-body';const h=document.createElement('h3');h.textContent=item.name;const b=document.createElement('button');b.type='button';b.className='tour-book-btn';b.textContent='PESAN SEKARANG';b.onclick=()=>bookTourDestination(item.name);body.append(h,b);card.appendChild(body);grid.appendChild(card);});if(typeof travelToolFillDestinations==='function')travelToolFillDestinations();}
 function openTourDetail(item){const modal=document.getElementById('tour-detail-modal');const img=document.getElementById('tour-detail-image');const title=document.getElementById('tour-detail-title');const desc=document.getElementById('tour-detail-description');const category=document.getElementById('tour-detail-category');const price=document.getElementById('tour-detail-price');const imageUrl=getTourImage(item);img.src=imageUrl;img.style.display='block';img.onerror=()=>{img.style.display='none';document.getElementById('tour-detail-image-placeholder').style.display='flex';};document.getElementById('tour-detail-image-placeholder').style.display='none';title.textContent=item.name;desc.textContent=item.description||'Jelajahi salah satu destinasi menarik di Bali.';category.textContent=item.category||'DESTINASI BALI';price.textContent='Transportasi mulai dari '+formatTourPrice(item.price);modal.classList.add('is-open');document.body.classList.add('tour-detail-open');}
 function closeTourDetail(){document.getElementById('tour-detail-modal').classList.remove('is-open');document.body.classList.remove('tour-detail-open');}
 function bookTourDestination(name){openPopup('booking-popup');const dest=document.getElementById('destination');if(dest){dest.value=name;dest.dispatchEvent(new Event('change',{bubbles:true}));}const service=document.getElementById('service');if(service){const o=[...service.options].find(x=>/private tour|tour/i.test(x.textContent));if(o){service.value=o.value;service.dispatchEvent(new Event('change',{bubbles:true}));}}}
@@ -2594,6 +2759,7 @@ body.dashboard-mode>.hero,
 body.dashboard-mode>.home-intro,
 body.dashboard-mode>#tourist-destinations,
 body.dashboard-mode>#public-price-list,
+body.dashboard-mode>#travel-tools,
 body.dashboard-mode>footer,
 body.dashboard-mode>#floating-chat-widget,
 body.dashboard-mode>#booking-popup,
@@ -2648,6 +2814,28 @@ body:not(.owner-mode) .owner-admin-popup-overlay{display:none!important}
     "Pilih layanan yang sesuai dengan kebutuhan perjalanan Anda. Isi formulir pemesanan untuk mengatur jadwal dan tujuan perjalanan di Bali.":"Choose a service that suits your travel needs. Complete the booking form to arrange your schedule and destinations in Bali.",
     "🚗 Private Driver":"🚗 Private Driver","✈️ Antar Jemput Bandara":"✈️ Airport Transfer","🏝️ Wisata Seharian":"🏝️ Full-Day Tour","🧳 Perjalanan Antar Kota":"🧳 Intercity Transfer",
     "BUAT PEMESANAN SEKARANG":"BOOK YOUR RIDE NOW","JELAJAHI PULAU DEWATA":"EXPLORE THE ISLAND OF THE GODS",
+    "Rencanakan Perjalanan Anda":"Plan Your Journey","Periksa estimasi tarif dan susun destinasi wisata Bali dalam satu tempat.":"Check estimated fares and plan your Bali destinations in one place.",
+    "Kalkulator Harga":"Fare Calculator","Pilih layanan dan rute untuk melihat tarif yang tersedia.":"Choose a service and route to view available fares.",
+    "Jenis layanan":"Service type","Lokasi penjemputan":"Pickup location","Destinasi tujuan":"Destination",
+    "LANJUTKAN BOOKING":"CONTINUE TO BOOKING","Perencana Perjalanan":"Trip Planner",
+    "Pilih titik jemput dan hingga 4 destinasi untuk menyusun rencana perjalanan.":"Choose a pickup point and up to 4 destinations to build your itinerary.",
+    "Lokasi awal / penjemputan":"Starting point / pickup","Pilih destinasi (maksimal 4)":"Choose destinations (up to 4)",
+    "BUAT RENCANA PERJALANAN":"BUILD ITINERARY","BOOKING RUTE INI":"BOOK THIS ROUTE",
+    "Estimasi tarif mengikuti daftar rute aktif. Harga akhir, durasi perjalanan, tiket masuk, dan biaya tambahan akan dikonfirmasi oleh tim kami.":"Fare estimates are based on active routes. Final prices, travel time, entrance tickets, and extra charges will be confirmed by our team.",
+    "Pilih jenis layanan":"Choose a service","Memuat layanan...":"Loading services...","Pilih penjemputan":"Choose pickup point",
+    "Pilih tujuan":"Choose destination","Pilih layanan dan rute untuk melihat estimasi harga.":"Choose a service and route to see an estimated fare.",
+    "Pilih lokasi penjemputan dan tujuan.":"Choose a pickup point and destination.",
+    "Tarif untuk layanan ini belum tersedia. Silakan hubungi kami untuk konfirmasi.":"Fares for this service are not available yet. Please contact us for confirmation.",
+    "Data tarif belum dapat dimuat. Silakan hubungi kami.":"Fare data could not be loaded. Please contact us.",
+    "Data layanan belum dapat dimuat. Silakan hubungi kami.":"Service data could not be loaded. Please contact us.",
+    "Memuat destinasi wisata...":"Loading destinations...","Destinasi belum tersedia. Silakan hubungi kami untuk rekomendasi.":"Destinations are not available yet. Please contact us for recommendations.",
+    "Contoh: Ubud atau nama hotel":"Example: Ubud or hotel name","Maksimal 4 destinasi dalam satu rencana.":"A maximum of 4 destinations can be selected.",
+    "Lengkapi jenis layanan, lokasi awal, dan pilih minimal satu destinasi.":"Complete the service type, starting point, and choose at least one destination.",
+    "Rencana perjalanan":"Itinerary","Perlu konfirmasi":"To be confirmed",
+    "Total estimasi tarif:":"Estimated total fare:","Beberapa rute belum memiliki tarif tersimpan. Harga keseluruhan perlu dikonfirmasi oleh tim kami.":"Some routes do not have saved fares. The total price must be confirmed by our team.",
+    "Estimasi tarif:":"Estimated fare:","Pilih layanan, penjemputan, dan tujuan.":"Choose a service, pickup point, and destination.",
+    "Tarif untuk rute ini belum tersedia. Tim kami akan membantu memberikan penawaran.":"A fare is not available for this route. Our team will help provide a quote."
+
     "Destinasi Wisata Populer di Bali":"Popular Destinations in Bali","Temukan destinasi pilihan dan pesan perjalanan dengan mudah.":"Discover selected destinations and book your ride with ease.",
     "Memuat destinasi wisata...":"Loading destinations...","PESAN PERJALANAN WISATA":"BOOK A TOUR",
     "TRANSPARAN & MUDAH":"CLEAR & SIMPLE","Daftar Tarif":"Price List","Lihat daftar layanan, rute perjalanan, dan tarif yang tersedia.":"View available services, routes, and prices.",
@@ -2893,6 +3081,35 @@ body:not(.owner-mode) .owner-admin-popup-overlay{display:none!important}
     line-height:1.5!important;
   }
 }
+</style>
+
+
+<style id="customer-travel-tools-royal-burgundy">
+#travel-tools{max-width:1080px;margin:30px auto;padding:0 18px;color:#351321}
+.travel-tools-heading{text-align:center;margin:0 auto 18px;max-width:760px}
+.travel-eyebrow{font-size:10px;font-weight:800;letter-spacing:2px;color:#b18b48}
+.travel-tools-heading h2{margin:7px 0;color:#572238;font-size:clamp(24px,4vw,32px)}
+.travel-tools-heading p,.travel-tool-description{color:#78656a;line-height:1.55;font-size:13px}
+.travel-tools-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.travel-tool-card{min-width:0;background:#fff;border:1px solid #e5d5c9;border-radius:18px;padding:20px;box-shadow:0 10px 30px #3513210d}
+.travel-tool-icon{width:42px;height:42px;display:grid;place-items:center;border-radius:12px;background:#f8f0e5;font-size:22px}
+.travel-tool-card h3{color:#572238;font-size:19px;margin:12px 0 5px}
+.travel-tool-description{margin:0 0 12px}
+.travel-tool-card label,.travel-choice-label{display:block;font-size:12px;font-weight:700;color:#593044;margin:12px 0 6px}
+.travel-tool-card input,.travel-tool-card select{width:100%;min-width:0;min-height:44px;padding:10px 12px;border:1px solid #e5d5c9;border-radius:9px;background:#fff;color:#351321;font:inherit;font-size:14px}
+.travel-tool-card input:focus,.travel-tool-card select:focus{outline:2px solid #d8b88a;outline-offset:1px}
+.travel-tool-result{margin-top:13px;padding:13px;border-radius:10px;background:#faf5ed;border:1px solid #eadcc8;color:#593044;font-size:13px;line-height:1.55;min-height:52px}
+.travel-tool-button{width:100%;margin:12px 0 0;padding:12px;background:linear-gradient(145deg,#572238,#351321);color:#fff;border:1px solid #d8b88a;border-radius:10px;font-size:12px;font-weight:800}
+.travel-tool-button:disabled{opacity:.45;cursor:not-allowed}
+.travel-tool-secondary{background:#d8b88a;color:#351321}
+.travel-destination-choices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;max-height:220px;overflow:auto;padding:9px;border:1px solid #eadcc8;border-radius:10px;background:#fffdf9}
+.travel-destination-option{display:flex!important;align-items:flex-start;gap:7px;margin:0!important;padding:7px;border-radius:7px;background:#faf5ed;font-size:11px!important;font-weight:600!important;line-height:1.35}
+.travel-destination-option input{width:15px!important;height:15px;min-height:15px!important;margin:0;flex:0 0 15px;padding:0}
+.travel-plan-legs{padding-left:20px;margin:8px 0}
+.travel-plan-legs li{padding:3px 0}
+.travel-plan-total{font-weight:800;color:#572238;margin:10px 0 0}
+.travel-tools-note{text-align:center;color:#806f70;font-size:11px;line-height:1.5;max-width:820px;margin:14px auto 0}
+@media(max-width:700px){#travel-tools{margin:22px auto;padding:0 12px}.travel-tools-grid{grid-template-columns:1fr;gap:12px}.travel-tool-card{padding:16px}.travel-tools-heading h2{font-size:24px}.travel-destination-choices{grid-template-columns:repeat(2,minmax(0,1fr))}}
 </style>
 
 </body>
