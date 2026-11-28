@@ -1062,6 +1062,7 @@ function travelToolContinueBooking(kind){
   const service=document.getElementById('service');if(service){service.value=serviceId;service.dispatchEvent(new Event('change',{bubbles:true}));}
   const pickup=document.getElementById('pickup');if(pickup){pickup.value=origin;pickup.dispatchEvent(new Event('input',{bubbles:true}));pickup.dispatchEvent(new Event('change',{bubbles:true}));}
   const target=document.getElementById('destination');if(target){target.value=destination;target.dispatchEvent(new Event('input',{bubbles:true}));target.dispatchEvent(new Event('change',{bubbles:true}));}
+  if(kind==='plan'){const notes=document.getElementById('notes');const stops=[origin,...[...document.querySelectorAll('#travel-plan-destinations input:checked')].map(input=>input.value)];if(notes)notes.value='Rencana perjalanan wisata: '+stops.join(' → ')+'. Mohon konfirmasi tarif dan durasi perjalanan.';}
 }
 document.getElementById('travel-fare-service')?.addEventListener('change',travelToolFillRouteOptions);
 document.getElementById('travel-fare-origin')?.addEventListener('change',()=>{
