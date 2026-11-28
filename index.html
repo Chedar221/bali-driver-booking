@@ -947,6 +947,24 @@ loadPublicRoutePrices();
 </div>
 
 <script>
+function setDashboardView(mode) {
+  const ownerDashboard = document.getElementById('owner-dashboard');
+  const driverDashboard = document.getElementById('driver-dashboard');
+  document.body.classList.remove('owner-mode', 'driver-mode');
+  if (mode === 'owner') document.body.classList.add('owner-mode');
+  if (mode === 'driver') document.body.classList.add('driver-mode');
+
+  if (ownerDashboard) {
+    ownerDashboard.style.setProperty('display', mode === 'owner' ? 'grid' : 'none', 'important');
+  }
+  if (driverDashboard) {
+    driverDashboard.style.setProperty('display', mode === 'driver' ? 'block' : 'none', 'important');
+  }
+
+  // Public navigation and customer-only overlays are hidden by the mode class.
+  document.body.classList.toggle('dashboard-mode', mode === 'owner' || mode === 'driver');
+}
+
 async function ownerLogin() {
   const email = document.getElementById('owner-email').value;
   const password = document.getElementById('owner-password').value;
@@ -979,14 +997,14 @@ async function ownerLogin() {
   message.textContent = 'Login Owner berhasil!';
   closePopup('owner-popup');
   const ownerDashboard = document.getElementById('owner-dashboard');
-  ownerDashboard.style.setProperty('display','grid','important');
+  setDashboardView('owner');
 
   // Rebuild Owner navigation after dashboard data has finished loading.
   // This prevents menu tiles from remaining detached/hidden during the login transition.
   try {
     await loadOwnerDashboard();
   } finally {
-    ownerDashboard.style.setProperty('display','grid','important');
+    setDashboardView('owner');
     window.setupOwnerMenu?.();
   }
 }
@@ -1022,7 +1040,7 @@ async function driverLogin() {
   message.textContent = 'Login Driver berhasil!';
 
     closePopup('driver-popup');
-    document.getElementById('driver-dashboard').style.display = 'block';
+    setDashboardView('driver');
 
   await loadDriverDashboard();
 }
@@ -1396,7 +1414,7 @@ async function sendDriverPasswordReset() {
 async function driverLogout() {
   await db.auth.signOut();
 
-  document.getElementById('driver-dashboard').style.display = 'none';
+  setDashboardView('public');
   openPopup('driver-popup');
 
   document.getElementById('driver-password').value = '';
@@ -1954,7 +1972,7 @@ async function ownerLogout() {
     alert('Logout gagal: ' + error.message);
     return;
   }
-  document.getElementById('owner-dashboard').style.setProperty('display','none','important');
+  setDashboardView('public');
   openPopup('owner-popup');
   document.getElementById('owner-password').value = '';
   document.getElementById('owner-message').textContent = 'Anda sudah logout.';
@@ -2440,6 +2458,50 @@ footer{padding:18px 14px!important;margin-top:28px!important;font-size:11px!impo
 <style id="owner-dashboard-hidden-until-authenticated">
 /* Jangan tampilkan isi Owner Dashboard di halaman publik sebelum login Owner berhasil. */
 #owner-dashboard { display: none !important; }
+</style>
+
+<style id="strict-public-owner-driver-view-isolation">
+/* Isolasi tampilan: hanya satu area aplikasi yang terlihat sesuai status login. */
+#owner-dashboard,#driver-dashboard{display:none!important}
+body.owner-mode #owner-dashboard{display:grid!important}
+body.driver-mode #driver-dashboard{display:block!important}
+
+/* Dashboard tidak boleh menampilkan halaman publik atau customer support. */
+body.dashboard-mode>header,
+body.dashboard-mode>.hero,
+body.dashboard-mode>.home-intro,
+body.dashboard-mode>#tourist-destinations,
+body.dashboard-mode>#public-price-list,
+body.dashboard-mode>footer,
+body.dashboard-mode>#floating-chat-widget,
+body.dashboard-mode>#booking-popup,
+body.dashboard-mode>#owner-popup,
+body.dashboard-mode>#driver-popup,
+body.dashboard-mode>#tour-detail-modal,
+body.dashboard-mode>#location-map-modal{display:none!important}
+
+/* Owner session: Owner dashboard only; Driver dashboard and Driver-only UI stay hidden. */
+body.owner-mode #driver-dashboard,
+body.owner-mode #driver-activation{display:none!important}
+body.owner-mode .owner-admin-popup-overlay{display:flex!important}
+
+/* Driver session: Driver dashboard only; Owner dashboard, Owner menus and Owner popups stay hidden. */
+body.driver-mode #owner-dashboard,
+body.driver-mode #assign-driver-modal,
+body.driver-mode .owner-admin-popup-overlay,
+body.driver-mode #driver-activation{display:none!important}
+
+/* Public session is the default after logout and on a fresh visit. */
+body:not(.dashboard-mode) #owner-dashboard,
+body:not(.dashboard-mode) #driver-dashboard,
+body:not(.owner-mode) .owner-admin-popup-overlay{display:none!important}
+
+@media(max-width:700px){
+ body.owner-mode #owner-dashboard,body.driver-mode #driver-dashboard{
+   width:calc(100% - 16px)!important;max-width:100%!important;margin:10px auto!important;
+   padding:12px!important;overflow-x:hidden!important
+ }
+}
 </style>
 
 </body>
