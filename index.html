@@ -400,16 +400,59 @@ header{background:#351321!important;display:flex;align-items:center;justify-cont
  .popup-nav .popup-menu-link{width:100%!important;min-width:0!important;padding:10px 2px!important;font-size:clamp(9px,2.7vw,11px)!important;white-space:nowrap!important}
 }
 </style>
-<style id="chedar-final-uploaded-logo">
-.logo{display:flex!important;align-items:center!important;justify-content:center!important;flex:0 0 auto!important;width:auto!important;min-width:0!important;text-decoration:none!important}
-.logo:before{content:none!important;display:none!important}
-.brand-logo{display:block!important;width:240px!important;height:160px!important;max-width:100%!important;object-fit:contain!important;object-position:center!important;flex:0 1 auto!important}
+<style id="chedar-logo-full-original-layout">
+/* Display the uploaded logo artwork as-is: preserve its full 3:2 canvas. */
+.brand-logo{
+ display:block!important;
+ width:min(100%,340px)!important;
+ height:auto!important;
+ aspect-ratio:3/2!important;
+ max-height:none!important;
+ object-fit:contain!important;
+ object-position:center!important;
+ margin:0 auto!important;
+}
+.logo{
+ display:flex!important;
+ align-items:center!important;
+ justify-content:center!important;
+ width:100%!important;
+ max-width:100%!important;
+ height:auto!important;
+ flex:0 0 auto!important;
+ overflow:visible!important;
+}
 @media(max-width:650px){
- header{flex-direction:column!important;align-items:center!important;justify-content:center!important;gap:8px!important;padding:7px 10px 12px!important}
- .logo{width:100%!important;min-height:116px!important;justify-content:center!important}
- .brand-logo{width:180px!important;height:120px!important}
- .popup-nav{width:100%!important;display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:6px!important}
- .popup-nav .popup-menu-link{width:100%!important;min-width:0!important;padding:10px 2px!important;font-size:clamp(9px,2.7vw,11px)!important;white-space:nowrap!important}
+ header{
+  flex-direction:column!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:8px!important;
+  padding:8px 10px 12px!important;
+ }
+ .logo{
+  width:100%!important;
+  min-height:0!important;
+ }
+ .brand-logo{
+  width:min(100%,310px)!important;
+  height:auto!important;
+  aspect-ratio:3/2!important;
+  max-height:none!important;
+ }
+ .popup-nav{
+  width:100%!important;
+  display:grid!important;
+  grid-template-columns:repeat(4,minmax(0,1fr))!important;
+  gap:6px!important;
+ }
+ .popup-nav .popup-menu-link{
+  width:100%!important;
+  min-width:0!important;
+  padding:10px 2px!important;
+  font-size:clamp(9px,2.7vw,11px)!important;
+  white-space:nowrap!important;
+ }
 }
 </style>
 </head>
